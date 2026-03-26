@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Palabra del Padre</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    #contenido {
+      max-width: 400px;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 16px;
+      margin-top: 20px;
+    }
+
+    .versiculo {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .reflexion {
+      font-size: 15px;
+      opacity: 0.9;
+    }
+
+    .botones {
+      margin-top: 20px;
+    }
+
+    .boton {
+      display: inline-block;
+      margin: 8px;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: #22c55e;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .donar {
+      background: #3b82f6;
+    }
+
+    .premium {
+      background: #f59e0b;
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #22c55e;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      font-size: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Palabra del Padre</h1>
+  <p>Cultiva tu relación con Dios cada día</p>
+
+  <div id="contenido">
+    <div class="versiculo" id="versiculo"></div>
+    <div class="reflexion" id="reflexion"></div>
+  </div>
+
+  <div class="botones">
+    <a class="boton donar" href="https://www.paypal.com/paypalme/TUUSUARIO" target="_blank">
+      Donar 🙏
+    </a>
+
+    <a class="boton premium" href="https://m.me/TUPAGINA" target="_blank">
+      Versión Premium ✨
+    </a>
+  </div>
+
+  <div class="fab" onclick="cambiarContenido()">+</div>
+
+  <script>
+    const contenidos = [
+      {
+        categoria: "ansiedad",
+        versiculo: "No se inquieten por nada… (Filipenses 4:6)",
+        reflexion: "Dios no te pide que cargues solo. Entrégale tu preocupación hoy."
+      },
+      {
+        categoria: "tentacion",
+        versiculo: "El Señor es mi luz y mi salvación… (Salmo 27)",
+        reflexion: "En la tentación, recuerda quién eres: hijo de Dios."
+      },
+      {
+        categoria: "motivacion",
+        versiculo: "Todo lo puedo en Aquel que me fortalece (Filipenses 4:13)",
+        reflexion: "Haz el bien hoy, aunque cueste. Dios ve tu esfuerzo."
+      }
+    ];
+
+    function cambiarContenido() {
+      const item = contenidos[Math.floor(Math.random() * contenidos.length)];
+      document.getElementById("versiculo").innerText = item.versiculo;
+      document.getElementById("reflexion").innerText = item.reflexion;
+    }
+
+    cambiarContenido();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+
+</body>
+</html>
