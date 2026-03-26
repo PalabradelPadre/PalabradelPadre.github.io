@@ -1,5 +1,4 @@
-const CACHE = "palabra-v3";
-
+const CACHE = "palabra-v4";
 self.addEventListener("install", e => {
   e.waitUntil(
     caches.open(CACHE).then(cache => cache.addAll([
