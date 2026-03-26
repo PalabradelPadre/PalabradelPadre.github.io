@@ -12,72 +12,71 @@
 <link rel="manifest" href="manifest.json">
 
 <style>
+/* ------------------ Body ------------------ */
 body{
   font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
   margin:0; padding:0;
-}
-
-/* Botones premium y donar */
-.top-bar, .bottom-bar{
-  display:flex;
-  justify-content: center;
-  gap:10px;
-  padding:10px;
-}
-.top-bar button, .bottom-bar button{
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  cursor:pointer;
-  font-weight:bold;
+  background: linear-gradient(135deg,#1e1e2f,#2a2a3d);
   color:white;
 }
-.top-bar button{background:#4f46e5;}
-.bottom-bar button{background:white; color:#333; font-weight:bold;}
 
-/* Cards container */
+/* ------------------ Header ------------------ */
+header{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  padding:15px 20px;
+  background:#111122;
+  box-shadow:0 4px 10px rgba(0,0,0,0.5);
+}
+header h1{margin:0; font-size:1.8em;}
+header button{
+  padding:10px 20px;
+  border:none;
+  border-radius:25px;
+  background:#10b981;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* ------------------ Top & Bottom Bars ------------------ */
+.top-bar, .bottom-bar{
+  display:flex;
+  justify-content:center;
+  gap:15px;
+  padding:10px 0;
+}
+.top-bar button{background:#4f46e5;}
+.bottom-bar button{background:white;color:#333;font-weight:bold;}
+
+/* ------------------ Cards ------------------ */
 #cardsContainer{
   display:grid;
   grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
   gap:15px;
   padding:15px;
 }
-
-/* Cards */
 .card{
   background: rgba(255,255,255,0.05);
   padding:20px;
   border-radius:20px;
   backdrop-filter: blur(10px);
-  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  box-shadow:0 10px 20px rgba(0,0,0,0.4);
   cursor:pointer;
   transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
   position:relative;
   overflow:hidden;
 }
-
 .card.expanded{
   transform: scale(1.05);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  box-shadow:0 20px 40px rgba(0,0,0,0.7);
   z-index:10;
 }
-
-/* Card content */
 .card h3{margin-top:0;}
-.card .versiculo{
-  font-style:italic;
-  margin-bottom:5px;
-  font-weight:bold;
-}
-.card .cita{
-  font-size:0.95em;
-  margin-bottom:5px;
-  color:#444;
-}
-.card .reflexion{margin-bottom:10px;}
-
-/* Card actions horizontal */
+.card .versiculo{font-style:italic;margin-bottom:5px;font-weight:bold;}
+.card .cita{font-size:0.95em;margin-bottom:5px;color:#ccc;}
+.card .reflexion{margin-bottom:10px;color:#eee;}
 .card-actions{
   display:none;
   gap:10px;
@@ -86,39 +85,62 @@ body{
   transition: opacity 0.4s ease;
   flex-direction:row;
 }
-
 .card.expanded .card-actions{
   display:flex;
   opacity:1;
 }
-
 .card-actions a{
-  width:40px;
-  height:40px;
+  width:40px; height:40px;
   display:flex;
   justify-content:center;
   align-items:center;
   border-radius:50%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(255,255,255,0.2);
   color:white;
   font-size:20px;
   transition: transform 0.3s ease, background 0.3s ease;
 }
-
 .card-actions a:hover{
   transform: scale(1.2);
-  background: rgba(0,0,0,0.7);
+  background: rgba(255,255,255,0.4);
 }
 
-/* Categorías */
+/* ------------------ Categorías ------------------ */
 .ansiedad{ background: rgba(59,130,246,0.3);}
 .tentacion{ background: rgba(239,68,68,0.3);}
 .motivacion{ background: rgba(16,185,129,0.3);}
 .caridad{ background: rgba(234,179,8,0.3);}
 .confianza{ background: rgba(139,92,246,0.3);}
+
+/* ------------------ Floating Categories ------------------ */
+#floatCategories{
+  position:fixed;
+  right:20px; bottom:150px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+#floatCategories button{
+  padding:12px;
+  border:none;
+  border-radius:50%;
+  cursor:pointer;
+  font-weight:bold;
+  color:white;
+  background:#4f46e5;
+  box-shadow:0 5px 10px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+#floatCategories button:hover{transform: scale(1.2);}
 </style>
 </head>
 <body>
+
+<!-- Header -->
+<header>
+  <h1>Palabra del Padre</h1>
+  <button id="installBtn">Instalar App</button>
+</header>
 
 <!-- Top Premium Button -->
 <div class="top-bar">
@@ -131,77 +153,57 @@ body{
 <!-- Bottom Donate Button -->
 <div class="bottom-bar">
   <button onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">Donar</button>
-  <!-- Si no hay usuario PayPal, comentar la línea anterior y usar: -->
-  <!-- <button disabled style="background:grey;color:#aaa;">Donar (no disponible)</button> -->
 </div>
 
-<!-- Install Button -->
-<div style="position:fixed;bottom:80px;right:20px;">
-  <button id="installBtn" style="padding:10px 20px;border:none;border-radius:20px;background:#10b981;color:white;cursor:pointer;">Instalar App</button>
+<!-- Floating Categories -->
+<div id="floatCategories">
+  <button onclick="filtrar('ansiedad')">Ansiedad</button>
+  <button onclick="filtrar('tentacion')">Tentación</button>
+  <button onclick="filtrar('motivacion')">Motivación</button>
+  <button onclick="filtrar('caridad')">Caridad</button>
+  <button onclick="filtrar('confianza')">Confianza</button>
+  <button onclick="filtrar('todas')">Todas</button>
 </div>
 
 <script>
-// Botón instalar PWA
+// ------------------ Install Button ------------------
 let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt',(e)=>{
+const installBtn=document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt=e;
-  installBtn.style.display='block';
+  installBtn.style.display='inline-block';
 });
 installBtn.addEventListener('click', async ()=>{
   if(deferredPrompt){
     deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if(choice.outcome==='accepted'){console.log('App instalada');}
+    const choice=await deferredPrompt.userChoice;
     deferredPrompt=null;
     installBtn.style.display='none';
   }
 });
 
-// Cards container
-const cardsContainer=document.getElementById('cardsContainer');
-
-// Contenido de ejemplo
+// ------------------ Cards Content ------------------
 const contenido=[
-  {
-    categoria:'ansiedad',
-    titulo:'No tengas miedo',
-    versiculo:'Filipenses 4:6-7',
-    cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.',
-    reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'
-  },
-  {
-    categoria:'tentacion',
-    titulo:'Resiste la tentación',
-    versiculo:'1 Corintios 10:13',
-    cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.',
-    reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.'
-  },
-  {
-    categoria:'motivacion',
-    titulo:'Actúa con bondad',
-    versiculo:'Gálatas 6:9',
-    cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.',
-    reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'
-  },
-  {
-    categoria:'caridad',
-    titulo:'Ayuda a otros',
-    versiculo:'Mateo 25:40',
-    cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.',
-    reflexion:'Hacer caridad es servir a Dios directamente.'
-  },
-  {
-    categoria:'confianza',
-    titulo:'Confía en el Señor',
-    versiculo:'Proverbios 3:5-6',
-    cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.',
-    reflexion:'Ríndete a Dios y Él guiará tus caminos.'
-  }
+  {categoria:'ansiedad',titulo:'No tengas miedo',versiculo:'Filipenses 4:6-7',cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.',reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'},
+  {categoria:'tentacion',titulo:'Resiste la tentación',versiculo:'1 Corintios 10:13',cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.',reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.'},
+  {categoria:'motivacion',titulo:'Actúa con bondad',versiculo:'Gálatas 6:9',cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.',reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'},
+  {categoria:'caridad',titulo:'Ayuda a otros',versiculo:'Mateo 25:40',cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.',reflexion:'Hacer caridad es servir a Dios directamente.'},
+  {categoria:'confianza',titulo:'Confía en el Señor',versiculo:'Proverbios 3:5-6',cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.',reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
+  {categoria:'ansiedad',titulo:'Paz interior',versiculo:'Salmo 23:1-3',cita:'El Señor es mi pastor; nada me faltará. Me hace descansar en verdes praderas.',reflexion:'Confía y hallarás paz en Él.'},
+  {categoria:'tentacion',titulo:'Controla tus deseos',versiculo:'Mateo 26:41',cita:'Velad y orad, para que no entréis en tentación; el espíritu está dispuesto, pero la carne es débil.',reflexion:'Orar ayuda a resistir.'},
+  {categoria:'motivacion',titulo:'Sé valiente',versiculo:'Josué 1:9',cita:'Mira que te mando que te esfuerces y seas valiente; no temas ni te acobardes.',reflexion:'Dios te acompaña en cada paso.'},
+  {categoria:'caridad',titulo:'Comparte tus bienes',versiculo:'Hechos 20:35',cita:'Más bienaventurado es dar que recibir.',reflexion:'El dar nos acerca al corazón de Dios.'},
+  {categoria:'confianza',titulo:'Entrega tus caminos',versiculo:'Salmo 37:5',cita:'Encomienda al Señor tu camino; confía en Él, y Él actuará.',reflexion:'Entrega tu vida y confía en Dios.'},
+  {categoria:'motivacion',titulo:'Persevera',versiculo:'Romanos 5:3-4',cita:'Nos gloriamos incluso en las tribulaciones, sabiendo que la tribulación produce paciencia.',reflexion:'La paciencia fortalece tu espíritu.'},
+  {categoria:'ansiedad',titulo:'No temas al futuro',versiculo:'Isaías 41:10',cita:'No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios.',reflexion:'Dios está contigo siempre.'},
+  {categoria:'tentacion',titulo:'Purifica tu corazón',versiculo:'Salmo 51:10',cita:'Crea en mí, oh Dios, un corazón limpio, y renueva un espíritu recto dentro de mí.',reflexion:'Pide a Dios fuerza para resistir.'},
+  {categoria:'caridad',titulo:'Amar al prójimo',versiculo:'Juan 13:34',cita:'Un mandamiento nuevo os doy: Que os améis unos a otros; como yo os he amado.',reflexion:'Ama a los demás como Dios nos ama.'},
+  {categoria:'confianza',titulo:'Esperanza firme',versiculo:'Hebreos 10:23',cita:'Mantengamos firme la esperanza que profesamos.',reflexion:'Confía en las promesas de Dios.'}
 ];
 
-// Mostrar cards
+const cardsContainer=document.getElementById('cardsContainer');
+
 function mostrarCards(items){
   cardsContainer.innerHTML='';
   items.forEach(c=>{
@@ -213,9 +215,9 @@ function mostrarCards(items){
       <div class="cita">${c.cita}</div>
       <div class="reflexion">${c.reflexion}</div>
       <div class="card-actions">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank" title="Compartir en Facebook"><i class="bi bi-facebook"></i></a>
-        <a href="https://www.instagram.com/" target="_blank" title="Compartir en Instagram"><i class="bi bi-instagram"></i></a>
-        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+' - '+c.reflexion)}" target="_blank" title="Compartir en WhatsApp"><i class="bi bi-whatsapp"></i></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank"><i class="bi bi-facebook"></i></a>
+        <a href="https://www.instagram.com/" target="_blank"><i class="bi bi-instagram"></i></a>
+        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+' - '+c.reflexion)}" target="_blank"><i class="bi bi-whatsapp"></i></a>
       </div>
     `;
     div.addEventListener('click', ()=>{
@@ -225,14 +227,19 @@ function mostrarCards(items){
     cardsContainer.appendChild(div);
   });
 }
-
 mostrarCards(contenido);
 
-// Registrar Service Worker
+// ------------------ Filtrar por categoría ------------------
+function filtrar(cat){
+  if(cat==='todas'){mostrarCards(contenido);}
+  else{mostrarCards(contenido.filter(c=>c.categoria===cat));}
+}
+
+// ------------------ Service Worker ------------------
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js')
-  .then(()=>console.log('SW registrado'))
-  .catch(e=>console.log('Error SW:', e));
+    .then(()=>console.log('SW registrado'))
+    .catch(e=>console.log('Error SW:',e));
 }
 </script>
 </body>
