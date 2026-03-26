@@ -4,84 +4,204 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palabra del Padre</title>
+
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Manifest -->
 <link rel="manifest" href="manifest.json">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
 
 <style>
-body { margin:0; font-family: system-ui; background: linear-gradient(135deg,#0f172a,#1e293b); color:white; }
-.header { padding:20px; text-align:center; }
-.header h1{margin:0;}
-.premium-btn { margin-top:10px; display:inline-block; padding:8px 15px; border-radius:12px; background:#f59e0b; color:white; text-decoration:none;}
-.install { margin-top:10px; display:none; background:#22c55e; padding:8px 15px; border-radius:10px; cursor:pointer; }
-.cards-container { display:grid; grid-template-columns: repeat(auto-fit, minmax(250px,1fr)); gap:15px; padding:20px; }
-.card { background: rgba(255,255,255,0.05); padding:20px; border-radius:20px; backdrop-filter: blur(10px); box-shadow:0 10px 25px rgba(0,0,0,0.4); cursor:pointer; transition: transform 0.3s, box-shadow 0.3s; position:relative; }
-.card:hover { transform:scale(1.03); box-shadow:0 15px 35px rgba(0,0,0,0.5); }
+body{
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #f5f7fa, #c3cfe2);
+  margin:0; padding:0;
+}
+
+/* Botones premium y donar */
+.top-bar, .bottom-bar{
+  display:flex;
+  justify-content: center;
+  gap:10px;
+  padding:10px;
+}
+.top-bar button, .bottom-bar button{
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-weight:bold;
+  color:white;
+}
+.top-bar button{background:#4f46e5;}
+.bottom-bar button{background:white; color:#333; font-weight:bold;}
+
+/* Cards container */
+#cardsContainer{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+  padding:15px;
+}
+
+/* Cards */
+.card{
+  background: rgba(255,255,255,0.05);
+  padding:20px;
+  border-radius:20px;
+  backdrop-filter: blur(10px);
+  box-shadow:0 10px 20px rgba(0,0,0,0.3);
+  cursor:pointer;
+  transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+.card.expanded{
+  transform: scale(1.05);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  z-index:10;
+}
+
+/* Card content */
 .card h3{margin-top:0;}
-.versiculo{ font-weight:bold; margin:10px 0;}
-.reflexion{ font-size:14px; opacity:0.85; }
-.card-actions{ display:none; margin-top:10px;}
-.card-actions a{ margin:5px; display:inline-block; background: rgba(0,0,0,0.4); padding:8px 12px; border-radius:10px; color:white; text-decoration:none; font-size:18px; width:36px; height:36px; display:flex; justify-content:center; align-items:center; }
+.card .versiculo{
+  font-style:italic;
+  margin-bottom:5px;
+  font-weight:bold;
+}
+.card .cita{
+  font-size:0.95em;
+  margin-bottom:5px;
+  color:#444;
+}
+.card .reflexion{margin-bottom:10px;}
 
-.fab { position: fixed; bottom:20px; right:20px; width:60px; height:60px; border-radius:50%; background:#22c55e; display:flex; align-items:center; justify-content:center; font-size:30px; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,0.3);}
-.fab-menu { position: fixed; bottom:90px; right:20px; display:none; flex-direction:column;}
-.fab-menu button { margin:5px 0; padding:10px; border-radius:10px; border:none; background:#1e293b; color:white; cursor:pointer;}
+/* Card actions horizontal */
+.card-actions{
+  display:none;
+  gap:10px;
+  margin-top:10px;
+  opacity:0;
+  transition: opacity 0.4s ease;
+  flex-direction:row;
+}
 
-.footer { text-align:center; padding:20px; }
-.donar-btn { background:#3b82f6; padding:12px 20px; border-radius:12px; color:white; text-decoration:none; }
+.card.expanded .card-actions{
+  display:flex;
+  opacity:1;
+}
 
-.ansiedad{ background: rgba(59,130,246,0.2); }
-.tentacion{ background: rgba(239,68,68,0.2); }
-.motivacion{ background: rgba(16,185,129,0.2); }
-.caridad{ background: rgba(234,179,8,0.2); }
-.confianza{ background: rgba(139,92,246,0.2); }
+.card-actions a{
+  width:40px;
+  height:40px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:50%;
+  background: rgba(0,0,0,0.4);
+  color:white;
+  font-size:20px;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.card-actions a:hover{
+  transform: scale(1.2);
+  background: rgba(0,0,0,0.7);
+}
+
+/* Categorías */
+.ansiedad{ background: rgba(59,130,246,0.3);}
+.tentacion{ background: rgba(239,68,68,0.3);}
+.motivacion{ background: rgba(16,185,129,0.3);}
+.caridad{ background: rgba(234,179,8,0.3);}
+.confianza{ background: rgba(139,92,246,0.3);}
 </style>
 </head>
 <body>
 
-<div class="header">
-  <h1>Palabra del Padre</h1>
-  <p>Cultiva tu amistad con Dios</p>
-  <a class="premium-btn" href="https://m.me/TUPAGINA" target="_blank">Acceso Premium ✨</a>
-  <div class="install" id="installBtn">Instalar App</div>
+<!-- Top Premium Button -->
+<div class="top-bar">
+  <button onclick="window.location.href='https://m.me/tuPaginaMessenger'">Premium</button>
 </div>
 
-<div class="cards-container" id="cardsContainer"></div>
+<!-- Cards -->
+<div id="cardsContainer"></div>
 
-<div class="footer">
-  <a class="donar-btn" href="https://www.paypal.com/paypalme/TUUSUARIO" target="_blank">Donar 🙏</a>
+<!-- Bottom Donate Button -->
+<div class="bottom-bar">
+  <button onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">Donar</button>
+  <!-- Si no hay usuario PayPal, comentar la línea anterior y usar: -->
+  <!-- <button disabled style="background:grey;color:#aaa;">Donar (no disponible)</button> -->
 </div>
 
-<div class="fab" onclick="toggleFabMenu()">☰</div>
-<div class="fab-menu" id="fabMenu">
-  <button onclick="filtrar('all')">Todas</button>
-  <button onclick="filtrar('ansiedad')">Ansiedad</button>
-  <button onclick="filtrar('tentacion')">Tentación</button>
-  <button onclick="filtrar('motivacion')">Motivación</button>
-  <button onclick="filtrar('caridad')">Caridad</button>
-  <button onclick="filtrar('confianza')">Confianza</button>
+<!-- Install Button -->
+<div style="position:fixed;bottom:80px;right:20px;">
+  <button id="installBtn" style="padding:10px 20px;border:none;border-radius:20px;background:#10b981;color:white;cursor:pointer;">Instalar App</button>
 </div>
 
 <script>
-const contenidos=[
-{categoria:'ansiedad',titulo:'Ansiedad',versiculo:'Filipenses 4:6',reflexion:'No cargues solo. Dios ya está contigo en esto.'},
-{categoria:'tentacion',titulo:'Tentación',versiculo:'1 Corintios 10:13',reflexion:'Siempre hay una salida. Recuerda quién eres.'},
-{categoria:'motivacion',titulo:'Motivación',versiculo:'Filipenses 4:13',reflexion:'Haz el bien hoy, aunque cueste.'},
-{categoria:'caridad',titulo:'Caridad',versiculo:'Mateo 25:40',reflexion:'Cada acto de amor cuenta ante Dios.'},
-{categoria:'confianza',titulo:'Confianza',versiculo:'Proverbios 3:5',reflexion:'Confía en Dios incluso cuando no entiendas.'},
-{categoria:'ansiedad',titulo:'Tranquilidad',versiculo:'Salmo 34:4',reflexion:'Dios escucha tus oraciones y calma tu corazón.'},
-{categoria:'tentacion',titulo:'Resistencia',versiculo:'Efesios 6:11',reflexion:'Vístete con la armadura de Dios y resiste la tentación.'},
-{categoria:'motivacion',titulo:'Valor',versiculo:'Josué 1:9',reflexion:'Sé fuerte y valiente; Dios está contigo siempre.'},
-{categoria:'caridad',titulo:'Ayuda al prójimo',versiculo:'Gálatas 6:9',reflexion:'No te canses de hacer el bien.'},
-{categoria:'confianza',titulo:'Esperanza',versiculo:'Romanos 15:13',reflexion:'Que la paz y la esperanza llenen tu corazón.'},
-{categoria:'ansiedad',titulo:'Paz',versiculo:'Isaías 26:3',reflexion:'Confía y Dios mantendrá tu mente en paz.'},
-{categoria:'tentacion',titulo:'Fortaleza',versiculo:'2 Timoteo 1:7',reflexion:'Dios nos dio un espíritu de poder y amor.'},
-{categoria:'motivacion',titulo:'Perseverancia',versiculo:'Hebreos 12:1',reflexion:'Corre con paciencia la carrera de la fe.'},
-{categoria:'caridad',titulo:'Generosidad',versiculo:'Lucas 6:38',reflexion:'Dios bendice a quienes dan con alegría.'},
-{categoria:'confianza',titulo:'Fe',versiculo:'Marcos 11:24',reflexion:'Cree y recibirás según la voluntad de Dios.'},
-];
+// Botón instalar PWA
+let deferredPrompt;
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt',(e)=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  installBtn.style.display='block';
+});
+installBtn.addEventListener('click', async ()=>{
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    if(choice.outcome==='accepted'){console.log('App instalada');}
+    deferredPrompt=null;
+    installBtn.style.display='none';
+  }
+});
 
+// Cards container
 const cardsContainer=document.getElementById('cardsContainer');
 
+// Contenido de ejemplo
+const contenido=[
+  {
+    categoria:'ansiedad',
+    titulo:'No tengas miedo',
+    versiculo:'Filipenses 4:6-7',
+    cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.',
+    reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'
+  },
+  {
+    categoria:'tentacion',
+    titulo:'Resiste la tentación',
+    versiculo:'1 Corintios 10:13',
+    cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.',
+    reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.'
+  },
+  {
+    categoria:'motivacion',
+    titulo:'Actúa con bondad',
+    versiculo:'Gálatas 6:9',
+    cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.',
+    reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'
+  },
+  {
+    categoria:'caridad',
+    titulo:'Ayuda a otros',
+    versiculo:'Mateo 25:40',
+    cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.',
+    reflexion:'Hacer caridad es servir a Dios directamente.'
+  },
+  {
+    categoria:'confianza',
+    titulo:'Confía en el Señor',
+    versiculo:'Proverbios 3:5-6',
+    cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.',
+    reflexion:'Ríndete a Dios y Él guiará tus caminos.'
+  }
+];
+
+// Mostrar cards
 function mostrarCards(items){
   cardsContainer.innerHTML='';
   items.forEach(c=>{
@@ -90,52 +210,30 @@ function mostrarCards(items){
     div.innerHTML=`
       <h3>${c.titulo}</h3>
       <div class="versiculo">${c.versiculo}</div>
+      <div class="cita">${c.cita}</div>
       <div class="reflexion">${c.reflexion}</div>
       <div class="card-actions">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${location.href}" target="_blank">
-          <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99h-2.54v-2.89h2.54V9.79c0-2.51 1.49-3.89 3.77-3.89 1.09 0 2.23.2 2.23.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.44 2.89h-2.34v6.99C18.34 21.13 22 17 22 12z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/" target="_blank">
-          <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.584.012 4.85.07 1.17.055 1.958.24 2.42.4a4.92 4.92 0 011.78 1.02 4.92 4.92 0 011.02 1.78c.16.462.345 1.25.4 2.42.058 1.266.07 1.65.07 4.85s-.012 3.584-.07 4.85c-.055 1.17-.24 1.958-.4 2.42a4.92 4.92 0 01-1.02 1.78 4.92 4.92 0 01-1.78 1.02c-.462.16-1.25.345-2.42.4-1.266.058-1.65.07-4.85.07s-3.584-.012-4.85-.07c-1.17-.055-1.958-.24-2.42-.4a4.92 4.92 0 01-1.78-1.02 4.92 4.92 0 01-1.02-1.78c-.16-.462-.345-1.25-.4-2.42C2.212 15.584 2.2 15.2 2.2 12s.012-3.584.07-4.85c.055-1.17.24-1.958.4-2.42a4.92 4.92 0 011.02-1.78 4.92 4.92 0 011.78-1.02c.462-.16 1.25-.345 2.42-.4C8.416 2.212 8.8 2.2 12 2.2zm0-2.2C8.735 0 8.332.014 7.052.072 5.78.13 4.864.28 4.042.512a7.073 7.073 0 00-2.56 1.02 7.073 7.073 0 00-1.02 2.56C.28 5.136.13 6.052.072 7.324.014 8.604 0 9.007 0 12c0 2.993.014 3.396.072 4.676.058 1.272.208 2.188.44 3.01a7.073 7.073 0 001.02 2.56 7.073 7.073 0 002.56 1.02c.822.232 1.738.382 3.01.44C8.604 23.986 9.007 24 12 24s3.396-.014 4.676-.072c1.272-.058 2.188-.208 3.01-.44a7.073 7.073 0 002.56-1.02 7.073 7.073 0 001.02-2.56c.232-.822.382-1.738.44-3.01.058-1.28.072-1.684.072-4.676s-.014-3.396-.072-4.676c-.058-1.272-.208-2.188-.44-3.01a7.073 7.073 0 00-1.02-2.56 7.073 7.073 0 00-2.56-1.02c-.822-.232-1.738-.382-3.01-.44C15.396.014 14.993 0 12 0z"/></svg>
-        </a>
-        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.versiculo + ' - ' + c.reflexion)}" target="_blank">
-          <svg width="20" height="20" fill="white" viewBox="0 0 24 24"><path d="M20.52 3.48a11.955 11.955 0 00-16.97 16.97l-1.77 5.16 5.3-1.75a11.955 11.955 0 0013.44-20.38zM12.002 20.2c-1.68 0-3.33-.44-4.77-1.28l-.34-.2-3.14 1.04 1.05-3.07-.22-.34a8.904 8.904 0 1112.5-12.5 8.9 8.9 0 01-5.08 16.35zm4.67-6.63c-.26-.13-1.53-.75-1.77-.84-.24-.09-.42-.13-.6.13-.18.26-.7.84-.86 1.02-.16.18-.32.21-.58.07-.26-.13-1.1-.4-2.09-1.29-.77-.68-1.29-1.52-1.44-1.78-.15-.26-.02-.4.11-.53.11-.11.26-.28.39-.42.13-.14.17-.25.26-.42.09-.16.04-.31-.02-.44-.06-.13-.6-1.44-.82-1.97-.22-.52-.45-.45-.6-.46-.15-.01-.33-.01-.51-.01-.18 0-.44.07-.67.31-.24.23-.92.9-.92 2.2s.94 2.55 1.07 2.73c.13.18 1.86 2.84 4.5 3.98.63.27 1.12.43 1.5.55.63.21 1.2.18 1.65.11.5-.08 1.53-.62 1.75-1.22.22-.61.22-1.13.16-1.23-.06-.1-.23-.16-.49-.29z"/></svg>
-        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank" title="Compartir en Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="https://www.instagram.com/" target="_blank" title="Compartir en Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+' - '+c.reflexion)}" target="_blank" title="Compartir en WhatsApp"><i class="bi bi-whatsapp"></i></a>
       </div>
     `;
     div.addEventListener('click', ()=>{
-      const actions=div.querySelector('.card-actions');
-      actions.style.display=actions.style.display==='block'?'none':'block';
+      document.querySelectorAll('.card').forEach(c=>c.classList.remove('expanded'));
+      div.classList.toggle('expanded');
     });
     cardsContainer.appendChild(div);
   });
 }
 
-function filtrar(cat){ toggleFabMenu(false); if(cat==='all'){ mostrarCards(contenidos); } else{ mostrarCards(contenidos.filter(c=>c.categoria===cat)); } }
-function toggleFabMenu(force){ const menu=document.getElementById('fabMenu'); if(force===false){menu.style.display='none';return;} menu.style.display=menu.style.display==='flex'?'none':'flex'; }
-mostrarCards(contenidos);
+mostrarCards(contenido);
 
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; document.getElementById('installBtn').style.display='inline-block';});
-document.getElementById('installBtn').addEventListener('click', ()=>{ deferredPrompt.prompt(); });
-
-if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
-
-function notificacionDiaria(){
-  if("Notification" in window){
-    const hoy=new Date().toDateString();
-    if(localStorage.getItem('ultimaNotificacion')===hoy) return;
-    Notification.requestPermission().then(p=>{
-      if(p==="granted"){
-        const contenido=contenidos[Math.floor(Math.random()*contenidos.length)];
-        new Notification("Palabra del Padre",{body:`${contenido.versiculo} - ${contenido.reflexion}`,icon:"icono.png"});
-        localStorage.setItem('ultimaNotificacion',hoy);
-      }
-    });
-  }
+// Registrar Service Worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js')
+  .then(()=>console.log('SW registrado'))
+  .catch(e=>console.log('Error SW:', e));
 }
-notificacionDiaria();
 </script>
-
 </body>
 </html>
