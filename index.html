@@ -9,145 +9,107 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!-- React + ReactDOM CDN -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1e1e2f">
-
-<style>
-  /* Botón flotante moderno */
-  .fab {
-    position: fixed;
-    bottom: 5rem;
-    right: 1.5rem;
-    z-index: 50;
-    background-color: #4f46e5;
-    color: white;
-    border-radius: 9999px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    box-shadow: 0 5px 10px rgba(0,0,0,0.3);
-    transition: transform 0.2s;
-  }
-  .fab:hover { transform: scale(1.1); }
-</style>
 </head>
 <body class="bg-gray-900 text-white font-sans">
 
-<!-- Header -->
-<header class="flex justify-between items-center p-4 bg-gray-800 shadow">
-  <h1 class="text-xl font-bold">Palabra del Padre</h1>
-  <button id="installBtn" class="flex items-center bg-green-600 px-3 py-1 rounded hover:bg-green-500">
-    <i class="bi bi-download mr-2"></i>Instalar
-  </button>
-</header>
-
-<!-- Acompañamiento -->
-<div class="text-center mt-4">
-  <button id="acompanamientoBtn" class="flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto">
-    <i class="bi bi-chat-left-text mr-2"></i>Acompañamiento
-  </button>
-</div>
-
-<!-- Floating Categories -->
-<div id="fabCategories" class="fab">Categorías</div>
-<div id="categoryList" class="hidden fixed bottom-24 right-6 flex flex-col space-y-2 bg-gray-800 p-3 rounded shadow-lg">
-  <!-- Botones se generarán dinámicamente -->
-</div>
-
-<!-- Cards -->
-<div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4"></div>
-
-<!-- Bottom Donate Button -->
-<div class="text-center my-4">
-  <button id="donarBtn" class="flex items-center bg-white text-gray-900 px-4 py-2 rounded hover:bg-gray-200">
-    <i class="bi bi-currency-dollar mr-2"></i>Donar
-  </button>
-</div>
+<div id="root"></div>
 
 <script>
+const e = React.createElement;
+
 // Datos
-const cards = [
-  {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'},
-  {categoria:'tentacion', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.', reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.'},
+const cardsData = [
+  {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en manos de Dios.'},
+  {categoria:'tentacion', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.', reflexion:'Dios te da la fuerza para superar cualquier tentación.'},
   {categoria:'motivacion', titulo:'Actúa con bondad', versiculo:'Gálatas 6:9', cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.', reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'},
   {categoria:'caridad', titulo:'Ayuda a otros', versiculo:'Mateo 25:40', cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.', reflexion:'Hacer caridad es servir a Dios directamente.'},
   {categoria:'confianza', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'}
 ];
 
-const categories = [
-  {id:'todas', label:'Todas'},
-  {id:'ansiedad', label:'Ansiedad'},
-  {id:'tentacion', label:'Tentación'},
-  {id:'motivacion', label:'Motivación'},
-  {id:'caridad', label:'Caridad'},
-  {id:'confianza', label:'Confianza'}
-];
+const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza'];
 
-// Render Cards
-const container = document.getElementById('cardsContainer');
-let currentCategory = 'todas';
+// App principal
+function App() {
+  const [category, setCategory] = React.useState('Todas');
 
-function renderCards() {
-  container.innerHTML = '';
-  const filtered = currentCategory === 'todas' ? cards : cards.filter(c => c.categoria===currentCategory);
-  filtered.forEach(card => {
-    const cardEl = document.createElement('div');
-    cardEl.className = "bg-gray-800 p-4 rounded shadow transform transition duration-300 hover:scale-105 cursor-pointer";
-    cardEl.innerHTML = `
-      <h2 class="text-lg font-bold">${card.titulo}</h2>
-      <h3 class="text-sm text-gray-300">${card.versiculo}</h3>
-      <p class="italic mb-2">&quot;${card.cita}&quot;</p>
-      <p>${card.reflexion}</p>
-      <div class="flex space-x-2 mt-2">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="text-blue-600"><i class="bi bi-facebook text-xl"></i></a>
-        <a href="https://www.instagram.com/" target="_blank" class="text-pink-500"><i class="bi bi-instagram text-xl"></i></a>
-        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(card.cita + ' - ' + card.reflexion)}" target="_blank" class="text-green-500"><i class="bi bi-whatsapp text-xl"></i></a>
-      </div>
-    `;
-    container.appendChild(cardEl);
-  });
+  const filteredCards = category==='Todas' ? cardsData : cardsData.filter(c=>c.categoria.toLowerCase()===category.toLowerCase());
+
+  return e('div', {className:'min-h-screen flex flex-col'},
+    // Header
+    e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
+      e('h1',{className:'text-xl font-bold'},'Palabra del Padre'),
+      e('button',{className:'flex items-center bg-green-600 px-3 py-1 rounded hover:bg-green-500', onClick:()=>{if(window.deferredPrompt){window.deferredPrompt.prompt(); window.deferredPrompt.userChoice.then(()=>window.deferredPrompt=null)}}},
+        e('i',{className:'bi bi-download mr-2'}), 'Instalar'
+      )
+    ),
+    // Acompañamiento
+    e('div',{className:'text-center mt-4'},
+      e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto', onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')},
+        e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento'
+      )
+    ),
+    // Botón flotante categorías
+    e(FloatingCategories,{categories, setCategory}),
+    // Cards
+    e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
+      filteredCards.map((card,i)=>e(Card,{key:i,...card}))
+    ),
+    // Donar
+    e('div',{className:'text-center my-4'},
+      e('button',{className:'flex items-center bg-white text-gray-900 px-4 py-2 rounded hover:bg-gray-200', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')},
+        e('i',{className:'bi bi-currency-dollar mr-2'}),'Donar'
+      )
+    )
+  );
 }
 
-// Render categories in floating panel
-const fab = document.getElementById('fabCategories');
-const catList = document.getElementById('categoryList');
-categories.forEach(cat => {
-  const btn = document.createElement('button');
-  btn.textContent = cat.label;
-  btn.className = "bg-indigo-600 hover:bg-indigo-500 px-3 py-1 rounded whitespace-nowrap";
-  btn.addEventListener('click', () => {
-    currentCategory = cat.id;
-    renderCards();
-    catList.classList.add('hidden');
-  });
-  catList.appendChild(btn);
-});
+// Card componente
+function Card({titulo, versiculo, cita, reflexion}) {
+  const [expanded, setExpanded] = React.useState(false);
+  return e('div',{className:'bg-gray-800 p-4 rounded shadow transform transition duration-300 hover:scale-105 cursor-pointer', onClick:()=>setExpanded(!expanded)},
+    e('h2',{className:'text-lg font-bold'},titulo),
+    e('h3',{className:'text-sm text-gray-300'},versiculo),
+    expanded && e('div', {className:'mt-2'},
+      e('p',{className:'italic mb-2'},`"${cita}"`),
+      e('p',null,reflexion),
+      e('div',{className:'flex space-x-2 mt-2'},
+        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'text-blue-600'},
+          e('i',{className:'bi bi-facebook text-xl'})
+        ),
+        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'text-pink-500'},
+          e('i',{className:'bi bi-instagram text-xl'})
+        ),
+        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'text-green-500'},
+          e('i',{className:'bi bi-whatsapp text-xl'})
+        )
+      )
+    )
+  );
+}
 
-// FAB toggle
-fab.addEventListener('click', () => {
-  catList.classList.toggle('hidden');
-});
+// Floating Categories componente
+function FloatingCategories({categories, setCategory}) {
+  const [open, setOpen] = React.useState(false);
+  return e('div', {className:'fixed bottom-24 right-6 z-50'},
+    e('button',{className:'bg-indigo-600 text-white px-4 py-2 rounded-full shadow-lg hover:scale-110 transition transform', onClick:()=>setOpen(!open)}, 'Categorías'),
+    open && e('div',{className:'mt-2 flex flex-col space-y-2 bg-gray-800 p-3 rounded shadow-lg'},
+      categories.map((cat,i)=>e('button',{key:i, className:'bg-indigo-500 hover:bg-indigo-400 px-3 py-1 rounded whitespace-nowrap', onClick:()=>{setCategory(cat); setOpen(false);}}, cat))
+    )
+  );
+}
 
-// Inicializar
-renderCards();
+// Render
+ReactDOM.createRoot(document.getElementById('root')).render(e(App));
 
-// Botón instalar PWA
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
-installBtn.addEventListener('click', () => {
-  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(()=>deferredPrompt=null); }
-});
-
-// Botón acompañamiento
-document.getElementById('acompanamientoBtn').addEventListener('click', () => {
-  window.open('https://m.me/tuPaginaMessenger','_blank');
-});
-
-// Botón donar
-document.getElementById('donarBtn').addEventListener('click', () => {
-  window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank');
-});
+// PWA install
+window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); window.deferredPrompt = e; });
 </script>
+
 </body>
 </html>
