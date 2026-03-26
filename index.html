@@ -21,9 +21,7 @@ body {
   text-align: center;
 }
 
-.header h1 {
-  margin: 0;
-}
+.header h1 { margin: 0; }
 
 .premium-btn {
   margin-top: 10px;
@@ -69,19 +67,10 @@ body {
   box-shadow: 0 15px 35px rgba(0,0,0,0.5);
 }
 
-.card h3 {
-  margin-top: 0;
-}
+.card h3 { margin-top: 0; }
 
-.versiculo {
-  font-weight: bold;
-  margin: 10px 0;
-}
-
-.reflexion {
-  font-size: 14px;
-  opacity: 0.85;
-}
+.versiculo { font-weight: bold; margin: 10px 0; }
+.reflexion { font-size: 14px; opacity: 0.85; }
 
 /* ACCIONES CARD AGRANDADA */
 .card-actions {
@@ -259,6 +248,25 @@ document.getElementById('installBtn').addEventListener('click', ()=>{
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js');
 }
+
+// NOTIFICACIÓN DIARIA SIMULADA
+function notificacionDiaria() {
+  if("Notification" in window){
+    const hoy = new Date().toDateString();
+    if(localStorage.getItem('ultimaNotificacion')===hoy) return;
+    Notification.requestPermission().then(p=>{
+      if(p==="granted"){
+        const contenido = contenidos[Math.floor(Math.random()*contenidos.length)];
+        new Notification("Palabra del Padre", {
+          body: `${contenido.versiculo} - ${contenido.reflexion}`,
+          icon: "icono.png"
+        });
+        localStorage.setItem('ultimaNotificacion', hoy);
+      }
+    });
+  }
+}
+notificacionDiaria();
 </script>
 
 </body>
