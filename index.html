@@ -30,16 +30,22 @@ ion-title{color:white;}
   --background: linear-gradient(90deg,#7c3aed,#4f46e5);
   --color:white; font-weight:bold;
   border-radius:25px;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px;
 }
 .bottom-buttons ion-button{
   --background:white; --color:#111122;
   border-radius:25px; font-weight:bold;
+  display:flex; align-items:center; justify-content:center;
+  gap:8px;
 }
 #installBtn{
   --background:#10b981;
   --color:white;
   font-weight:bold;
   border-radius:20px;
+  display:flex; align-items:center; justify-content:center;
+  gap:6px;
 }
 
 /* Cards */
@@ -82,7 +88,12 @@ ion-card.confianza{--background: rgba(139,92,246,0.3);}
 
 /* Floating categories */
 ion-fab{bottom: 80px; right:20px;}
-ion-fab-list ion-fab-button{--background:#6d28d9;}
+ion-fab-list ion-fab-button{
+  --background:#6d28d9;
+  white-space: nowrap;
+  padding-left:10px; padding-right:10px;
+  min-width:auto;
+}
 ion-fab-button{--border-radius:50%;}
 
 /* Grid cards */
@@ -97,16 +108,16 @@ ion-grid{padding:10px;}
     <ion-toolbar>
       <ion-title>Palabra del Padre</ion-title>
       <ion-buttons slot="end">
-        <ion-button id="installBtn">Instalar</ion-button>
+        <ion-button id="installBtn"><i class="bi bi-download"></i> Instalar</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
   <ion-content>
-    <!-- Top Premium Button -->
+    <!-- Top Acompañamiento Button -->
     <div class="top-buttons" style="text-align:center; margin:10px;">
       <ion-button expand="block" onclick="window.location.href='https://m.me/tuPaginaMessenger'">
-        Premium
+        <i class="bi bi-chat-dots"></i> Acompañamiento
       </ion-button>
     </div>
 
@@ -116,7 +127,7 @@ ion-grid{padding:10px;}
     <!-- Bottom Donate Button -->
     <div class="bottom-buttons" style="text-align:center; margin:10px;">
       <ion-button expand="block" onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">
-        Donar
+        <i class="bi bi-currency-dollar"></i> Donar
       </ion-button>
     </div>
 
@@ -144,7 +155,7 @@ installBtn.style.display='none';
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt=e;
-  installBtn.style.display='inline-block';
+  installBtn.style.display='inline-flex';
 });
 installBtn.addEventListener('click', async ()=>{
   if(deferredPrompt){
