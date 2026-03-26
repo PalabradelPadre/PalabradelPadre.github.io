@@ -38,7 +38,9 @@ header button{
   color:white;
   cursor:pointer;
   font-weight:bold;
+  transition: transform 0.2s ease;
 }
+header button:hover{transform: scale(1.05);}
 
 /* ------------------ Top & Bottom Bars ------------------ */
 .top-bar, .bottom-bar{
@@ -47,8 +49,28 @@ header button{
   gap:15px;
   padding:10px 0;
 }
-.top-bar button{background:#4f46e5;}
-.bottom-bar button{background:white;color:#333;font-weight:bold;}
+.top-bar button{
+  padding:10px 20px;
+  border:none;
+  border-radius:25px;
+  background:#4f46e5;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition: transform 0.2s ease;
+}
+.top-bar button:hover{transform: scale(1.05);}
+.bottom-bar button{
+  padding:10px 20px;
+  border:none;
+  border-radius:25px;
+  background:white;
+  color:#333;
+  font-weight:bold;
+  cursor:pointer;
+  transition: transform 0.2s ease;
+}
+.bottom-bar button:hover{transform: scale(1.05);}
 
 /* ------------------ Cards ------------------ */
 #cardsContainer{
@@ -112,26 +134,43 @@ header button{
 .caridad{ background: rgba(234,179,8,0.3);}
 .confianza{ background: rgba(139,92,246,0.3);}
 
-/* ------------------ Floating Categories ------------------ */
+/* ------------------ Floating Expandable Categories ------------------ */
 #floatCategories{
   position:fixed;
-  right:20px; bottom:150px;
+  right:20px; bottom:100px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
-#floatCategories button{
-  padding:12px;
-  border:none;
+#floatCategories .main-btn{
+  width:60px; height:60px;
   border-radius:50%;
-  cursor:pointer;
-  font-weight:bold;
-  color:white;
+  border:none;
   background:#4f46e5;
+  color:white;
+  font-size:30px;
+  cursor:pointer;
   box-shadow:0 5px 10px rgba(0,0,0,0.3);
   transition: transform 0.2s ease;
 }
-#floatCategories button:hover{transform: scale(1.2);}
+#floatCategories .main-btn:hover{transform: scale(1.2);}
+#floatCategories .cat-btn{
+  width:50px; height:50px;
+  border-radius:50%;
+  border:none;
+  background:#6d28d9;
+  color:white;
+  font-size:18px;
+  cursor:pointer;
+  box-shadow:0 4px 8px rgba(0,0,0,0.3);
+  transform: scale(0);
+  opacity:0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#floatCategories.show .cat-btn{
+  transform: scale(1);
+  opacity:1;
+}
 </style>
 </head>
 <body>
@@ -155,14 +194,15 @@ header button{
   <button onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">Donar</button>
 </div>
 
-<!-- Floating Categories -->
+<!-- Floating Expandable Categories -->
 <div id="floatCategories">
-  <button onclick="filtrar('ansiedad')">Ansiedad</button>
-  <button onclick="filtrar('tentacion')">Tentación</button>
-  <button onclick="filtrar('motivacion')">Motivación</button>
-  <button onclick="filtrar('caridad')">Caridad</button>
-  <button onclick="filtrar('confianza')">Confianza</button>
-  <button onclick="filtrar('todas')">Todas</button>
+  <button class="main-btn" id="toggleCats">☰</button>
+  <button class="cat-btn" onclick="filtrar('ansiedad')">Ansiedad</button>
+  <button class="cat-btn" onclick="filtrar('tentacion')">Tentación</button>
+  <button class="cat-btn" onclick="filtrar('motivacion')">Motivación</button>
+  <button class="cat-btn" onclick="filtrar('caridad')">Caridad</button>
+  <button class="cat-btn" onclick="filtrar('confianza')">Confianza</button>
+  <button class="cat-btn" onclick="filtrar('todas')">Todas</button>
 </div>
 
 <script>
@@ -182,6 +222,11 @@ installBtn.addEventListener('click', async ()=>{
     installBtn.style.display='none';
   }
 });
+
+// ------------------ Floating Expandable Categories ------------------
+const floatCats=document.getElementById('floatCategories');
+const toggleCats=document.getElementById('toggleCats');
+toggleCats.addEventListener('click',()=>floatCats.classList.toggle('show'));
 
 // ------------------ Cards Content ------------------
 const contenido=[
@@ -203,7 +248,6 @@ const contenido=[
 ];
 
 const cardsContainer=document.getElementById('cardsContainer');
-
 function mostrarCards(items){
   cardsContainer.innerHTML='';
   items.forEach(c=>{
@@ -229,7 +273,6 @@ function mostrarCards(items){
 }
 mostrarCards(contenido);
 
-// ------------------ Filtrar por categoría ------------------
 function filtrar(cat){
   if(cat==='todas'){mostrarCards(contenido);}
   else{mostrarCards(contenido.filter(c=>c.categoria===cat));}
