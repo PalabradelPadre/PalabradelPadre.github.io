@@ -29,7 +29,8 @@ const categoryColors = {
   tentacion: 'bg-pink-700',
   motivacion: 'bg-green-700',
   caridad: 'bg-blue-700',
-  confianza: 'bg-indigo-700'
+  confianza: 'bg-indigo-700',
+  todas: 'bg-gray-600'
 };
 
 // Cards (4 por categoría = 20)
@@ -101,13 +102,13 @@ function Card({categoria, titulo, versiculo, cita, reflexion}) {
       e('p',{className:'italic mb-2'},`"${cita}"`),
       e('p',null,reflexion),
       e('div',{className:'flex space-x-3 mt-2 justify-start'},
-        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'bg-blue-500 p-2 rounded-full hover:bg-blue-400'},
+        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'bg-blue-500 p-3 rounded-full hover:bg-blue-400 flex justify-center items-center'},
           e('i',{className:'bi bi-facebook text-xl text-white'})
         ),
-        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'bg-pink-500 p-2 rounded-full hover:bg-pink-400'},
+        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'bg-pink-500 p-3 rounded-full hover:bg-pink-400 flex justify-center items-center'},
           e('i',{className:'bi bi-instagram text-xl text-white'})
         ),
-        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'bg-green-500 p-2 rounded-full hover:bg-green-400'},
+        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'bg-green-500 p-3 rounded-full hover:bg-green-400 flex justify-center items-center'},
           e('i',{className:'bi bi-whatsapp text-xl text-white'})
         )
       )
@@ -119,8 +120,11 @@ function FloatingCategories({categories, setCategory}) {
   const [open, setOpen] = React.useState(false);
   return e('div', {className:'fixed bottom-24 right-6 z-50'},
     e('button',{className:'bg-indigo-600 text-white px-4 py-2 rounded-full shadow-lg hover:scale-110 transition transform', onClick:()=>setOpen(!open)}, 'Categorías'),
-    open && e('div',{className:'mt-2 flex flex-col space-y-2 bg-gray-800 p-3 rounded shadow-lg'},
-      categories.map((cat,i)=>e('button',{key:i, className:'bg-indigo-500 hover:bg-indigo-400 px-3 py-1 rounded whitespace-nowrap', onClick:()=>{setCategory(cat); setOpen(false);}}, cat))
+    open && e('div',{className:'mt-2 flex flex-col space-y-2 p-3 rounded shadow-lg'},
+      categories.map((cat,i)=>{
+        const color = categoryColors[cat.toLowerCase()] || 'bg-gray-600';
+        return e('button',{key:i, className:`${color} hover:opacity-80 px-3 py-1 rounded whitespace-nowrap text-white`, onClick:()=>{setCategory(cat); setOpen(false);}}, cat)
+      })
     )
   );
 }
