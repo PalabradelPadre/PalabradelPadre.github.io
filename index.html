@@ -12,54 +12,55 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
 <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
 
-<!-- Bootstrap Icons para compartir -->
+<!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
-body{
-  font-family: 'Segoe UI', sans-serif;
+body {
   margin:0; padding:0;
   background: linear-gradient(135deg,#1e1e2f,#2a2a3d);
+  font-family: 'Segoe UI', sans-serif;
   color:white;
 }
+ion-header{--background:#111122;}
+ion-title{color:white;}
 
-/* Header */
-ion-header{
-  --background:#111122;
-}
-ion-title{
-  color:white;
-}
 .top-buttons ion-button{
-  --background:#4f46e5;
-  --border-radius:25px;
-  color:white;
-  font-weight:bold;
+  --background: linear-gradient(90deg,#7c3aed,#4f46e5);
+  --color:white; font-weight:bold;
+  border-radius:25px;
 }
 .bottom-buttons ion-button{
-  --background:white;
-  --color:#333;
-  --border-radius:25px;
+  --background:white; --color:#111122;
+  border-radius:25px; font-weight:bold;
+}
+
+/* Install button */
+#installBtn{
+  --background:#10b981;
+  --color:white;
   font-weight:bold;
+  border-radius:20px;
 }
 
 /* Cards */
 ion-card{
-  margin: 10px;
+  margin:10px;
   --background: rgba(255,255,255,0.05);
   border-radius:20px;
+  transition: transform 0.3s ease;
 }
+ion-card:hover{transform: scale(1.03);}
 ion-card.ansiedad{--background: rgba(59,130,246,0.3);}
 ion-card.tentacion{--background: rgba(239,68,68,0.3);}
 ion-card.motivacion{--background: rgba(16,185,129,0.3);}
 ion-card.caridad{--background: rgba(234,179,8,0.3);}
 ion-card.confianza{--background: rgba(139,92,246,0.3);}
 
-/* Card actions share */
+/* Share buttons */
 .card-actions{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
+  display:flex; gap:10px; margin-top:10px;
+  justify-content:flex-start;
 }
 .card-actions a{
   width:40px; height:40px;
@@ -75,17 +76,15 @@ ion-card.confianza{--background: rgba(139,92,246,0.3);}
 }
 
 /* Floating categories */
-ion-fab{
-  bottom: 80px;
-  right: 20px;
-}
-ion-fab-list ion-fab-button{
-  --background:#6d28d9;
-}
+ion-fab{bottom: 80px; right:20px;}
+ion-fab-list ion-fab-button{--background:#6d28d9;}
+ion-fab-button{--border-radius:50%;}
+
+/* Grid cards */
+ion-grid{padding:10px;}
 </style>
 </head>
 <body>
-
 <ion-app>
 
   <!-- Header -->
@@ -98,10 +97,12 @@ ion-fab-list ion-fab-button{
     </ion-toolbar>
   </ion-header>
 
-  <!-- Top Premium Button -->
   <ion-content>
+    <!-- Top Premium Button -->
     <div class="top-buttons" style="text-align:center; margin:10px;">
-      <ion-button expand="block" onclick="window.location.href='https://m.me/tuPaginaMessenger'">Premium</ion-button>
+      <ion-button expand="block" onclick="window.location.href='https://m.me/tuPaginaMessenger'">
+        Premium
+      </ion-button>
     </div>
 
     <!-- Cards Container -->
@@ -109,7 +110,9 @@ ion-fab-list ion-fab-button{
 
     <!-- Bottom Donate Button -->
     <div class="bottom-buttons" style="text-align:center; margin:10px;">
-      <ion-button expand="block" onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">Donar</ion-button>
+      <ion-button expand="block" onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">
+        Donar
+      </ion-button>
     </div>
 
     <!-- Floating Expandable Categories -->
@@ -132,6 +135,7 @@ ion-fab-list ion-fab-button{
 // ------------------ Install Button ------------------
 let deferredPrompt;
 const installBtn=document.getElementById('installBtn');
+installBtn.style.display='none';
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt=e;
@@ -152,24 +156,14 @@ const contenido=[
   {categoria:'tentacion',titulo:'Resiste la tentación',versiculo:'1 Corintios 10:13',cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.',reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.'},
   {categoria:'motivacion',titulo:'Actúa con bondad',versiculo:'Gálatas 6:9',cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.',reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'},
   {categoria:'caridad',titulo:'Ayuda a otros',versiculo:'Mateo 25:40',cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.',reflexion:'Hacer caridad es servir a Dios directamente.'},
-  {categoria:'confianza',titulo:'Confía en el Señor',versiculo:'Proverbios 3:5-6',cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.',reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
-  {categoria:'ansiedad',titulo:'Paz interior',versiculo:'Salmo 23:1-3',cita:'El Señor es mi pastor; nada me faltará. Me hace descansar en verdes praderas.',reflexion:'Confía y hallarás paz en Él.'},
-  {categoria:'tentacion',titulo:'Controla tus deseos',versiculo:'Mateo 26:41',cita:'Velad y orad, para que no entréis en tentación; el espíritu está dispuesto, pero la carne es débil.',reflexion:'Orar ayuda a resistir.'},
-  {categoria:'motivacion',titulo:'Sé valiente',versiculo:'Josué 1:9',cita:'Mira que te mando que te esfuerces y seas valiente; no temas ni te acobardes.',reflexion:'Dios te acompaña en cada paso.'},
-  {categoria:'caridad',titulo:'Comparte tus bienes',versiculo:'Hechos 20:35',cita:'Más bienaventurado es dar que recibir.',reflexion:'El dar nos acerca al corazón de Dios.'},
-  {categoria:'confianza',titulo:'Entrega tus caminos',versiculo:'Salmo 37:5',cita:'Encomienda al Señor tu camino; confía en Él, y Él actuará.',reflexion:'Entrega tu vida y confía en Dios.'},
-  {categoria:'motivacion',titulo:'Persevera',versiculo:'Romanos 5:3-4',cita:'Nos gloriamos incluso en las tribulaciones, sabiendo que la tribulación produce paciencia.',reflexion:'La paciencia fortalece tu espíritu.'},
-  {categoria:'ansiedad',titulo:'No temas al futuro',versiculo:'Isaías 41:10',cita:'No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios.',reflexion:'Dios está contigo siempre.'},
-  {categoria:'tentacion',titulo:'Purifica tu corazón',versiculo:'Salmo 51:10',cita:'Crea en mí, oh Dios, un corazón limpio, y renueva un espíritu recto dentro de mí.',reflexion:'Pide a Dios fuerza para resistir.'},
-  {categoria:'caridad',titulo:'Amar al prójimo',versiculo:'Juan 13:34',cita:'Un mandamiento nuevo os doy: Que os améis unos a otros; como yo os he amado.',reflexion:'Ama a los demás como Dios nos ama.'},
-  {categoria:'confianza',titulo:'Esperanza firme',versiculo:'Hebreos 10:23',cita:'Mantengamos firme la esperanza que profesamos.',reflexion:'Confía en las promesas de Dios.'}
+  {categoria:'confianza',titulo:'Confía en el Señor',versiculo:'Proverbios 3:5-6',cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.',reflexion:'Ríndete a Dios y Él guiará tus caminos.'}
 ];
 
 const cardsContainer=document.getElementById('cardsContainer');
 function mostrarCards(items){
   cardsContainer.innerHTML='';
   items.forEach(c=>{
-    const card = document.createElement('ion-card');
+    const card=document.createElement('ion-card');
     card.classList.add(c.categoria);
     card.innerHTML=`
       <ion-card-header>
