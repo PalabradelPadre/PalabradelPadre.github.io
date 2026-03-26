@@ -23,7 +23,6 @@
 <script>
 const e = React.createElement;
 
-// Datos con más categorías y color
 const categoryColors = {
   ansiedad: 'bg-red-700',
   tentacion: 'bg-pink-700',
@@ -36,47 +35,44 @@ const categoryColors = {
   esperanza: 'bg-orange-600'
 };
 
+// Cards por categoría (2 máximo cada una)
 const cardsData = [
   {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en manos de Dios.'},
+  {categoria:'ansiedad', titulo:'Paz en el corazón', versiculo:'Juan 14:27', cita:'La paz os dejo, mi paz os doy; yo no os la doy como el mundo la da.', reflexion:'Recibe la paz de Dios y deja ir la ansiedad.'},
   {categoria:'tentacion', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.', reflexion:'Dios te da la fuerza para superar cualquier tentación.'},
+  {categoria:'tentacion', titulo:'Firme en la fe', versiculo:'Santiago 4:7', cita:'Sométanse, pues, a Dios; resistan al diablo, y él huirá de ustedes.', reflexion:'Mantente firme y Dios te protegerá.'},
   {categoria:'motivacion', titulo:'Actúa con bondad', versiculo:'Gálatas 6:9', cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.', reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'},
+  {categoria:'motivacion', titulo:'Siembra esperanza', versiculo:'Romanos 15:13', cita:'Que el Dios de la esperanza los llene de todo gozo y paz en la fe.', reflexion:'Mantén la esperanza y contagia alegría a otros.'},
   {categoria:'caridad', titulo:'Ayuda a otros', versiculo:'Mateo 25:40', cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.', reflexion:'Hacer caridad es servir a Dios directamente.'},
+  {categoria:'caridad', titulo:'Comparte tu bendición', versiculo:'Lucas 6:38', cita:'Den, y se les dará; medida buena, apretada, remecida y rebosante darán en su regazo.', reflexion:'Compartir multiplica las bendiciones.'},
   {categoria:'confianza', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
-  {categoria:'gratitud', titulo:'Sé agradecido', versiculo:'1 Tesalonicenses 5:18', cita:'Den gracias en toda situación, porque esta es la voluntad de Dios para ustedes en Cristo Jesús.', reflexion:'Agradece siempre y verás bendiciones multiplicadas.'},
-  {categoria:'paciencia', titulo:'Ten paciencia', versiculo:'Romanos 12:12', cita:'Alégrense en la esperanza, muestren paciencia en la tribulación, perseveren en la oración.', reflexion:'La paciencia fortalece tu fe y tu carácter.'},
-  {categoria:'fe', titulo:'Mantén tu fe', versiculo:'Hebreos 11:1', cita:'La fe es la certeza de lo que se espera, la convicción de lo que no se ve.', reflexion:'Confía en Dios aunque no veas el camino completo.'},
-  {categoria:'esperanza', titulo:'No pierdas la esperanza', versiculo:'Romanos 15:13', cita:'Que el Dios de la esperanza los llene de todo gozo y paz en la fe.', reflexion:'Mantén la esperanza viva y contagia alegría a los demás.'}
+  {categoria:'confianza', titulo:'Apóyate en Dios', versiculo:'Salmo 37:5', cita:'Encomienda a Jehová tu camino, confía en él, y él hará.', reflexion:'Dios nunca falla cuando confías plenamente en Él.'}
 ];
 
-const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza','Gratitud','Paciencia','Fe','Esperanza'];
+const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza'];
 
-// App principal
 function App() {
   const [category, setCategory] = React.useState('Todas');
 
-  const filteredCards = category==='Todas' ? cardsData : cardsData.filter(c=>c.categoria.toLowerCase()===category.toLowerCase());
+  let filteredCards = category==='Todas' ? cardsData : cardsData.filter(c=>c.categoria.toLowerCase()===category.toLowerCase());
+  filteredCards = filteredCards.slice(0,2); // solo 2 cards por categoría
 
   return e('div', {className:'min-h-screen flex flex-col'},
-    // Header
     e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
       e('h1',{className:'text-xl font-bold'},'Palabra del Padre'),
       e('button',{className:'flex items-center bg-green-600 px-3 py-1 rounded hover:bg-green-500', onClick:()=>{if(window.deferredPrompt){window.deferredPrompt.prompt(); window.deferredPrompt.userChoice.then(()=>window.deferredPrompt=null)}}},
-        e('i',{className:'bi bi-download mr-2'}), 'Instalar'
+        e('i',{className:'bi bi-phone mr-2'}), 'Instalar'
       )
     ),
-    // Acompañamiento
     e('div',{className:'text-center mt-4'},
       e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto', onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')},
         e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento'
       )
     ),
-    // Botón flotante categorías
     e(FloatingCategories,{categories, setCategory}),
-    // Cards
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
       filteredCards.map((card,i)=>e(Card,{key:i,...card}))
     ),
-    // Donar
     e('div',{className:'text-center my-4'},
       e('button',{className:'flex items-center bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')},
         e('i',{className:'bi bi-hand-thumbs-up-fill mr-2'}),'Donar'
@@ -85,7 +81,6 @@ function App() {
   );
 }
 
-// Card componente con color según categoría
 function Card({categoria, titulo, versiculo, cita, reflexion}) {
   const [expanded, setExpanded] = React.useState(true);
   const bgColor = categoryColors[categoria] || 'bg-gray-800';
@@ -96,21 +91,20 @@ function Card({categoria, titulo, versiculo, cita, reflexion}) {
       e('p',{className:'italic mb-2'},`"${cita}"`),
       e('p',null,reflexion),
       e('div',{className:'flex space-x-3 mt-2 justify-start'},
-        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'text-blue-500 hover:text-blue-400'},
-          e('i',{className:'bi bi-facebook text-2xl'})
+        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'bg-blue-500 p-2 rounded-full hover:bg-blue-400'},
+          e('i',{className:'bi bi-facebook text-xl text-white'})
         ),
-        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'text-pink-500 hover:text-pink-400'},
-          e('i',{className:'bi bi-instagram text-2xl'})
+        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'bg-pink-500 p-2 rounded-full hover:bg-pink-400'},
+          e('i',{className:'bi bi-instagram text-xl text-white'})
         ),
-        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'text-green-500 hover:text-green-400'},
-          e('i',{className:'bi bi-whatsapp text-2xl'})
+        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'bg-green-500 p-2 rounded-full hover:bg-green-400'},
+          e('i',{className:'bi bi-whatsapp text-xl text-white'})
         )
       )
     )
   );
 }
 
-// Floating Categories componente
 function FloatingCategories({categories, setCategory}) {
   const [open, setOpen] = React.useState(false);
   return e('div', {className:'fixed bottom-24 right-6 z-50'},
@@ -121,7 +115,6 @@ function FloatingCategories({categories, setCategory}) {
   );
 }
 
-// Render
 ReactDOM.createRoot(document.getElementById('root')).render(e(App));
 
 // PWA install
