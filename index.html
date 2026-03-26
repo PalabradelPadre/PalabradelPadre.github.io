@@ -23,16 +23,18 @@
 <script>
 const e = React.createElement;
 
-// Datos
+// Datos con más categorías
 const cardsData = [
   {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en manos de Dios.'},
   {categoria:'tentacion', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.', reflexion:'Dios te da la fuerza para superar cualquier tentación.'},
   {categoria:'motivacion', titulo:'Actúa con bondad', versiculo:'Gálatas 6:9', cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.', reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'},
   {categoria:'caridad', titulo:'Ayuda a otros', versiculo:'Mateo 25:40', cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.', reflexion:'Hacer caridad es servir a Dios directamente.'},
-  {categoria:'confianza', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'}
+  {categoria:'confianza', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
+  {categoria:'gratitud', titulo:'Sé agradecido', versiculo:'1 Tesalonicenses 5:18', cita:'Den gracias en toda situación, porque esta es la voluntad de Dios para ustedes en Cristo Jesús.', reflexion:'Agradece siempre y verás bendiciones multiplicadas.'},
+  {categoria:'paciencia', titulo:'Ten paciencia', versiculo:'Romanos 12:12', cita:'Alégrense en la esperanza, muestren paciencia en la tribulación, perseveren en la oración.', reflexion:'La paciencia fortalece tu fe y tu carácter.'}
 ];
 
-const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza'];
+const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza','Gratitud','Paciencia'];
 
 // App principal
 function App() {
@@ -69,24 +71,24 @@ function App() {
   );
 }
 
-// Card componente
+// Card componente expandida por defecto
 function Card({titulo, versiculo, cita, reflexion}) {
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(true);
   return e('div',{className:'bg-gray-800 p-4 rounded shadow transform transition duration-300 hover:scale-105 cursor-pointer', onClick:()=>setExpanded(!expanded)},
     e('h2',{className:'text-lg font-bold'},titulo),
     e('h3',{className:'text-sm text-gray-300'},versiculo),
     expanded && e('div', {className:'mt-2'},
       e('p',{className:'italic mb-2'},`"${cita}"`),
       e('p',null,reflexion),
-      e('div',{className:'flex space-x-2 mt-2'},
-        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'text-blue-600'},
-          e('i',{className:'bi bi-facebook text-xl'})
+      e('div',{className:'flex space-x-3 mt-2 justify-start'},
+        e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'text-blue-500 hover:text-blue-400'},
+          e('i',{className:'bi bi-facebook text-2xl'})
         ),
-        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'text-pink-500'},
-          e('i',{className:'bi bi-instagram text-xl'})
+        e('a',{href:'https://www.instagram.com/', target:'_blank', className:'text-pink-500 hover:text-pink-400'},
+          e('i',{className:'bi bi-instagram text-2xl'})
         ),
-        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'text-green-500'},
-          e('i',{className:'bi bi-whatsapp text-xl'})
+        e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'text-green-500 hover:text-green-400'},
+          e('i',{className:'bi bi-whatsapp text-2xl'})
         )
       )
     )
