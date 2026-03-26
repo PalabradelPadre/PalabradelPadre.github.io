@@ -17,7 +17,8 @@
 <meta name="theme-color" content="#2a1e3b">
 <style>
   body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); }
-  .share-btn { width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; border-radius:50%; }
+  .share-btn { width: 36px; height: 36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition: transform 0.2s; }
+  .share-btn:hover { transform: scale(1.2); }
 </style>
 </head>
 <body class="text-white font-sans">
@@ -27,7 +28,7 @@
 <script>
 const e = React.createElement;
 
-// Datos de cards (20 cards, 4 por categoría)
+// Datos de cards (5 categorías, 4 cards cada una, total 24)
 const cardsData = [
   // Ansiedad
   {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en manos de Dios.'},
@@ -57,18 +58,25 @@ const cardsData = [
   {categoria:'confianza', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
   {categoria:'confianza', titulo:'Dios es tu guía', versiculo:'Salmos 32:8', cita:'Te haré entender y te enseñaré el camino en que debes andar; sobre ti fijaré mis ojos.', reflexion:'Dios te guía y te protege en cada paso.'},
   {categoria:'confianza', titulo:'Fortaleza divina', versiculo:'Isaías 41:10', cita:'No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios.', reflexion:'Encuentra fortaleza en Dios.'},
-  {categoria:'confianza', titulo:'Refugio seguro', versiculo:'Salmos 46:1', cita:'Dios es nuestro refugio y fortaleza, nuestro pronto auxilio en las tribulaciones.', reflexion:'Busca en Él tu refugio diario.'}
+  {categoria:'confianza', titulo:'Refugio seguro', versiculo:'Salmos 46:1', cita:'Dios es nuestro refugio y fortaleza, nuestro pronto auxilio en las tribulaciones.', reflexion:'Busca en Él tu refugio diario.'},
+
+  // Oraciones
+  {categoria:'oraciones', titulo:'Oración a San Miguel', versiculo:'San Miguel Arcángel', cita:'San Miguel Arcángel, defiéndenos en la batalla; sé nuestro amparo contra la maldad y asechanzas del demonio.', reflexion:'Lleva esta oración en tu bolsillo para protección diaria.'},
+  {categoria:'oraciones', titulo:'El Angelus', versiculo:'Oración tradicional', cita:'El Ángel del Señor anunció a María, y concibió por obra del Espíritu Santo.', reflexion:'Reza cada día el Angelus para meditar en la Encarnación.'},
+  {categoria:'oraciones', titulo:'Después de la comunión', versiculo:'Sangre de Cristo, sálvame', cita:'Sangre de Cristo, sálvame; pasión de Cristo, fortaléceme.', reflexion:'Oración corta y poderosa tras recibir la Eucaristía.'},
+  {categoria:'oraciones', titulo:'Oración de protección', versiculo:'Protección diaria', cita:'Ángel de Dios, mi guardián, ilumíname y protégeme hoy y siempre.', reflexion:'Útil para llevar y rezar en cualquier momento.'}
 ];
 
-const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza'];
+const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza','Oraciones'];
 
-// Colores de categoría para cards y botón flotante
+// Colores de categoría
 const categoryColors = {
   'ansiedad':'bg-blue-600', 
   'tentacion':'bg-red-600', 
   'motivacion':'bg-green-600', 
   'caridad':'bg-yellow-500', 
   'confianza':'bg-purple-600',
+  'oraciones':'bg-pink-600',
   'todas':'bg-indigo-600'
 };
 
@@ -86,44 +94,38 @@ function App() {
     : cardsData.filter(c=>normalize(c.categoria) === normalize(category));
 
   return e('div',{className:'min-h-screen flex flex-col'},
-    // Header
     e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
       e('h1',{className:'text-xl font-bold'},'Palabra del Padre'),
       e('button',{className:'flex items-center bg-green-600 px-3 py-1 rounded hover:bg-green-500', onClick:()=>{if(window.deferredPrompt){window.deferredPrompt.prompt(); window.deferredPrompt.userChoice.then(()=>window.deferredPrompt=null)}}},
         e('i',{className:'bi bi-phone mr-2'}), 'Instalar'
       )
     ),
-    // Acompañamiento
     e('div',{className:'text-center mt-4'},
       e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto', onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')},
         e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento'
       )
     ),
-    // Botón flotante categorías
     e(FloatingCategories,{categories, setCategory, category}),
-    // Cards
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
       filteredCards.map((card,i)=>e(Card,{key:i,...card}))
     ),
-    // Donar
     e('div',{className:'text-center my-4'},
       e('button',{className:'flex items-center bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')},
         e('i',{className:'bi bi-hand-thumbs-up mr-2'}),'Apoya la misión'
       )
     ),
-    // Footer
     e('footer',{className:'text-center py-4 text-gray-300'},'Gracias por apoyar esta herramienta de crecimiento espiritual.')
   );
 }
 
-// Card componente
+// Card con animación
 function Card({titulo, versiculo, cita, reflexion, categoria}){
   const [expanded, setExpanded] = React.useState(false);
   const color = categoryColors[normalize(categoria)] || 'bg-gray-600';
-  return e('div',{className:`${color} p-4 rounded shadow transform transition duration-300 hover:scale-105 cursor-pointer`, onClick:()=>setExpanded(!expanded)},
+  return e('div',{className:`${color} p-4 rounded shadow transform transition-all duration-300 hover:scale-105 cursor-pointer`, onClick:()=>setExpanded(!expanded)},
     e('h2',{className:'text-lg font-bold'},titulo),
     e('h3',{className:'text-sm text-gray-200'},versiculo),
-    expanded && e('div',{className:'mt-2'},
+    e('div',{className:`overflow-hidden transition-all duration-500 ${expanded ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'}`},
       e('p',{className:'italic mb-2'},`"${cita}"`),
       e('p',null,reflexion),
       e('div',{className:'flex space-x-2 mt-2'},
@@ -141,12 +143,12 @@ function Card({titulo, versiculo, cita, reflexion, categoria}){
   );
 }
 
-// Floating Categories componente
+// Floating Categories animado
 function FloatingCategories({categories, setCategory, category}) {
   const [open, setOpen] = React.useState(false);
   return e('div',{className:'fixed bottom-24 right-6 z-50 flex flex-col items-end'},
     e('button',{className:'bg-indigo-600 text-white px-4 py-2 rounded-full shadow-lg hover:scale-110 transition transform mb-2', onClick:()=>setOpen(!open)}, 'Categorías'),
-    open && e('div',{className:'flex flex-col space-y-2'},
+    open && e('div',{className:'flex flex-col space-y-2 transition-all duration-300'},
       categories.map((cat,i)=>{
         const color = categoryColors[normalize(cat)] || 'bg-gray-600';
         return e('button',{key:i, className:`${color} text-white px-3 py-1 rounded whitespace-nowrap`, onClick:()=>{setCategory(cat); setOpen(false);}},cat)
