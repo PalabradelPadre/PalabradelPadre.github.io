@@ -5,14 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palabra del Padre</title>
 
-<!-- Bootstrap Icons -->
+<!-- Ionic Core CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/>
+
+<!-- Ionic Core JS -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+<script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+
+<!-- Bootstrap Icons para compartir -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<!-- Manifest -->
-<link rel="manifest" href="manifest.json">
-
 <style>
-/* ------------------ Body ------------------ */
 body{
   font-family: 'Segoe UI', sans-serif;
   margin:0; padding:0;
@@ -20,106 +23,50 @@ body{
   color:white;
 }
 
-/* ------------------ Header ------------------ */
-header{
-  display:flex;
-  justify-content: space-between;
-  align-items:center;
-  padding:15px 20px;
-  background:#111122;
-  box-shadow:0 4px 10px rgba(0,0,0,0.5);
+/* Header */
+ion-header{
+  --background:#111122;
 }
-header h1{margin:0; font-size:1.8em;}
-header button{
-  padding:10px 20px;
-  border:none;
-  border-radius:25px;
-  background:#10b981;
+ion-title{
   color:white;
-  cursor:pointer;
-  font-weight:bold;
-  transition: transform 0.2s ease;
 }
-header button:hover{transform: scale(1.05);}
-
-/* ------------------ Top & Bottom Bars ------------------ */
-.top-bar, .bottom-bar{
-  display:flex;
-  justify-content:center;
-  gap:15px;
-  padding:10px 0;
-}
-.top-bar button{
-  padding:10px 20px;
-  border:none;
-  border-radius:25px;
-  background:#4f46e5;
+.top-buttons ion-button{
+  --background:#4f46e5;
+  --border-radius:25px;
   color:white;
   font-weight:bold;
-  cursor:pointer;
-  transition: transform 0.2s ease;
 }
-.top-bar button:hover{transform: scale(1.05);}
-.bottom-bar button{
-  padding:10px 20px;
-  border:none;
-  border-radius:25px;
-  background:white;
-  color:#333;
+.bottom-buttons ion-button{
+  --background:white;
+  --color:#333;
+  --border-radius:25px;
   font-weight:bold;
-  cursor:pointer;
-  transition: transform 0.2s ease;
 }
-.bottom-bar button:hover{transform: scale(1.05);}
 
-/* ------------------ Cards ------------------ */
-#cardsContainer{
-  display:grid;
-  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
-  gap:15px;
-  padding:15px;
-}
-.card{
-  background: rgba(255,255,255,0.05);
-  padding:20px;
+/* Cards */
+ion-card{
+  margin: 10px;
+  --background: rgba(255,255,255,0.05);
   border-radius:20px;
-  backdrop-filter: blur(10px);
-  box-shadow:0 10px 20px rgba(0,0,0,0.4);
-  cursor:pointer;
-  transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.4s ease;
-  position:relative;
-  overflow:hidden;
 }
-.card.expanded{
-  transform: scale(1.05);
-  box-shadow:0 20px 40px rgba(0,0,0,0.7);
-  z-index:10;
-}
-.card h3{margin-top:0;}
-.card .versiculo{font-style:italic;margin-bottom:5px;font-weight:bold;}
-.card .cita{font-size:0.95em;margin-bottom:5px;color:#ccc;}
-.card .reflexion{margin-bottom:10px;color:#eee;}
+ion-card.ansiedad{--background: rgba(59,130,246,0.3);}
+ion-card.tentacion{--background: rgba(239,68,68,0.3);}
+ion-card.motivacion{--background: rgba(16,185,129,0.3);}
+ion-card.caridad{--background: rgba(234,179,8,0.3);}
+ion-card.confianza{--background: rgba(139,92,246,0.3);}
+
+/* Card actions share */
 .card-actions{
-  display:none;
+  display:flex;
   gap:10px;
   margin-top:10px;
-  opacity:0;
-  transition: opacity 0.4s ease;
-  flex-direction:row;
-}
-.card.expanded .card-actions{
-  display:flex;
-  opacity:1;
 }
 .card-actions a{
   width:40px; height:40px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  display:flex; justify-content:center; align-items:center;
   border-radius:50%;
   background: rgba(255,255,255,0.2);
-  color:white;
-  font-size:20px;
+  color:white; font-size:20px;
   transition: transform 0.3s ease, background 0.3s ease;
 }
 .card-actions a:hover{
@@ -127,83 +74,59 @@ header button:hover{transform: scale(1.05);}
   background: rgba(255,255,255,0.4);
 }
 
-/* ------------------ Categorías ------------------ */
-.ansiedad{ background: rgba(59,130,246,0.3);}
-.tentacion{ background: rgba(239,68,68,0.3);}
-.motivacion{ background: rgba(16,185,129,0.3);}
-.caridad{ background: rgba(234,179,8,0.3);}
-.confianza{ background: rgba(139,92,246,0.3);}
-
-/* ------------------ Floating Expandable Categories ------------------ */
-#floatCategories{
-  position:fixed;
-  right:20px; bottom:100px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+/* Floating categories */
+ion-fab{
+  bottom: 80px;
+  right: 20px;
 }
-#floatCategories .main-btn{
-  width:60px; height:60px;
-  border-radius:50%;
-  border:none;
-  background:#4f46e5;
-  color:white;
-  font-size:30px;
-  cursor:pointer;
-  box-shadow:0 5px 10px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease;
-}
-#floatCategories .main-btn:hover{transform: scale(1.2);}
-#floatCategories .cat-btn{
-  width:50px; height:50px;
-  border-radius:50%;
-  border:none;
-  background:#6d28d9;
-  color:white;
-  font-size:18px;
-  cursor:pointer;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-  transform: scale(0);
-  opacity:0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-#floatCategories.show .cat-btn{
-  transform: scale(1);
-  opacity:1;
+ion-fab-list ion-fab-button{
+  --background:#6d28d9;
 }
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<header>
-  <h1>Palabra del Padre</h1>
-  <button id="installBtn">Instalar App</button>
-</header>
+<ion-app>
 
-<!-- Top Premium Button -->
-<div class="top-bar">
-  <button onclick="window.location.href='https://m.me/tuPaginaMessenger'">Premium</button>
-</div>
+  <!-- Header -->
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Palabra del Padre</ion-title>
+      <ion-buttons slot="end">
+        <ion-button id="installBtn">Instalar App</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
-<!-- Cards -->
-<div id="cardsContainer"></div>
+  <!-- Top Premium Button -->
+  <ion-content>
+    <div class="top-buttons" style="text-align:center; margin:10px;">
+      <ion-button expand="block" onclick="window.location.href='https://m.me/tuPaginaMessenger'">Premium</ion-button>
+    </div>
 
-<!-- Bottom Donate Button -->
-<div class="bottom-bar">
-  <button onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">Donar</button>
-</div>
+    <!-- Cards Container -->
+    <ion-grid id="cardsContainer"></ion-grid>
 
-<!-- Floating Expandable Categories -->
-<div id="floatCategories">
-  <button class="main-btn" id="toggleCats">☰</button>
-  <button class="cat-btn" onclick="filtrar('ansiedad')">Ansiedad</button>
-  <button class="cat-btn" onclick="filtrar('tentacion')">Tentación</button>
-  <button class="cat-btn" onclick="filtrar('motivacion')">Motivación</button>
-  <button class="cat-btn" onclick="filtrar('caridad')">Caridad</button>
-  <button class="cat-btn" onclick="filtrar('confianza')">Confianza</button>
-  <button class="cat-btn" onclick="filtrar('todas')">Todas</button>
-</div>
+    <!-- Bottom Donate Button -->
+    <div class="bottom-buttons" style="text-align:center; margin:10px;">
+      <ion-button expand="block" onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">Donar</ion-button>
+    </div>
+
+    <!-- Floating Expandable Categories -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button id="mainFab">☰</ion-fab-button>
+      <ion-fab-list side="top">
+        <ion-fab-button onclick="filtrar('ansiedad')">Ansiedad</ion-fab-button>
+        <ion-fab-button onclick="filtrar('tentacion')">Tentación</ion-fab-button>
+        <ion-fab-button onclick="filtrar('motivacion')">Motivación</ion-fab-button>
+        <ion-fab-button onclick="filtrar('caridad')">Caridad</ion-fab-button>
+        <ion-fab-button onclick="filtrar('confianza')">Confianza</ion-fab-button>
+        <ion-fab-button onclick="filtrar('todas')">Todas</ion-fab-button>
+      </ion-fab-list>
+    </ion-fab>
+
+  </ion-content>
+</ion-app>
 
 <script>
 // ------------------ Install Button ------------------
@@ -222,11 +145,6 @@ installBtn.addEventListener('click', async ()=>{
     installBtn.style.display='none';
   }
 });
-
-// ------------------ Floating Expandable Categories ------------------
-const floatCats=document.getElementById('floatCategories');
-const toggleCats=document.getElementById('toggleCats');
-toggleCats.addEventListener('click',()=>floatCats.classList.toggle('show'));
 
 // ------------------ Cards Content ------------------
 const contenido=[
@@ -251,24 +169,24 @@ const cardsContainer=document.getElementById('cardsContainer');
 function mostrarCards(items){
   cardsContainer.innerHTML='';
   items.forEach(c=>{
-    const div=document.createElement('div');
-    div.className=`card ${c.categoria}`;
-    div.innerHTML=`
-      <h3>${c.titulo}</h3>
-      <div class="versiculo">${c.versiculo}</div>
-      <div class="cita">${c.cita}</div>
-      <div class="reflexion">${c.reflexion}</div>
-      <div class="card-actions">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank"><i class="bi bi-facebook"></i></a>
-        <a href="https://www.instagram.com/" target="_blank"><i class="bi bi-instagram"></i></a>
-        <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+' - '+c.reflexion)}" target="_blank"><i class="bi bi-whatsapp"></i></a>
-      </div>
+    const card = document.createElement('ion-card');
+    card.classList.add(c.categoria);
+    card.innerHTML=`
+      <ion-card-header>
+        <ion-card-title>${c.titulo}</ion-card-title>
+        <ion-card-subtitle>${c.versiculo}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p><em>${c.cita}</em></p>
+        <p>${c.reflexion}</p>
+        <div class="card-actions">
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank"><i class="bi bi-facebook"></i></a>
+          <a href="https://www.instagram.com/" target="_blank"><i class="bi bi-instagram"></i></a>
+          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+' - '+c.reflexion)}" target="_blank"><i class="bi bi-whatsapp"></i></a>
+        </div>
+      </ion-card-content>
     `;
-    div.addEventListener('click', ()=>{
-      document.querySelectorAll('.card').forEach(c=>c.classList.remove('expanded'));
-      div.classList.toggle('expanded');
-    });
-    cardsContainer.appendChild(div);
+    cardsContainer.appendChild(card);
   });
 }
 mostrarCards(contenido);
@@ -276,13 +194,6 @@ mostrarCards(contenido);
 function filtrar(cat){
   if(cat==='todas'){mostrarCards(contenido);}
   else{mostrarCards(contenido.filter(c=>c.categoria===cat));}
-}
-
-// ------------------ Service Worker ------------------
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('./sw.js')
-    .then(()=>console.log('SW registrado'))
-    .catch(e=>console.log('Error SW:',e));
 }
 </script>
 </body>
