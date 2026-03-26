@@ -3,9 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Palabra del Padre</title>
 
 <link rel="manifest" href="manifest.json">
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline';">
 
 <style>
 body {
@@ -13,159 +16,164 @@ body {
   font-family: system-ui;
   background: linear-gradient(135deg, #0f172a, #1e293b);
   color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
-/* TARJETA */
-.card {
-  width: 90%;
-  max-width: 420px;
-  padding: 25px;
-  border-radius: 20px;
-  backdrop-filter: blur(15px);
-  background: rgba(255,255,255,0.05);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+/* HEADER */
+.header {
+  padding: 20px;
   text-align: center;
-  animation: fadeIn 0.6s ease;
 }
 
-h1 {
-  margin-bottom: 5px;
+.header h1 {
+  margin: 0;
 }
 
-.subtitle {
-  font-size: 14px;
-  opacity: 0.7;
+.premium-btn {
+  margin-top: 10px;
+  display: inline-block;
+  padding: 8px 15px;
+  border-radius: 12px;
+  background: #f59e0b;
+  color: white;
+  text-decoration: none;
+}
+
+/* INSTALL */
+.install {
+  margin-top: 10px;
+  display: none;
+  background: #22c55e;
+  padding: 8px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* CAROUSEL */
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  padding: 20px;
+  gap: 15px;
+}
+
+/* CARD */
+.card {
+  min-width: 280px;
+  max-width: 300px;
+  background: rgba(255,255,255,0.05);
+  padding: 20px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+.card h3 {
+  margin-top: 0;
 }
 
 .versiculo {
-  margin-top: 20px;
-  font-size: 18px;
-  font-weight: 600;
+  font-weight: bold;
+  margin: 10px 0;
 }
 
 .reflexion {
-  margin-top: 10px;
-  font-size: 15px;
+  font-size: 14px;
   opacity: 0.85;
 }
 
-/* BOTONES */
-.actions {
-  margin-top: 20px;
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 20px;
 }
 
-.btn {
-  padding: 10px 15px;
+.donar-btn {
+  background: #3b82f6;
+  padding: 12px 20px;
   border-radius: 12px;
-  margin: 5px;
+  color: white;
   text-decoration: none;
-  color: white;
-  display: inline-block;
-  font-size: 14px;
 }
 
-.donar { background: #3b82f6; }
-.premium { background: #f59e0b; }
-
-/* FAB */
-.fab {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
+/* SCROLL BAR */
+.carousel::-webkit-scrollbar {
+  height: 6px;
+}
+.carousel::-webkit-scrollbar-thumb {
   background: #22c55e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 30px;
-  cursor: pointer;
-}
-
-/* MENU */
-.menu {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  display: none;
-  flex-direction: column;
-}
-
-.menu button {
-  margin: 5px 0;
-  padding: 10px;
   border-radius: 10px;
-  border: none;
-  background: #1e293b;
-  color: white;
-  cursor: pointer;
-}
-
-/* ANIMACIÓN */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px);}
-  to { opacity: 1; transform: translateY(0);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="header">
   <h1>Palabra del Padre</h1>
-  <div class="subtitle">Cerca de Dios en tu día a día</div>
+  <p>Cultiva tu amistad con Dios</p>
 
-  <div class="versiculo" id="versiculo"></div>
-  <div class="reflexion" id="reflexion"></div>
+  <a class="premium-btn" href="https://m.me/TUPAGINA" target="_blank">
+    Acceso Premium ✨
+  </a>
 
-  <div class="actions">
-    <a class="btn donar" href="https://www.paypal.com/paypalme/TUUSUARIO" target="_blank">Donar</a>
-    <a class="btn premium" href="https://m.me/TUPAGINA" target="_blank">Premium</a>
-  </div>
+  <div class="install" id="installBtn">Instalar App</div>
 </div>
 
-<div class="fab" onclick="toggleMenu()">+</div>
+<div class="carousel">
 
-<div class="menu" id="menu">
-  <button onclick="mostrar('ansiedad')">Ansiedad</button>
-  <button onclick="mostrar('tentacion')">Tentación</button>
-  <button onclick="mostrar('motivacion')">Motivación</button>
+  <div class="card">
+    <h3>Ansiedad</h3>
+    <div class="versiculo">Filipenses 4:6</div>
+    <div class="reflexion">No cargues solo. Dios ya está contigo en esto.</div>
+  </div>
+
+  <div class="card">
+    <h3>Tentación</h3>
+    <div class="versiculo">1 Corintios 10:13</div>
+    <div class="reflexion">Siempre hay una salida. Recuerda quién eres.</div>
+  </div>
+
+  <div class="card">
+    <h3>Motivación</h3>
+    <div class="versiculo">Filipenses 4:13</div>
+    <div class="reflexion">Haz el bien hoy, aunque cueste.</div>
+  </div>
+
+  <div class="card">
+    <h3>Caridad</h3>
+    <div class="versiculo">Mateo 25:40</div>
+    <div class="reflexion">Cada acto de amor cuenta ante Dios.</div>
+  </div>
+
+  <div class="card">
+    <h3>Confianza</h3>
+    <div class="versiculo">Proverbios 3:5</div>
+    <div class="reflexion">Confía en Dios incluso cuando no entiendas.</div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <a class="donar-btn" href="https://www.paypal.com/paypalme/TUUSUARIO" target="_blank">
+    Donar 🙏
+  </a>
 </div>
 
 <script>
-const data = {
-  ansiedad: {
-    versiculo: "No se inquieten por nada… (Fil 4:6)",
-    reflexion: "Confía en Dios hoy. No cargues solo."
-  },
-  tentacion: {
-    versiculo: "Dios es fiel… (1 Cor 10:13)",
-    reflexion: "No estás solo en la lucha."
-  },
-  motivacion: {
-    versiculo: "Todo lo puedo… (Fil 4:13)",
-    reflexion: "Haz el bien hoy, aunque cueste."
-  }
-};
+// PWA install
+let deferredPrompt;
 
-function mostrar(tipo) {
-  document.getElementById("versiculo").innerText = data[tipo].versiculo;
-  document.getElementById("reflexion").innerText = data[tipo].reflexion;
-  document.getElementById("menu").style.display = "none";
-}
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBtn').style.display = 'inline-block';
+});
 
-function toggleMenu() {
-  const menu = document.getElementById("menu");
-  menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-}
+document.getElementById('installBtn').addEventListener('click', () => {
+  deferredPrompt.prompt();
+});
 
-mostrar("ansiedad");
-
+// SW
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
