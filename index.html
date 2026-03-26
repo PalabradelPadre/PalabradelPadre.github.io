@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palabra del Padre</title>
 
-<!-- Ionic Core CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/>
-
-<!-- Ionic Core JS -->
-<script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
-<script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+<!-- Quasar Framework CDN -->
+<link href="https://cdn.jsdelivr.net/npm/quasar@2.16.7/dist/quasar.prod.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.prod.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quasar@2.16.7/dist/quasar.umd.prod.js"></script>
 
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
@@ -22,191 +20,124 @@ body {
   font-family: 'Segoe UI', sans-serif;
   color:white;
 }
-ion-header{--background:#111122;}
-ion-title{color:white;}
-
-/* Top/Bottom Buttons */
-.top-buttons ion-button{
-  --background: linear-gradient(90deg,#7c3aed,#4f46e5);
-  --color:white; font-weight:bold;
-  border-radius:25px;
-  display:flex; align-items:center; justify-content:center;
-  gap:8px;
-}
-.bottom-buttons ion-button{
-  --background:white; --color:#111122;
-  border-radius:25px; font-weight:bold;
-  display:flex; align-items:center; justify-content:center;
-  gap:8px;
-}
-#installBtn{
-  --background:#10b981;
-  --color:white;
-  font-weight:bold;
-  border-radius:20px;
-  display:flex; align-items:center; justify-content:center;
-  gap:6px;
-}
-
-/* Cards */
-ion-card{
-  margin:10px;
-  --background: rgba(255,255,255,0.05);
-  border-radius:20px;
-  transition: transform 0.3s ease, max-height 0.5s ease;
-  overflow:hidden;
-  max-height:200px;
-  cursor:pointer;
-}
-ion-card.expanded{
-  max-height:500px;
-  transform: scale(1.03);
-}
-ion-card.ansiedad{--background: rgba(59,130,246,0.3);}
-ion-card.tentacion{--background: rgba(239,68,68,0.3);}
-ion-card.motivacion{--background: rgba(16,185,129,0.3);}
-ion-card.caridad{--background: rgba(234,179,8,0.3);}
-ion-card.confianza{--background: rgba(139,92,246,0.3);}
-
-/* Share buttons */
-.card-actions{
-  display:flex; gap:10px; margin-top:10px;
-  justify-content:flex-start;
-}
-.card-actions a{
-  width:40px; height:40px;
-  display:flex; justify-content:center; align-items:center;
-  border-radius:50%;
-  background: rgba(255,255,255,0.2);
-  color:white; font-size:20px;
-  transition: transform 0.3s ease, background 0.3s ease;
-}
-.card-actions a:hover{
-  transform: scale(1.2);
-  background: rgba(255,255,255,0.4);
-}
-
-/* Floating categories */
-ion-fab{bottom: 80px; right:20px;}
-ion-fab-list ion-fab-button{
-  --background:#6d28d9;
-  white-space: nowrap;
-  padding-left:10px; padding-right:10px;
-  min-width:auto;
-}
-ion-fab-button{--border-radius:50%;}
-
-/* Grid cards */
-ion-grid{padding:10px;}
+.q-btn { font-weight:bold; }
+.q-card { cursor:pointer; transition: transform 0.3s; }
+.q-card.expanded { transform: scale(1.03); }
+.category-btn { white-space: nowrap; margin:5px; }
 </style>
 </head>
 <body>
-<ion-app>
 
-  <!-- Header -->
-  <ion-header>
-    <ion-toolbar>
-      <ion-title>Palabra del Padre</ion-title>
-      <ion-buttons slot="end">
-        <ion-button id="installBtn"><i class="bi bi-download"></i> Instalar</ion-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+<div id="app">
+  <q-layout view="hHh Lpr fFf">
 
-  <ion-content>
-    <!-- Top Acompañamiento Button -->
-    <div class="top-buttons" style="text-align:center; margin:10px;">
-      <ion-button expand="block" onclick="window.location.href='https://m.me/tuPaginaMessenger'">
-        <i class="bi bi-chat-dots"></i> Acompañamiento
-      </ion-button>
-    </div>
+    <!-- Header -->
+    <q-header elevated>
+      <q-toolbar>
+        <q-toolbar-title>Palabra del Padre</q-toolbar-title>
+        <q-btn color="green" label="Instalar" icon="download" @click="instalarPWA" flat dense round />
+      </q-toolbar>
+    </q-header>
 
-    <!-- Cards Container -->
-    <ion-grid id="cardsContainer"></ion-grid>
+    <!-- Page Content -->
+    <q-page padding>
 
-    <!-- Bottom Donate Button -->
-    <div class="bottom-buttons" style="text-align:center; margin:10px;">
-      <ion-button expand="block" onclick="window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')">
-        <i class="bi bi-currency-dollar"></i> Donar
-      </ion-button>
-    </div>
+      <!-- Top Acompañamiento Button -->
+      <div style="text-align:center; margin:10px;">
+        <q-btn color="purple" label="Acompañamiento" icon="chat" @click="abrirMessenger" unelevated rounded />
+      </div>
 
-    <!-- Floating Expandable Categories -->
-    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-      <ion-fab-button id="mainFab">☰</ion-fab-button>
-      <ion-fab-list side="top">
-        <ion-fab-button onclick="filtrar('ansiedad')">Ansiedad</ion-fab-button>
-        <ion-fab-button onclick="filtrar('tentacion')">Tentación</ion-fab-button>
-        <ion-fab-button onclick="filtrar('motivacion')">Motivación</ion-fab-button>
-        <ion-fab-button onclick="filtrar('caridad')">Caridad</ion-fab-button>
-        <ion-fab-button onclick="filtrar('confianza')">Confianza</ion-fab-button>
-        <ion-fab-button onclick="filtrar('todas')">Todas</ion-fab-button>
-      </ion-fab-list>
-    </ion-fab>
+      <!-- Floating Category Buttons -->
+      <div style="position:fixed; bottom:80px; right:20px; display:flex; flex-direction:column; align-items:flex-end;">
+        <q-btn v-for="cat in categorias" :key="cat.id" :label="cat.label" color="indigo" class="category-btn" @click="filtrar(cat.id)" rounded unelevated />
+      </div>
 
-  </ion-content>
-</ion-app>
+      <!-- Cards -->
+      <q-card v-for="item in cardsFiltradas" :key="item.titulo" :class="{'expanded': item.expanded}" flat bordered style="margin:10px;" @click="toggleExpand(item)">
+        <q-card-section>
+          <div class="text-h6">{{ item.titulo }}</div>
+          <div class="text-subtitle2">{{ item.versiculo }}</div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section v-if="item.expanded">
+          <p><em>"{{ item.cita }}"</em></p>
+          <p>{{ item.reflexion }}</p>
+          <div style="display:flex; gap:10px;">
+            <q-btn flat round icon="facebook" @click.stop="shareFB(item)" />
+            <q-btn flat round icon="instagram" @click.stop="shareIG(item)" />
+            <q-btn flat round icon="whatsapp" @click.stop="shareWA(item)" />
+          </div>
+        </q-card-section>
+      </q-card>
+
+      <!-- Bottom Donate Button -->
+      <div style="text-align:center; margin:10px;">
+        <q-btn color="white" text-color="#111" icon="attach_money" label="Donar" @click="donar" rounded unelevated />
+      </div>
+
+    </q-page>
+
+  </q-layout>
+</div>
 
 <script>
-// ------------------ Install Button ------------------
-let deferredPrompt;
-const installBtn=document.getElementById('installBtn');
-installBtn.style.display='none';
-window.addEventListener('beforeinstallprompt', e=>{
-  e.preventDefault();
-  deferredPrompt=e;
-  installBtn.style.display='inline-flex';
-});
-installBtn.addEventListener('click', async ()=>{
-  if(deferredPrompt){
-    deferredPrompt.prompt();
-    const choice=await deferredPrompt.userChoice;
-    deferredPrompt=null;
-    installBtn.style.display='none';
+const { createApp, ref } = Vue;
+createApp({
+  setup() {
+    const deferredPrompt = ref(null);
+
+    // --- PWA Install ---
+    window.addEventListener('beforeinstallprompt', e=>{
+      e.preventDefault();
+      deferredPrompt.value = e;
+    });
+    const instalarPWA = async ()=>{
+      if(deferredPrompt.value){
+        deferredPrompt.value.prompt();
+        await deferredPrompt.value.userChoice;
+        deferredPrompt.value = null;
+      }
+    };
+
+    // --- Cards Data ---
+    const cards = ref([
+      {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.', expanded:false},
+      {categoria:'tentacion', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.', reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.', expanded:false},
+      {categoria:'motivacion', titulo:'Actúa con bondad', versiculo:'Gálatas 6:9', cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.', reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.', expanded:false},
+      {categoria:'caridad', titulo:'Ayuda a otros', versiculo:'Mateo 25:40', cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.', reflexion:'Hacer caridad es servir a Dios directamente.', expanded:false},
+      {categoria:'confianza', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y Él guiará tus caminos.', expanded:false}
+    ]);
+
+    const categorias = ref([
+      {id:'ansiedad', label:'Ansiedad'},
+      {id:'tentacion', label:'Tentación'},
+      {id:'motivacion', label:'Motivación'},
+      {id:'caridad', label:'Caridad'},
+      {id:'confianza', label:'Confianza'},
+      {id:'todas', label:'Todas'}
+    ]);
+
+    const cardsFiltradas = ref([...cards.value]);
+
+    const filtrar = (cat)=>{
+      if(cat==='todas') cardsFiltradas.value = [...cards.value];
+      else cardsFiltradas.value = cards.value.filter(c=>c.categoria===cat);
+    };
+
+    const toggleExpand = (item)=>{ item.expanded = !item.expanded; };
+
+    // --- Sharing ---
+    const shareFB = (item)=>{ window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`,'_blank'); };
+    const shareIG = (item)=>{ window.open(`https://www.instagram.com/`,'_blank'); };
+    const shareWA = (item)=>{ window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(item.cita+' - '+item.reflexion)}`,'_blank'); };
+
+    const abrirMessenger = ()=>{ window.open('https://m.me/tuPaginaMessenger','_blank'); };
+    const donar = ()=>{ window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank'); };
+
+    return {cardsFiltradas,categorias,filtrar,toggleExpand,shareFB,shareIG,shareWA,instalarPWA,abrirMessenger,donar};
   }
-});
-
-// ------------------ Cards Content ------------------
-const contenido=[
-  {categoria:'ansiedad',titulo:'No tengas miedo',versiculo:'Filipenses 4:6-7',cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.',reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'},
-  {categoria:'tentacion',titulo:'Resiste la tentación',versiculo:'1 Corintios 10:13',cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.',reflexion:'Recuerda que Dios te da la fuerza para superar cualquier tentación.'},
-  {categoria:'motivacion',titulo:'Actúa con bondad',versiculo:'Gálatas 6:9',cita:'No nos cansemos de hacer el bien, porque a su debido tiempo cosecharemos si no nos damos por vencidos.',reflexion:'Cada acto de bondad te acerca más a Dios y ayuda a los demás.'},
-  {categoria:'caridad',titulo:'Ayuda a otros',versiculo:'Mateo 25:40',cita:'De cierto les digo que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.',reflexion:'Hacer caridad es servir a Dios directamente.'},
-  {categoria:'confianza',titulo:'Confía en el Señor',versiculo:'Proverbios 3:5-6',cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.',reflexion:'Ríndete a Dios y Él guiará tus caminos.'}
-];
-
-const cardsContainer=document.getElementById('cardsContainer');
-function mostrarCards(items){
-  cardsContainer.innerHTML='';
-  items.forEach(c=>{
-    const card=document.createElement('ion-card');
-    card.classList.add(c.categoria);
-    card.innerHTML=`
-      <ion-card-header>
-        <ion-card-title>${c.titulo}</ion-card-title>
-        <ion-card-subtitle>${c.versiculo}</ion-card-subtitle>
-      </ion-card-header>
-      <ion-card-content>
-        <p><em>${c.cita}</em></p>
-        <p>${c.reflexion}</p>
-        <div class="card-actions">
-          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank"><i class="bi bi-facebook"></i></a>
-          <a href="https://www.instagram.com/" target="_blank"><i class="bi bi-instagram"></i></a>
-          <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+' - '+c.reflexion)}" target="_blank"><i class="bi bi-whatsapp"></i></a>
-        </div>
-      </ion-card-content>
-    `;
-    // Animación expandir/contraer
-    card.addEventListener('click', ()=>card.classList.toggle('expanded'));
-    cardsContainer.appendChild(card);
-  });
-}
-mostrarCards(contenido);
-
-function filtrar(cat){
-  if(cat==='todas'){mostrarCards(contenido);}
-  else{mostrarCards(contenido.filter(c=>c.categoria===cat));}
-}
+}).use(Quasar).mount('#app');
 </script>
+
 </body>
 </html>
