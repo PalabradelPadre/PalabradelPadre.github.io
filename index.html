@@ -25,6 +25,7 @@ body {
 ion-header{--background:#111122;}
 ion-title{color:white;}
 
+/* Top/Bottom Buttons */
 .top-buttons ion-button{
   --background: linear-gradient(90deg,#7c3aed,#4f46e5);
   --color:white; font-weight:bold;
@@ -34,8 +35,6 @@ ion-title{color:white;}
   --background:white; --color:#111122;
   border-radius:25px; font-weight:bold;
 }
-
-/* Install button */
 #installBtn{
   --background:#10b981;
   --color:white;
@@ -48,9 +47,15 @@ ion-card{
   margin:10px;
   --background: rgba(255,255,255,0.05);
   border-radius:20px;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, max-height 0.5s ease;
+  overflow:hidden;
+  max-height:200px;
+  cursor:pointer;
 }
-ion-card:hover{transform: scale(1.03);}
+ion-card.expanded{
+  max-height:500px;
+  transform: scale(1.03);
+}
 ion-card.ansiedad{--background: rgba(59,130,246,0.3);}
 ion-card.tentacion{--background: rgba(239,68,68,0.3);}
 ion-card.motivacion{--background: rgba(16,185,129,0.3);}
@@ -92,7 +97,7 @@ ion-grid{padding:10px;}
     <ion-toolbar>
       <ion-title>Palabra del Padre</ion-title>
       <ion-buttons slot="end">
-        <ion-button id="installBtn">Instalar App</ion-button>
+        <ion-button id="installBtn">Instalar</ion-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
@@ -180,6 +185,8 @@ function mostrarCards(items){
         </div>
       </ion-card-content>
     `;
+    // Animación expandir/contraer
+    card.addEventListener('click', ()=>card.classList.toggle('expanded'));
     cardsContainer.appendChild(card);
   });
 }
