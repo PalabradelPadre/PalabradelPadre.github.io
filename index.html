@@ -15,6 +15,7 @@
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2a1e3b">
+
 <style>
   body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); }
   .share-btn { 
@@ -70,11 +71,19 @@ const cardsData = [
   {categoria:'confianza', titulo:'Fortaleza divina', versiculo:'Isaías 41:10', cita:'No temas, porque yo estoy contigo; no desmayes, porque yo soy tu Dios.', reflexion:'Encuentra fortaleza en Dios.'},
   {categoria:'confianza', titulo:'Refugio seguro', versiculo:'Salmos 46:1', cita:'Dios es nuestro refugio y fortaleza, nuestro pronto auxilio en las tribulaciones.', reflexion:'Busca en Él tu refugio diario.'},
 
-  // Oraciones
-  {categoria:'oraciones', titulo:'Oración a San Miguel', versiculo:'San Miguel Arcángel', cita:'San Miguel Arcángel, defiéndenos en la batalla; sé nuestro amparo contra la maldad y asechanzas del demonio.', reflexion:'Lleva esta oración en tu bolsillo para protección diaria.'},
-  {categoria:'oraciones', titulo:'El Angelus', versiculo:'Oración tradicional', cita:'El Ángel del Señor anunció a María, y concibió por obra del Espíritu Santo.', reflexion:'Reza cada día el Angelus para meditar en la Encarnación.'},
-  {categoria:'oraciones', titulo:'Después de la comunión', versiculo:'Sangre de Cristo, sálvame', cita:'Sangre de Cristo, sálvame; pasión de Cristo, fortaléceme.', reflexion:'Oración corta y poderosa tras recibir la Eucaristía.'},
-  {categoria:'oraciones', titulo:'Oración de protección', versiculo:'Protección diaria', cita:'Ángel de Dios, mi guardián, ilumíname y protégeme hoy y siempre.', reflexion:'Útil para llevar y rezar en cualquier momento.'}
+  // Oraciones completas
+  {categoria:'oraciones', titulo:'Oración a San Miguel', versiculo:'San Miguel Arcángel', cita:`San Miguel Arcángel, defiéndenos en la batalla;
+Sé nuestro amparo contra la maldad y asechanzas del demonio;
+Reprímelos Dios, pedimos suplicantes; y tú, Príncipe de la Milicia Celestial, arroja al infierno a Satanás y a los demás espíritus malignos que vagan por el mundo para la perdición de las almas.`, reflexion:'Lleva esta oración en tu bolsillo para protección diaria.'},
+  {categoria:'oraciones', titulo:'El Angelus', versiculo:'Oración tradicional', cita:`El Ángel del Señor anunció a María,
+y concibió por obra del Espíritu Santo,
+He aquí la sierva del Señor; hágase en mí según tu palabra.`, reflexion:'Reza cada día el Angelus para meditar en la Encarnación.'},
+  {categoria:'oraciones', titulo:'Después de la comunión', versiculo:'Sangre de Cristo, sálvame', cita:`Sangre de Cristo, sálvame;
+Pasión de Cristo, fortaléceme;
+Jesús, confío en Ti y te doy gracias.`, reflexion:'Oración corta y poderosa tras recibir la Eucaristía.'},
+  {categoria:'oraciones', titulo:'Oración de protección', versiculo:'Protección diaria', cita:`Ángel de Dios, mi guardián,
+ilumíname y protégeme hoy y siempre.
+Guíame por el camino correcto y defiéndeme de todo mal.`, reflexion:'Útil para llevar y rezar en cualquier momento.'}
 ];
 
 const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza','Oraciones'];
@@ -96,11 +105,10 @@ function App() {
     ? cardsData 
     : cardsData.filter(c=>normalize(c.categoria) === normalize(category));
   return e('div',{className:'min-h-screen flex flex-col'},
-    e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
-      e('h1',{className:'text-xl font-bold'},'Palabra del Padre'),
-      e('button',{className:'flex items-center bg-green-600 px-3 py-1 rounded hover:bg-green-500', onClick:()=>{if(window.deferredPrompt){window.deferredPrompt.prompt(); window.deferredPrompt.userChoice.then(()=>window.deferredPrompt=null)}}},
-        e('i',{className:'bi bi-phone mr-2'}), 'Instalar'
-      )
+    e('header',{className:'flex justify-center items-center p-4 bg-gray-800 shadow space-x-2'},
+      e('i',{className:'bi bi-cross text-xl text-yellow-400'}),
+      e('h1',{className:'text-xl font-bold text-center'},'Palabra del Padre'),
+      e('i',{className:'bi bi-dove text-xl text-white'})
     ),
     e('div',{className:'text-center mt-4'},
       e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto', onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')},
@@ -125,10 +133,12 @@ function Card({titulo, versiculo, cita, reflexion, categoria}){
   const [expanded, setExpanded] = React.useState(false);
   const color = categoryColors[normalize(categoria)] || 'bg-gray-600';
   return e('div',{className:`${color} p-4 rounded shadow transform transition-all duration-300 hover:scale-105 cursor-pointer border border-white/20`, onClick:()=>setExpanded(!expanded)},
-    e('h2',{className:'text-lg font-bold'},titulo),
+    e('h2',{className:'text-lg font-bold flex items-center space-x-2'},
+      e('i',{className:'bi bi-book mr-1'}), titulo
+    ),
     e('h3',{className:'text-sm text-gray-200'},versiculo),
     e('div',{className:`overflow-hidden transition-all duration-500 ${expanded ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'}`},
-      e('p',{className:'italic mb-2'},`"${cita}"`),
+      e('p',{className:'italic mb-2 whitespace-pre-line'},`"${cita}"`),
       e('p',null,reflexion),
       e('div',{className:'flex space-x-2 mt-2'},
         e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'share-btn bg-blue-700 hover:bg-blue-600'},
