@@ -5,24 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palabra del Padre</title>
 
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- React + ReactDOM -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<!-- html2canvas para convertir cards en imagen -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); font-family: sans-serif; overflow-x:hidden; }
-.card-glass { backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.1); border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.2); padding: 1rem; cursor:pointer; transition: transform 0.3s; }
-.card-glass:hover { transform: scale(1.03); }
-.share-btn { width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:transform 0.2s;border:1px solid rgba(255,255,255,0.4); }
+body {
+  background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+  font-family: sans-serif;
+}
+.card-glass {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 1rem;
+}
+.share-btn { 
+  width: 36px; height: 36px; 
+  display:flex; align-items:center; justify-content:center; 
+  border-radius:50%; 
+  transition: transform 0.2s; 
+  border: 1px solid rgba(255,255,255,0.4); 
+}
 .share-btn:hover { transform: scale(1.2); }
-.modo-oracion { position:fixed;top:0;left:0;width:100%;height:100%;background: rgba(0,0,0,0.95); display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; padding:2rem; z-index:1000; overflow-y:scroll; scroll-snap-type: y mandatory; }
-.modo-card { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; scroll-snap-align: start; width:100%; max-width:600px; text-align:center; padding:1rem; }
-.modo-card textarea { width:100%; height:120px; border-radius:0.5rem; border:none; padding:1rem; margin-top:1rem; resize:none; color:black; }
-.menu { display:flex; gap:1rem; margin-left:1rem; }
-.menu a { color:white; text-decoration:none; font-weight:500; }
-.search-input { max-width:400px; margin: 0 auto 1rem auto; padding:0.5rem 1rem; border-radius:0.5rem; border:none; }
+.category-btn { 
+  border: 1px solid rgba(255,255,255,0.4); 
+  border-radius: 0.375rem; 
+  display:flex; align-items:center; gap:0.25rem;
+}
 </style>
 </head>
 <body class="text-white">
@@ -32,97 +49,189 @@ body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); font-family: sa
 <script>
 const e = React.createElement;
 
-// --- Datos de cards ---
-const cardsData = [ /* Tus 28 cards originales */ ];
+// Datos de cards
+const cardsData = [
+  {categoria:'paz', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, presenten sus peticiones a Dios en toda oración y súplica, acompañadas de acción de gracias. Y la paz de Dios, que supera todo entendimiento, cuidará sus corazones y sus pensamientos en Cristo Jesús.', reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'},
+  {categoria:'paz', titulo:'Paz en tu corazón', versiculo:'Juan 14:27', cita:'La paz les dejo, mi paz les doy; no se la doy como el mundo la da. No se turbe su corazón ni tenga miedo.', reflexion:'Busca la paz de Dios diariamente.'},
+  {categoria:'paz', titulo:'Entrega tus cargas', versiculo:'1 Pedro 5:7', cita:'Depositen en Él toda ansiedad, porque Él cuida de ustedes.', reflexion:'No cargues solo tus preocupaciones.'},
+  {categoria:'paz', titulo:'Confía en Dios', versiculo:'Proverbios 3:5', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y deja que Él guíe tus pasos.'},
 
-const categories = [ /* Tus categorías originales */ ];
+  {categoria:'fortaleza', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea común a los hombres; pero Dios es fiel, y no permitirá que sean tentados más allá de lo que puedan soportar.', reflexion:'Dios te da la fuerza para superar cualquier tentación.'},
+  {categoria:'fortaleza', titulo:'Huye del mal', versiculo:'2 Timoteo 2:22', cita:'Huye también de las pasiones juveniles; sigue la justicia, la fe, el amor y la paz con los que invocan al Señor con corazón puro.', reflexion:'Alejarte de lo que no agrada a Dios es un acto de sabiduría.'},
+  {categoria:'fortaleza', titulo:'Sé firme', versiculo:'Efesios 6:11', cita:'Pónganse toda la armadura de Dios para poder resistir los embates del diablo.', reflexion:'Mantente firme con la ayuda de Dios.'},
+  {categoria:'fortaleza', titulo:'Dios te fortalece', versiculo:'Salmos 119:9', cita:'¿Con qué limpiará el joven su camino? Guardando tu palabra.', reflexion:'Fortalece tu corazón con la Palabra de Dios.'},
+
+  {categoria:'inspiracion', titulo:'Actúa con bondad', versiculo:'Gálatas 6:9', cita:'No nos cansemos de hacer el bien, porque a su tiempo cosecharemos si no desmayamos.', reflexion:'Cada acto de bondad te acerca más a Dios.'},
+  {categoria:'inspiracion', titulo:'Levántate con fe', versiculo:'Isaías 40:31', cita:'Pero los que esperan al Señor renovarán sus fuerzas; se elevarán con alas como águilas; correrán sin fatigarse y caminarán sin cansarse.', reflexion:'La fe te renueva y fortalece.'},
+  {categoria:'inspiracion', titulo:'Sé valiente', versiculo:'Josué 1:9', cita:'Mira que te mando: Sé fuerte y valiente; no temas ni te acobardes, porque el Señor tu Dios estará contigo dondequiera que vayas.', reflexion:'Dios está contigo en cada desafío.'},
+  {categoria:'inspiracion', titulo:'Confianza diaria', versiculo:'Salmos 56:3', cita:'Cuando temo, en ti confío.', reflexion:'Confía en Dios cada día, incluso en el miedo.'},
+
+  {categoria:'amor', titulo:'Ayuda a otros', versiculo:'Mateo 25:40', cita:'Les aseguro que todo lo que hicieron por uno de estos mis hermanos más pequeños, a mí me lo hicieron.', reflexion:'Hacer caridad es servir a Dios directamente.'},
+  {categoria:'amor', titulo:'Ama al prójimo', versiculo:'1 Juan 3:18', cita:'Hijos míos, no amemos de palabra ni de lengua, sino con hechos y en verdad.', reflexion:'El amor se demuestra con acciones.'},
+  {categoria:'amor', titulo:'Da con alegría', versiculo:'2 Corintios 9:7', cita:'Cada uno dé como propuso en su corazón, no de mala gana ni por obligación, porque Dios ama al que da con alegría.', reflexion:'Dar con alegría multiplica la bendición.'},
+  {categoria:'amor', titulo:'Sé generoso', versiculo:'Proverbios 11:25', cita:'El alma generosa será prosperada, y el que sacia a otros, también será saciado.', reflexion:'La generosidad abre puertas de bendición.'},
+
+  {categoria:'fe', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia. Reconócelo en todos tus caminos, y Él enderezará tus senderos.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
+  {categoria:'fe', titulo:'Dios es tu guía', versiculo:'Salmos 32:8', cita:'Yo te instruiré y te enseñaré el camino que debes seguir; sobre ti fijaré mis ojos.', reflexion:'Dios te guía y te protege.'},
+  {categoria:'fe', titulo:'Fortaleza divina', versiculo:'Isaías 41:10', cita:'No temas, porque yo estoy contigo; no te desalientes, porque yo soy tu Dios. Te fortaleceré, te ayudaré y te sostendré con mi diestra victoriosa.', reflexion:'Encuentra fortaleza en Dios.'},
+  {categoria:'fe', titulo:'Refugio seguro', versiculo:'Salmos 46:1', cita:'Dios es nuestro refugio y nuestra fortaleza, ayuda siempre presente en las tribulaciones.', reflexion:'Busca en Él tu refugio diario.'},
+
+  {categoria:'devocion', titulo:'Oración a San Miguel', versiculo:'San Miguel Arcángel', cita:'San Miguel Arcángel, defiéndenos en la batalla; sé nuestro amparo contra la maldad y las asechanzas del demonio.', reflexion:'Lleva esta oración en tu bolsillo.'},
+  {categoria:'devocion', titulo:'El Angelus', versiculo:'Oración tradicional', cita:'El Ángel del Señor anunció a María; ella concibió por obra del Espíritu Santo. Ave María...', reflexion:'Reza cada día el Angelus.'},
+  {categoria:'devocion', titulo:'Después de la comunión', versiculo:'Sangre de Cristo, sálvame', cita:'Sangre de Cristo, sálvame; Señor, te pido protección y fuerza tras recibirte en la Eucaristía.', reflexion:'Oración corta y poderosa tras la Eucaristía.'},
+  {categoria:'devocion', titulo:'Oración de protección', versiculo:'Protección diaria', cita:'Ángel de Dios, mi guardián, a quien la divina misericordia me confía, ilumíname, guárdame, gobierna y dirige.', reflexion:'Útil para llevar y rezar en cualquier momento.'}
+];
+
+const categories = [
+  {id:'todas', label:'Todas', icon:'bi-list', color:'bg-indigo-600/50'},
+  {id:'paz', label:'Paz', icon:'bi-dove-fill', color:'bg-blue-400/30'},
+  {id:'fortaleza', label:'Fortaleza', icon:'bi-shield-fill', color:'bg-red-400/30'},
+  {id:'inspiracion', label:'Inspiración', icon:'bi-lightning-fill', color:'bg-green-400/30'},
+  {id:'amor', label:'Amor al prójimo', icon:'bi-heart-fill', color:'bg-yellow-300/30'},
+  {id:'fe', label:'Fe y Confianza', icon:'bi-star-fill', color:'bg-purple-400/30'},
+  {id:'devocion', label:'Devoción', icon:'bi-book-fill', color:'bg-pink-400/30'}
+];
 
 function normalize(str){return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();}
 
+// COMPONENTE PRINCIPAL
 function App() {
   const [category, setCategory] = React.useState('todas');
-  const [modoOracion, setModoOracion] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [search, setSearch] = React.useState('');
 
-  const filteredCards = cardsData
-    .filter(c=>category==='todas' || normalize(c.categoria)===category)
-    .filter(c=>c.titulo.toLowerCase().includes(searchTerm.toLowerCase()) || c.cita.toLowerCase().includes(searchTerm.toLowerCase()));
+  // Filtrado por categoría y búsqueda
+  const filteredCards = cardsData.filter(c=>{
+    const matchesCategory = category==='todas' ? true : normalize(c.categoria)===category;
+    const matchesSearch = search ? normalize(c.titulo).includes(normalize(search)) || normalize(c.cita).includes(normalize(search)) : true;
+    return matchesCategory && matchesSearch;
+  });
 
   return e('div',{className:'min-h-screen flex flex-col'},
-    e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
-      e('div',{className:'flex items-center'},
-        e('img',{src:'https://upload.wikimedia.org/wikipedia/commons/3/32/Book_icon.svg', alt:'Logo', className:'w-8 h-8 mr-2'}),
-        e('h1',{className:'text-2xl font-bold'},'Palabra del Padre')
-      ),
-      e('nav',{className:'menu'},
-        e('a',{href:'https://www.vatican.va/archive/horarion'},'Liturgia'),
-        e('a',{href:'https://www.vatican.va/archive/catechism'},'Catecismo'),
-        e('a',{href:'https://www.vatican.va/archive/bible'},'Biblia')
+    // HEADER
+    e('header',{className:'flex justify-center items-center p-4 bg-gray-800 shadow relative'},
+      e('h1',{className:'text-2xl font-bold flex items-center gap-2'}, 
+        e('i',{className:'bi book text-yellow-400'}), 'Palabra del Padre', e('i',{className:'bi bi-dove-fill text-white'})
       )
     ),
-    e('input',{className:'search-input text-black', placeholder:'Buscar palabra de Dios...', value:searchTerm, onChange:e=>setSearchTerm(e.target.value)}),
-    e('div',{className:'text-center mt-2 space-x-2'},
+    // CARD DESTACADA
+    e('div',{className:'p-4'},
+      e('div',{className:'card-glass shadow text-center p-6 text-lg'},
+        e('p',{className:'italic mb-2'},'"Busquen primero el reino de Dios y su justicia, y todas estas cosas les serán añadidas."'),
+        e('p',null,'— Mateo 6:33'),
+        e('p',{className:'mt-2 font-bold'},'¿Qué buscas?')
+      )
+    ),
+    // BUSCADOR
+    e('div',{className:'p-4 text-center'},
+      e('input',{
+        className:'w-full md:w-1/2 p-2 rounded text-gray-900',
+        placeholder:'Busca una palabra, frase o reflexión...',
+        value:search,
+        onChange:(e)=>setSearch(e.target.value)
+      })
+    ),
+    // BOTÓN ACOMPAÑAMIENTO
+    e('div',{className:'text-center mt-4'},
       e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto', onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')},
         e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento'
-      ),
-      e('button',{className:'flex items-center bg-green-600 px-4 py-2 rounded hover:bg-green-500 mx-auto', onClick:()=>setModoOracion(true)},
-        e('i',{className:'bi bi-heart-text mr-2'}),'Modo Oración'
       )
     ),
+    // CATEGORÍAS FLOTANTES
     e(FloatingCategories,{categories, setCategory, category}),
+    // CARDS
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
       filteredCards.map((card,i)=>e(Card,{key:i,...card}))
     ),
+    // DONACIÓN
     e('div',{className:'text-center my-4'},
       e('button',{className:'flex items-center bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')},
-        e('i',{className:'bi bi-heart-fill mr-2'}),'Colaborar'
+        e('i',{className:'bi bi-heart-fill mr-2'}),'Apoya la misión'
       )
     ),
-    modoOracion && e(ModoOracion,{cards:filteredCards, close:()=>setModoOracion(false)})
+    // FOOTER
+    e('footer',{className:'text-center py-4 text-gray-300'},'Gracias por apoyar esta herramienta de crecimiento espiritual.')
   );
 }
 
-function Card({titulo, versiculo, cita, reflexion}) {
-  return e('div',{className:'card-glass shadow p-4'},
-    e('h2',{className:'text-lg font-bold flex items-center gap-1'}, titulo),
+// CARD
+function Card({titulo, versiculo, cita, reflexion, categoria}) {
+  const [expanded,setExpanded] = React.useState(false);
+  const catObj = categories.find(c=>normalize(c.id)===normalize(categoria)) || {color:'bg-gray-600/30'};
+  const cardRef = React.useRef();
+
+  const shareCard = (platform)=>{
+    html2canvas(cardRef.current).then(canvas=>{
+      canvas.toBlob(blob=>{
+        const file = new File([blob], 'card.png', {type:'image/png'});
+        const url = URL.createObjectURL(file);
+        if(platform==='whatsapp'){
+          const text = encodeURIComponent(reflexion + ' - ' + window.location.href);
+          window.open(`https://api.whatsapp.com/send?text=${text}`,'_blank');
+        } else if(platform==='facebook'){
+          const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
+          window.open(fbUrl,'_blank');
+        } else if(platform==='instagram'){
+          alert('Instagram no permite compartir imagen directamente desde web. Descarga la imagen y compártela.');
+          window.open(url,'_blank');
+        }
+      });
+    });
+  };
+
+  return e('div',{ref:cardRef, className:`card-glass shadow transform transition-all duration-300 hover:scale-105 cursor-pointer ${catObj.color} border border-white/20 p-4`, onClick:()=>setExpanded(!expanded)},
+    e('h2',{className:'text-lg font-bold flex items-center gap-1'}, titulo, e('i',{className:'bi bi-cross text-white text-sm'})),
     e('h3',{className:'text-sm text-gray-200'},versiculo),
-    e('p',{className:'italic mt-2'}, `"${cita}"`),
-    e('p',null,reflexion)
-  );
-}
-
-function FloatingCategories({categories,setCategory,category}){
-  const [open,setOpen] = React.useState(false);
-  return e('div',{className:'fixed bottom-6 right-6 z-50 flex flex-col items-end'},
-    e('button',{className:'bg-white/10 backdrop-blur-lg border border-white/20 text-white px-4 py-3 rounded-full shadow hover:scale-110 transition', onClick:()=>setOpen(!open)},
-      e('i',{className:`bi ${open ? 'bi-x-lg' : 'bi-list'} text-white/80 text-lg`}),
-      'Categorías'
-    ),
-    e('div',{className:`flex flex-col space-y-2 transition-all duration-300 origin-bottom-right ${open ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`},
-      categories.map((cat,i)=>e('button',{key:i,onClick:()=>{setCategory(cat.id); setOpen(false);}, className:`flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/20 ${cat.color} text-white/90 shadow hover:scale-105 hover:bg-white/20 transition-all duration-200`},
-        e('i',{className:`${cat.icon} text-white/80`}), cat.label
-      ))
+    e('div',{className:`overflow-hidden transition-all duration-500 ${expanded?'max-h-96 opacity-100 mt-2':'max-h-0 opacity-0'}`},
+      e('p',{className:'italic mb-2'},`"${cita}"`),
+      e('p',null,reflexion),
+      e('div',{className:'flex space-x-2 mt-2'},
+        e('button',{className:'share-btn bg-blue-700 hover:bg-blue-600', onClick:(e)=>{e.stopPropagation(); shareCard('facebook');}},
+          e('i',{className:'bi bi-facebook text-white'})
+        ),
+        e('button',{className:'share-btn bg-pink-600 hover:bg-pink-500', onClick:(e)=>{e.stopPropagation(); shareCard('instagram');}},
+          e('i',{className:'bi bi-instagram text-white'})
+        ),
+        e('button',{className:'share-btn bg-green-600 hover:bg-green-500', onClick:(e)=>{e.stopPropagation(); shareCard('whatsapp');}},
+          e('i',{className:'bi bi-whatsapp text-white'})
+        ),
+        e('button',{className:'ml-auto px-2 py-1 bg-white text-gray-900 rounded hover:bg-gray-200 text-sm', onClick:(e)=>{e.stopPropagation(); alert('Abrir modo oración para meditar');}}, 'Modo Oración')
+      )
     )
   );
 }
 
-function ModoOracion({cards, close}){
-  return e('div',{className:'modo-oracion'},
-    cards.map((card,i)=>e('div',{key:i,className:'modo-card'},
-      e('h2',{className:'text-3xl font-bold mb-2'}, card.titulo),
-      e('p',{className:'text-lg mb-2'}, card.versiculo),
-      e('p',{className:'italic mb-4'}, `"${card.cita}"`),
-      e('p',{className:'mb-4'}, card.reflexion),
-      e('textarea',{placeholder:'Escribe aquí tu reflexión...'}),
-      e('div',{className:'flex space-x-4 mt-4 justify-center'},
-        e('button',{className:'bg-yellow-400 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')}, 'Colaborar'),
-        e('button',{className:'bg-red-600 px-4 py-2 rounded hover:bg-red-500', onClick:close}, 'Cerrar')
+// CATEGORÍAS FLOTANTES
+function FloatingCategories({categories,setCategory,category}){
+  const [open,setOpen] = React.useState(false);
+
+  return e('div',{className:'fixed bottom-6 right-6 z-50 flex flex-col items-end'},
+    e('button',{
+      className:`bg-white/10 backdrop-blur-lg border border-white/20 text-white px-4 py-3 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:scale-110 active:scale-95 transition-all duration-300 flex items-center gap-2 mb-2`,
+      onClick:()=>setOpen(!open)
+    },
+      e('i',{className:`bi ${open ? 'bi-x-lg' : 'bi-list'} text-white/80 text-lg`}),
+      'Categorías'
+    ),
+    e('div',{
+      className:`flex flex-col space-y-2 transition-all duration-300 origin-bottom-right ${open ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`
+    },
+      categories.map((cat,i)=>
+        e('button',{
+          key:i,
+          onClick:()=>{ setCategory(cat.id); setOpen(false); },
+          className:`flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/20 ${cat.color} text-white/90 shadow-lg hover:scale-105 hover:bg-white/20 transition-all duration-200`
+        },
+          e('i',{className:`${cat.icon} text-white/80`}),
+          cat.label
+        )
       )
-    ))
+    )
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); window.deferredPrompt = e; });
+
 </script>
 </body>
 </html>
