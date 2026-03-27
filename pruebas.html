@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palabra del Padre</title>
+<title>Palabra del Padre Premium</title>
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -29,9 +29,7 @@ body {
   cursor: pointer;
   transition: transform 0.3s;
 }
-.card-glass:hover {
-  transform: scale(1.03);
-}
+.card-glass:hover { transform: scale(1.03); }
 .share-btn { 
   width: 36px; height: 36px; 
   display:flex; align-items:center; justify-content:center; 
@@ -51,6 +49,7 @@ body {
   color:white;
   padding:2rem;
   z-index:1000;
+  overflow-y: auto;
 }
 .modo-oracion textarea {
   width: 100%;
@@ -60,6 +59,15 @@ body {
   border:none;
   padding:1rem;
   margin:1rem 0;
+  resize:none;
+}
+.audio-control {
+  margin-top: 1rem;
+}
+.timer {
+  font-size:1.2rem;
+  font-weight:bold;
+  margin:0.5rem 0;
 }
 </style>
 </head>
@@ -70,15 +78,13 @@ body {
 <script>
 const e = React.createElement;
 
-// --- Datos de las cards católicas ---
+// --- Datos de cards premium y normales ---
 const cardsData = [
-  {categoria:'paz', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; presenten sus peticiones a Dios en oración y súplica, con acción de gracias. Y la paz de Dios cuidará sus corazones y pensamientos.', reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.'},
-  {categoria:'paz', titulo:'Paz en tu corazón', versiculo:'Juan 14:27', cita:'La paz les dejo, mi paz les doy; no se la doy como el mundo la da. No se turbe su corazón ni tenga miedo.', reflexion:'Busca la paz de Dios diariamente.'},
-  {categoria:'fortaleza', titulo:'Sé firme', versiculo:'Efesios 6:11', cita:'Pónganse toda la armadura de Dios para poder resistir los embates del diablo.', reflexion:'Mantente firme con la ayuda de Dios.'},
-  {categoria:'inspiracion', titulo:'Sé valiente', versiculo:'Josué 1:9', cita:'Sé fuerte y valiente; no temas, porque el Señor tu Dios estará contigo dondequiera que vayas.', reflexion:'Dios está contigo en cada desafío.'},
-  {categoria:'amor', titulo:'Ama al prójimo', versiculo:'1 Juan 3:18', cita:'Hijos míos, no amemos de palabra ni de lengua, sino con hechos y en verdad.', reflexion:'El amor se demuestra con acciones.'},
-  {categoria:'fe', titulo:'Confía en el Señor', versiculo:'Proverbios 3:5-6', cita:'Confía en el Señor con todo tu corazón; reconócelo en todos tus caminos y Él enderezará tus senderos.', reflexion:'Ríndete a Dios y Él guiará tus caminos.'},
-  {categoria:'devocion', titulo:'Oración a San Miguel', versiculo:'San Miguel Arcángel', cita:'San Miguel Arcángel, defiéndenos en la batalla; sé nuestro amparo contra la maldad y las asechanzas del demonio.', reflexion:'Lleva esta oración en tu bolsillo.'}
+  {categoria:'paz', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; presenten sus peticiones a Dios en oración y súplica, con acción de gracias. Y la paz de Dios cuidará sus corazones y pensamientos.', reflexion:'Confía en Dios y deja tus preocupaciones en sus manos.', premium:false},
+  {categoria:'amor', titulo:'Ama al prójimo', versiculo:'1 Juan 3:18', cita:'Hijos míos, no amemos de palabra ni de lengua, sino con hechos y en verdad.', reflexion:'El amor se demuestra con acciones.', premium:false},
+  {categoria:'devocion', titulo:'Oración a San Miguel', versiculo:'San Miguel Arcángel', cita:'San Miguel Arcángel, defiéndenos en la batalla; sé nuestro amparo contra la maldad y las asechanzas del demonio.', reflexion:'Lleva esta oración en tu bolsillo.', premium:false},
+  {categoria:'fortaleza', titulo:'Fortaleza Premium', versiculo:'Isaías 41:10', cita:'No temas, porque yo estoy contigo; no te angusties, porque yo soy tu Dios. Te fortaleceré y te ayudaré.', reflexion:'Confía en la fuerza de Dios.', premium:true},
+  {categoria:'inspiracion', titulo:'Valentía Premium', versiculo:'Josué 1:9', cita:'Sé fuerte y valiente; no temas, porque el Señor tu Dios estará contigo dondequiera que vayas.', reflexion:'Dios está contigo en cada desafío.', premium:true}
 ];
 
 // --- Categorías ---
@@ -98,6 +104,8 @@ function App() {
   const [category, setCategory] = React.useState('todas');
   const [oracion, setOracion] = React.useState(false);
   const [cardIndex, setCardIndex] = React.useState(0);
+  const [contadorOraciones, setContadorOraciones] = React.useState(0);
+
   const filteredCards = category==='todas' ? cardsData : cardsData.filter(c=>normalize(c.categoria)===category);
 
   const startOracion = () => {
@@ -106,6 +114,7 @@ function App() {
   };
 
   const nextCard = () => {
+    setContadorOraciones(prev => prev + 1);
     if(cardIndex < filteredCards.length - 1) {
       setCardIndex(cardIndex + 1);
     } else {
@@ -117,7 +126,7 @@ function App() {
   return e('div',{className:'min-h-screen flex flex-col'},
     e('header',{className:'flex justify-center items-center p-4 bg-gray-800 shadow relative'},
       e('h1',{className:'text-2xl font-bold flex items-center gap-2'}, 
-        e('i',{className:'bi bi-sun-fill text-yellow-400'}), 'Palabra del Padre', e('i',{className:'bi bi-dove-fill text-white'})
+        e('i',{className:'bi bi-sun-fill text-yellow-400'}), 'Palabra del Padre Premium', e('i',{className:'bi bi-dove-fill text-white'})
       )
     ),
     e('div',{className:'text-center mt-4 space-x-2'},
@@ -130,14 +139,14 @@ function App() {
     ),
     e(FloatingCategories,{categories, setCategory, category}),
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
-      filteredCards.map((card,i)=>e(Card,{key:i,...card, startOracion}))
+      filteredCards.map((card,i)=>e(Card,{key:i,...card,startOracion}))
     ),
-    oracion && e(ModoOracion,{card:filteredCards[cardIndex], nextCard})
+    oracion && e(ModoOracionPremium,{card:filteredCards[cardIndex], nextCard})
   );
 }
 
 // --- Card normal ---
-function Card({titulo, versiculo, cita, reflexion, startOracion}) {
+function Card({titulo, versiculo, cita, reflexion, premium, startOracion}) {
   const [expanded,setExpanded] = React.useState(false);
   const cardRef = React.useRef();
 
@@ -161,7 +170,7 @@ function Card({titulo, versiculo, cita, reflexion, startOracion}) {
   };
 
   return e('div',{ref:cardRef, className:'card-glass shadow p-4', onClick:()=>setExpanded(!expanded)},
-    e('h2',{className:'text-lg font-bold flex items-center gap-1'}, titulo),
+    e('h2',{className:'text-lg font-bold flex items-center gap-1'}, titulo, premium && e('span',{className:'ml-2 text-yellow-400'},'⭐')),
     e('h3',{className:'text-sm text-gray-200'},versiculo),
     e('div',{className:`overflow-hidden transition-all duration-500 ${expanded?'max-h-96 opacity-100 mt-2':'max-h-0 opacity-0'}`},
       e('p',{className:'italic mb-2'},`"${cita}"`),
@@ -201,15 +210,29 @@ function FloatingCategories({categories,setCategory,category}){
   );
 }
 
-// --- Modo Oración ---
-function ModoOracion({card,nextCard}){
+// --- Modo Oración Premium ---
+function ModoOracionPremium({card,nextCard}){
+  const [timeLeft, setTimeLeft] = React.useState(60); // 60 segundos por card
+  const audioRef = React.useRef();
+
+  React.useEffect(()=>{
+    const timer = setInterval(()=>{
+      setTimeLeft(prev => prev > 0 ? prev-1 : 0);
+    },1000);
+    return ()=>clearInterval(timer);
+  },[card]);
+
   return e('div',{className:'modo-oracion'},
     e('h2',{className:'text-2xl font-bold mb-2'}, card.titulo),
     e('p',{className:'text-lg mb-2'}, card.versiculo),
     e('p',{className:'italic mb-4'}, `"${card.cita}"`),
     e('p',{className:'mb-4'}, card.reflexion),
     e('textarea',{placeholder:'Escribe aquí tu oración personal...'}),
-    e('div',{className:'flex space-x-4'},
+    e('div',{className:'timer'}, `Tiempo de meditación: ${timeLeft}s`),
+    e('div',{className:'audio-control'},
+      e('audio',{ref:audioRef, controls:true, src:`https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(card.cita)}&tl=es&client=tw-ob`, autoPlay:true})
+    ),
+    e('div',{className:'flex space-x-4 mt-4'},
       e('button',{className:'bg-green-600 px-4 py-2 rounded hover:bg-green-500', onClick:nextCard}, 'Siguiente'),
       e('button',{className:'bg-yellow-400 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')}, 'Donar')
     )
