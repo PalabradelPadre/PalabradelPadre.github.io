@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palabra del Padre Premium</title>
+<title>Palabra del Padre - Libre</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -65,6 +65,13 @@ body {
   border-radius:0.5rem;
   border:none;
 }
+footer {
+  background: rgba(0,0,0,0.7);
+  text-align:center;
+  padding:1rem;
+  margin-top:auto;
+  color:white;
+}
 </style>
 </head>
 <body class="text-white">
@@ -125,23 +132,24 @@ function App() {
   return e('div',{className:'min-h-screen flex flex-col'},
     e('header',{className:'flex flex-col justify-center items-center p-4 bg-gray-800 shadow relative'},
       e('h1',{className:'text-2xl font-bold flex items-center gap-2 mb-2'}, 
-        e('i',{className:'bi bi-sun-fill text-yellow-400'}), 'Palabra del Padre Premium', e('i',{className:'bi bi-dove-fill text-white'})
+        e('i',{className:'bi bi-book-fill text-yellow-400'}), 'Palabra del Padre - Libre'
       ),
       e('input',{className:'search-input text-black', placeholder:'Buscar palabra de Dios...', value:searchTerm, onChange:e=>setSearchTerm(e.target.value)})
     ),
     e('div',{className:'text-center mt-2 space-x-2'},
-      e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded-full hover:bg-purple-500 mx-auto', onClick:()=>startOracion(0)},
+      e('button',{className:'flex items-center bg-purple-600 px-6 py-3 rounded-full hover:bg-purple-500 mx-auto text-lg font-semibold', onClick:()=>startOracion(0)},
         e('i',{className:'bi bi-chat-left-text mr-2'}),'Modo Oración'
-      ),
-      e('button',{className:'flex items-center bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')},
-        e('i',{className:'bi bi-heart-fill mr-2'}),'Apoya la misión'
       )
     ),
     e(FloatingCategories,{categories, setCategory, category}),
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
       filteredCards.map((card,i)=>e(Card,{key:i,...card,startOracion,index:i}))
     ),
-    oracion && e(ModoOracionPremium,{card:filteredCards[cardIndex], nextCard})
+    oracion && e(ModoOracionPremium,{card:filteredCards[cardIndex], nextCard}),
+    e('footer', null, 
+      e('p',null,'Si estas palabras te han inspirado, considera apoyar nuestra misión para seguir compartiendo la Palabra de Dios.'),
+      e('button',{className:'mt-2 bg-yellow-400 text-gray-900 px-6 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')}, 'Donar')
+    )
   );
 }
 
@@ -194,14 +202,12 @@ function FloatingCategories({categories,setCategory,category}){
   const [open,setOpen] = React.useState(false);
   return e('div',{className:'fixed bottom-6 right-6 z-50 flex flex-col items-end'},
     e('button',{className:'bg-white/10 backdrop-blur-lg border border-white/20 text-white px-4 py-3 rounded-full shadow hover:scale-110 transition', onClick:()=>setOpen(!open)},
-      e('i',{className:`bi ${open ? 'bi-x-lg' : 'bi-list'} text-white/80 text-lg`}),
-      'Categorías'
+      e('i',{className:`bi ${open ? 'bi-x-lg' : 'bi-list'} text-white/80 text-lg`}),'Categorías'
     ),
     e('div',{className:`flex flex-col space-y-2 transition-all duration-300 origin-bottom-right ${open ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`},
       categories.map((cat,i)=>
         e('button',{key:i,onClick:()=>{setCategory(cat.id); setOpen(false);}, className:`flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/20 ${cat.color} text-white/90 shadow hover:scale-105 hover:bg-white/20 transition-all duration-200`},
           e('i',{className:`${cat.icon} text-white/80`}),
-
           cat.label
         )
       )
@@ -209,7 +215,6 @@ function FloatingCategories({categories,setCategory,category}){
   );
 }
 
-// --- Modo Oración y diario espiritual ---
 function ModoOracionPremium({card,nextCard}){
   const [nota, setNota] = React.useState('');
 
