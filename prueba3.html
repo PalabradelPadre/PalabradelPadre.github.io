@@ -12,13 +12,14 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
-body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); font-family: sans-serif; }
+body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); font-family: sans-serif; overflow-x:hidden; }
 .card-glass { backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.1); border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.2); padding: 1rem; cursor:pointer; transition: transform 0.3s; }
 .card-glass:hover { transform: scale(1.03); }
 .share-btn { width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;transition:transform 0.2s;border:1px solid rgba(255,255,255,0.4); }
 .share-btn:hover { transform: scale(1.2); }
-.modo-oracion { position:fixed;top:0;left:0;width:100%;height:100%;background: rgba(0,0,0,0.95); display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; padding:2rem; z-index:1000; overflow-y:auto; }
-.modo-oracion textarea { width:100%; max-width:500px; height:120px; border-radius:0.5rem; border:none; padding:1rem; margin:1rem 0; resize:none; color:black; }
+.modo-oracion { position:fixed;top:0;left:0;width:100%;height:100%;background: rgba(0,0,0,0.95); display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; padding:2rem; z-index:1000; overflow-y:scroll; scroll-snap-type: y mandatory; }
+.modo-card { min-height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; scroll-snap-align: start; width:100%; max-width:600px; text-align:center; padding:1rem; }
+.modo-card textarea { width:100%; height:120px; border-radius:0.5rem; border:none; padding:1rem; margin-top:1rem; resize:none; color:black; }
 .menu { display:flex; gap:1rem; margin-left:1rem; }
 .menu a { color:white; text-decoration:none; font-weight:500; }
 .search-input { max-width:400px; margin: 0 auto 1rem auto; padding:0.5rem 1rem; border-radius:0.5rem; border:none; }
@@ -32,27 +33,22 @@ body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); font-family: sa
 const e = React.createElement;
 
 // --- Datos de cards ---
-const cardsData = [ /* Copiar exactamente tus 28 cards de tu código original */ ];
+const cardsData = [ /* Tus 28 cards originales */ ];
 
-const categories = [ /* Copiar categorías originales */ ];
+const categories = [ /* Tus categorías originales */ ];
 
 function normalize(str){return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();}
 
 function App() {
   const [category, setCategory] = React.useState('todas');
   const [modoOracion, setModoOracion] = React.useState(false);
-  const [cardIndex, setCardIndex] = React.useState(0);
   const [searchTerm, setSearchTerm] = React.useState('');
-  
+
   const filteredCards = cardsData
     .filter(c=>category==='todas' || normalize(c.categoria)===category)
     .filter(c=>c.titulo.toLowerCase().includes(searchTerm.toLowerCase()) || c.cita.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const startOracion = (index=0) => { setCardIndex(index); setModoOracion(true); };
-  const nextCard = () => { if(cardIndex<filteredCards.length-1){setCardIndex(cardIndex+1);} else {setModoOracion(false);} };
-
   return e('div',{className:'min-h-screen flex flex-col'},
-    // HEADER
     e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
       e('div',{className:'flex items-center'},
         e('img',{src:'https://upload.wikimedia.org/wikipedia/commons/3/32/Book_icon.svg', alt:'Logo', className:'w-8 h-8 mr-2'}),
@@ -64,53 +60,34 @@ function App() {
         e('a',{href:'https://www.vatican.va/archive/bible'},'Biblia')
       )
     ),
-    // BUSCADOR
     e('input',{className:'search-input text-black', placeholder:'Buscar palabra de Dios...', value:searchTerm, onChange:e=>setSearchTerm(e.target.value)}),
-    // BOTONES
     e('div',{className:'text-center mt-2 space-x-2'},
       e('button',{className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto', onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')},
         e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento'
       ),
-      e('button',{className:'flex items-center bg-green-600 px-4 py-2 rounded hover:bg-green-500 mx-auto', onClick:()=>startOracion(0)},
+      e('button',{className:'flex items-center bg-green-600 px-4 py-2 rounded hover:bg-green-500 mx-auto', onClick:()=>setModoOracion(true)},
         e('i',{className:'bi bi-heart-text mr-2'}),'Modo Oración'
       )
     ),
     e(FloatingCategories,{categories, setCategory, category}),
-    // CARDS
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
-      filteredCards.map((card,i)=>e(Card,{key:i,...card, startOracion, index:i}))
+      filteredCards.map((card,i)=>e(Card,{key:i,...card}))
     ),
-    // COLABORAR
     e('div',{className:'text-center my-4'},
       e('button',{className:'flex items-center bg-yellow-400 text-gray-900 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')},
         e('i',{className:'bi bi-heart-fill mr-2'}),'Colaborar'
       )
     ),
-    e('footer',{className:'text-center py-4 text-gray-300'},'Gracias por apoyar esta herramienta de crecimiento espiritual 🙏'),
-    modoOracion && e(ModoOracion,{card:filteredCards[cardIndex], nextCard})
+    modoOracion && e(ModoOracion,{cards:filteredCards, close:()=>setModoOracion(false)})
   );
 }
 
-function Card({titulo, versiculo, cita, reflexion, categoria, startOracion, index}) {
-  const [expanded,setExpanded] = React.useState(false);
-  const catObj = categories.find(c=>normalize(c.id)===normalize(categoria)) || {color:'bg-gray-600/30'};
-  const cardRef = React.useRef();
-
-  const shareCard = (platform)=>{ /* Mismo código de compartir */ };
-
-  return e('div',{ref:cardRef, className:`card-glass shadow ${catObj.color} p-4`, onClick:()=>setExpanded(!expanded)},
+function Card({titulo, versiculo, cita, reflexion}) {
+  return e('div',{className:'card-glass shadow p-4'},
     e('h2',{className:'text-lg font-bold flex items-center gap-1'}, titulo),
     e('h3',{className:'text-sm text-gray-200'},versiculo),
-    e('div',{className:`overflow-hidden transition-all duration-500 ${expanded?'max-h-96 opacity-100 mt-2':'max-h-0 opacity-0'}`},
-      e('p',{className:'italic mb-2'},`"${cita}"`),
-      e('p',null,reflexion),
-      e('div',{className:'flex space-x-2 mt-2'},
-        e('button',{className:'share-btn bg-blue-700 hover:bg-blue-600', onClick:(e)=>{e.stopPropagation(); shareCard('facebook');}}, e('i',{className:'bi bi-facebook text-white'})),
-        e('button',{className:'share-btn bg-pink-600 hover:bg-pink-500', onClick:(e)=>{e.stopPropagation(); shareCard('instagram');}}, e('i',{className:'bi bi-instagram text-white'})),
-        e('button',{className:'share-btn bg-green-600 hover:bg-green-500', onClick:(e)=>{e.stopPropagation(); shareCard('whatsapp');}}, e('i',{className:'bi bi-whatsapp text-white'})),
-        e('button',{className:'ml-auto px-2 py-1 bg-white text-gray-900 rounded hover:bg-gray-200 text-sm', onClick:(e)=>{e.stopPropagation(); startOracion(index);}}, 'Modo Oración')
-      )
-    )
+    e('p',{className:'italic mt-2'}, `"${cita}"`),
+    e('p',null,reflexion)
   );
 }
 
@@ -129,18 +106,19 @@ function FloatingCategories({categories,setCategory,category}){
   );
 }
 
-function ModoOracion({card,nextCard}){
-  const [nota, setNota] = React.useState('');
+function ModoOracion({cards, close}){
   return e('div',{className:'modo-oracion'},
-    e('h2',{className:'text-2xl font-bold mb-2'}, card.titulo),
-    e('p',{className:'text-lg mb-2'}, card.versiculo),
-    e('p',{className:'italic mb-4'}, `"${card.cita}"`),
-    e('p',{className:'mb-4'}, card.reflexion),
-    e('textarea',{placeholder:'Escribe aquí tu reflexión...', value:nota, onChange:e=>setNota(e.target.value)}),
-    e('div',{className:'flex space-x-4 mt-4'},
-      e('button',{className:'bg-green-600 px-4 py-2 rounded hover:bg-green-500', onClick:nextCard}, 'Siguiente'),
-      e('button',{className:'bg-yellow-400 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')}, 'Colaborar')
-    )
+    cards.map((card,i)=>e('div',{key:i,className:'modo-card'},
+      e('h2',{className:'text-3xl font-bold mb-2'}, card.titulo),
+      e('p',{className:'text-lg mb-2'}, card.versiculo),
+      e('p',{className:'italic mb-4'}, `"${card.cita}"`),
+      e('p',{className:'mb-4'}, card.reflexion),
+      e('textarea',{placeholder:'Escribe aquí tu reflexión...'}),
+      e('div',{className:'flex space-x-4 mt-4 justify-center'},
+        e('button',{className:'bg-yellow-400 px-4 py-2 rounded hover:bg-yellow-300', onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')}, 'Colaborar'),
+        e('button',{className:'bg-red-600 px-4 py-2 rounded hover:bg-red-500', onClick:close}, 'Cerrar')
+      )
+    ))
   );
 }
 
