@@ -16,24 +16,18 @@
 body {
   background: radial-gradient(circle at top, #3b1f5f, #0f172a);
 }
-
 .glass {
   background: rgba(255,255,255,0.07);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
 }
-
 .share-btn {
   width:32px;height:32px;
   display:flex;align-items:center;justify-content:center;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,0.25);
-  transition:0.2s;
+  border:1px solid rgba(255,255,255,0.3);
 }
-.share-btn:hover { transform:scale(1.15); }
-
 .category-btn {
   border:1px solid rgba(255,255,255,0.3);
-  border-radius:8px;
 }
 </style>
 </head>
@@ -44,36 +38,36 @@ body {
 <script>
 const e = React.createElement;
 
-// 🎨 COLORES POR CATEGORÍA
+// 🎨 COLORES
 const colors = {
-  ansiedad:'from-blue-500/30 to-blue-900/30',
-  tentacion:'from-red-500/30 to-red-900/30',
-  motivacion:'from-green-500/30 to-green-900/30',
-  caridad:'from-yellow-400/30 to-yellow-800/30',
-  confianza:'from-purple-500/30 to-purple-900/30'
+  ansiedad:'bg-blue-600',
+  tentacion:'bg-red-600',
+  motivacion:'bg-green-600',
+  caridad:'bg-yellow-500 text-black',
+  confianza:'bg-purple-600'
 };
 
 // 📖 20 CARDS
 const cardsData = [
   {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6', cita:'No se inquieten por nada...', reflexion:'Confía en Dios.'},
   {categoria:'ansiedad', titulo:'Paz interior', versiculo:'Juan 14:27', cita:'Mi paz les doy...', reflexion:'Dios calma tu corazón.'},
-  {categoria:'ansiedad', titulo:'Entrega tus cargas', versiculo:'1 Pedro 5:7', cita:'Depositen en Él...', reflexion:'Dios cuida de ti.'},
+  {categoria:'ansiedad', titulo:'Entrega', versiculo:'1 Pedro 5:7', cita:'Depositen en Él...', reflexion:'Dios cuida de ti.'},
   {categoria:'ansiedad', titulo:'Descansa', versiculo:'Mateo 11:28', cita:'Vengan a mí...', reflexion:'Cristo te da descanso.'},
 
   {categoria:'tentacion', titulo:'Resiste', versiculo:'1 Corintios 10:13', cita:'Dios es fiel...', reflexion:'No estás solo.'},
-  {categoria:'tentacion', titulo:'Huye del mal', versiculo:'2 Timoteo 2:22', cita:'Huye...', reflexion:'Evita ocasiones.'},
-  {categoria:'tentacion', titulo:'Sé fuerte', versiculo:'Efesios 6:11', cita:'Armadura de Dios...', reflexion:'Defiéndete espiritualmente.'},
-  {categoria:'tentacion', titulo:'Pureza', versiculo:'Salmo 119:9', cita:'Guarda tu camino...', reflexion:'La Palabra limpia.'},
+  {categoria:'tentacion', titulo:'Huye', versiculo:'2 Timoteo 2:22', cita:'Huye...', reflexion:'Evita el mal.'},
+  {categoria:'tentacion', titulo:'Armadura', versiculo:'Efesios 6:11', cita:'Armadura...', reflexion:'Defiéndete.'},
+  {categoria:'tentacion', titulo:'Pureza', versiculo:'Salmo 119:9', cita:'Guarda...', reflexion:'La Palabra limpia.'},
 
   {categoria:'motivacion', titulo:'Haz el bien', versiculo:'Gálatas 6:9', cita:'No te canses...', reflexion:'Persevera.'},
-  {categoria:'motivacion', titulo:'Levántate', versiculo:'Isaías 40:31', cita:'Tendrán fuerzas...', reflexion:'Dios renueva.'},
-  {categoria:'motivacion', titulo:'Valentía', versiculo:'Josué 1:9', cita:'Sé fuerte...', reflexion:'Dios está contigo.'},
-  {categoria:'motivacion', titulo:'Confía', versiculo:'Salmo 56:3', cita:'En ti confío...', reflexion:'Entrega el miedo.'},
+  {categoria:'motivacion', titulo:'Levántate', versiculo:'Isaías 40:31', cita:'Fuerzas...', reflexion:'Dios renueva.'},
+  {categoria:'motivacion', titulo:'Valentía', versiculo:'Josué 1:9', cita:'Sé fuerte...', reflexion:'Dios contigo.'},
+  {categoria:'motivacion', titulo:'Confía', versiculo:'Salmo 56:3', cita:'Confío...', reflexion:'Entrega miedo.'},
 
-  {categoria:'caridad', titulo:'Ayuda', versiculo:'Mateo 25:40', cita:'Lo hiciste a mí...', reflexion:'Sirve a Cristo.'},
-  {categoria:'caridad', titulo:'Amor real', versiculo:'1 Juan 3:18', cita:'Ama con hechos...', reflexion:'Ama de verdad.'},
-  {categoria:'caridad', titulo:'Dar', versiculo:'2 Corintios 9:7', cita:'Dador alegre...', reflexion:'Da con amor.'},
-  {categoria:'caridad', titulo:'Generosidad', versiculo:'Proverbios 11:25', cita:'Será prosperado...', reflexion:'Comparte.'},
+  {categoria:'caridad', titulo:'Ayuda', versiculo:'Mateo 25:40', cita:'Lo hiciste...', reflexion:'Sirve a Cristo.'},
+  {categoria:'caridad', titulo:'Ama', versiculo:'1 Juan 3:18', cita:'Ama...', reflexion:'Ama con hechos.'},
+  {categoria:'caridad', titulo:'Da', versiculo:'2 Corintios 9:7', cita:'Da...', reflexion:'Dador alegre.'},
+  {categoria:'caridad', titulo:'Generosidad', versiculo:'Proverbios 11:25', cita:'Prospera...', reflexion:'Comparte.'},
 
   {categoria:'confianza', titulo:'Confía en Dios', versiculo:'Proverbios 3:5', cita:'Confía...', reflexion:'Dios guía.'},
   {categoria:'confianza', titulo:'No temas', versiculo:'Isaías 41:10', cita:'Estoy contigo...', reflexion:'Dios sostiene.'},
@@ -96,15 +90,7 @@ function App(){
     // HEADER
     e('div',{className:'text-center p-5'},
       e('h1',{className:'text-3xl font-bold text-yellow-300'},"✝ Palabra del Padre 🕊"),
-      e('p',{className:'text-gray-300 text-sm'},"Encuentra a Dios en tu vida diaria")
-    ),
-
-    // BOTÓN ACOMPAÑAMIENTO
-    e('div',{className:'text-center mb-4'},
-      e('button',{
-        className:'bg-purple-600 px-5 py-2 rounded-xl shadow hover:bg-purple-500',
-        onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')
-      },"💬 Acompañamiento espiritual")
+      e('p',{className:'text-gray-300 text-sm'},"Encuentra a Dios cada día")
     ),
 
     // CARDS
@@ -112,15 +98,17 @@ function App(){
       filtered.map((c,i)=>e(Card,{...c,key:i}))
     ),
 
-    // DONACIÓN
-    e('div',{className:'text-center mt-6 mb-6'},
+    // DONAR
+    e('div',{className:'text-center my-6'},
       e('p',{className:'text-gray-300 text-sm mb-2'},
-        'Tu apoyo permite que más personas reciban la Palabra de Dios'
+        'Tu apoyo permite llevar la Palabra de Dios a más personas'
       ),
       e('button',{
         className:'bg-yellow-400 text-black px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-300',
         onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX')
-      },"🙏 Apoya esta misión")
+      },
+        e('i',{className:'bi bi-heart-fill mr-2'}),'Apoya esta misión'
+      )
     ),
 
     e(Floating,{categories,setCat})
@@ -130,32 +118,54 @@ function App(){
 // CARD
 function Card(props){
   const [open,setOpen]=React.useState(false);
+  const color = colors[props.categoria] || 'bg-gray-700';
 
   return e('div',{
-    className:'glass p-4 rounded-xl border border-white/10 cursor-pointer',
+    className:`glass p-4 rounded-xl border border-white/10 cursor-pointer ${color}`,
     onClick:()=>setOpen(!open)
   },
-    e('h2',{className:'font-bold text-yellow-200'},props.titulo),
-    e('p',{className:'text-sm text-gray-300'},props.versiculo),
+    e('h2',{className:'font-bold'},props.titulo),
+    e('p',{className:'text-sm'},props.versiculo),
 
     open && e('div',{className:'mt-2'},
       e('p',{className:'italic mb-2'},"\""+props.cita+"\""),
       e('p',null,props.reflexion),
 
-      e('div',{className:'flex gap-2 text-yellow-300 mt-2'},"✝","🕊","📖"),
-
+      // SHARE
       e('div',{className:'flex gap-2 mt-3'},
-        e('button',{className:'share-btn bg-blue-600'},"f"),
-        e('button',{className:'share-btn bg-pink-600'},"ig"),
-        e('button',{className:'share-btn bg-green-600'},"wa"),
 
-        // 📸 IMAGEN PRO
+        // FACEBOOK
+        e('a',{
+          href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href),
+          target:'_blank',
+          className:`share-btn ${color}`
+        }, e('i',{className:'bi bi-facebook'})),
+
+        // INSTAGRAM
+        e('button',{
+          className:`share-btn ${color}`,
+          onClick:(ev)=>{
+            ev.stopPropagation();
+            alert('Se descargará la imagen para subirla a Instagram 🙏');
+          }
+        }, e('i',{className:'bi bi-instagram'})),
+
+        // WHATSAPP
+        e('a',{
+          href:'https://api.whatsapp.com/send?text='+encodeURIComponent(
+            '🙏 "'+props.cita+'" - '+props.reflexion+' 👉 '+window.location.href
+          ),
+          target:'_blank',
+          className:`share-btn ${color}`
+        }, e('i',{className:'bi bi-whatsapp'})),
+
+        // IMAGEN
         e('button',{
           className:'share-btn bg-gray-700',
           onClick:(ev)=>{
             ev.stopPropagation();
 
-            const div = document.createElement("div");
+            const div=document.createElement("div");
             div.style.width="400px";
             div.style.padding="30px";
             div.style.background="linear-gradient(135deg,#3b1f5f,#1e293b)";
@@ -163,12 +173,11 @@ function Card(props){
             div.style.borderRadius="20px";
             div.style.textAlign="center";
 
-            div.innerHTML = `
-              <div style="color:#facc15;font-size:18px;">✝ Palabra del Padre 🕊</div>
-              <div style="margin-top:10px;font-size:14px;">${props.versiculo}</div>
-              <div style="margin-top:15px;font-size:18px;font-style:italic;">"${props.cita}"</div>
-              <div style="margin-top:15px;font-size:14px;">${props.reflexion}</div>
-              <div style="margin-top:20px;font-size:12px;">Comparte la Palabra 🙏</div>
+            div.innerHTML=`
+              <div style="color:#facc15;">✝ Palabra del Padre 🕊</div>
+              <div>${props.versiculo}</div>
+              <div>"${props.cita}"</div>
+              <div>${props.reflexion}</div>
             `;
 
             document.body.appendChild(div);
@@ -192,7 +201,7 @@ function Floating({categories,setCat}){
   const [open,setOpen]=React.useState(false);
 
   return e('div',{className:'fixed bottom-6 right-6'},
-    e('button',{className:'bg-indigo-600 px-4 py-3 rounded-full shadow-lg',onClick:()=>setOpen(!open)},"☰"),
+    e('button',{className:'bg-indigo-600 px-4 py-3 rounded-full',onClick:()=>setOpen(!open)},"☰"),
     open && e('div',{className:'flex flex-col mt-2 gap-2'},
       categories.map((c,i)=>
         e('button',{key:i,className:'bg-indigo-500 px-3 py-1 category-btn',onClick:()=>{setCat(c);setOpen(false)}},c)
