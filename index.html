@@ -8,30 +8,29 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
 body {
-  background: radial-gradient(circle at top, #3b1f5f, #1a1a2e);
+  background: radial-gradient(circle at top, #3b1f5f, #0f172a);
 }
 
-/* efecto glass */
 .glass {
-  background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(14px);
 }
 
-/* botones compartir */
 .share-btn {
   width:32px;height:32px;
   display:flex;align-items:center;justify-content:center;
   border-radius:8px;
-  border:1px solid rgba(255,255,255,0.3);
+  border:1px solid rgba(255,255,255,0.25);
   transition:0.2s;
 }
 .share-btn:hover { transform:scale(1.15); }
 
-/* categorías */
 .category-btn {
   border:1px solid rgba(255,255,255,0.3);
   border-radius:8px;
@@ -45,147 +44,163 @@ body {
 <script>
 const e = React.createElement;
 
-// 🎨 colores por categoría
+// 🎨 COLORES POR CATEGORÍA
 const colors = {
-  ansiedad:'from-blue-500 to-blue-700',
-  tentacion:'from-red-500 to-red-700',
-  motivacion:'from-green-500 to-green-700',
-  caridad:'from-yellow-400 to-yellow-600',
-  confianza:'from-purple-500 to-purple-700',
-  oraciones:'from-pink-500 to-pink-700'
+  ansiedad:'from-blue-500/30 to-blue-900/30',
+  tentacion:'from-red-500/30 to-red-900/30',
+  motivacion:'from-green-500/30 to-green-900/30',
+  caridad:'from-yellow-400/30 to-yellow-800/30',
+  confianza:'from-purple-500/30 to-purple-900/30'
 };
 
-// 📖 DATOS (ejemplo resumido, puedes seguir agregando más)
+// 📖 20 CARDS
 const cardsData = [
-  {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6', cita:'No se inquieten por nada...', reflexion:'Dios cuida de ti incluso en la ansiedad.'},
-  {categoria:'tentacion', titulo:'Resiste', versiculo:'1 Corintios 10:13', cita:'Dios no permitirá...', reflexion:'No estás solo en la lucha.'},
-  {categoria:'motivacion', titulo:'Haz el bien', versiculo:'Gálatas 6:9', cita:'No nos cansemos...', reflexion:'Tu esfuerzo tiene sentido.'},
-  {categoria:'caridad', titulo:'Ama al prójimo', versiculo:'Mateo 25:40', cita:'Lo que hiciste...', reflexion:'Servir es amar a Dios.'},
-  {categoria:'confianza', titulo:'Confía', versiculo:'Proverbios 3:5', cita:'Confía en el Señor...', reflexion:'Dios guía tu camino.'},
+  {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6', cita:'No se inquieten por nada...', reflexion:'Confía en Dios.'},
+  {categoria:'ansiedad', titulo:'Paz interior', versiculo:'Juan 14:27', cita:'Mi paz les doy...', reflexion:'Dios calma tu corazón.'},
+  {categoria:'ansiedad', titulo:'Entrega tus cargas', versiculo:'1 Pedro 5:7', cita:'Depositen en Él...', reflexion:'Dios cuida de ti.'},
+  {categoria:'ansiedad', titulo:'Descansa', versiculo:'Mateo 11:28', cita:'Vengan a mí...', reflexion:'Cristo te da descanso.'},
 
-  {categoria:'oraciones', titulo:'San Miguel Arcángel', versiculo:'Oración', cita:`San Miguel Arcángel,
-defiéndenos en la batalla,
-sé nuestro amparo...`, reflexion:'Protección espiritual diaria.'}
+  {categoria:'tentacion', titulo:'Resiste', versiculo:'1 Corintios 10:13', cita:'Dios es fiel...', reflexion:'No estás solo.'},
+  {categoria:'tentacion', titulo:'Huye del mal', versiculo:'2 Timoteo 2:22', cita:'Huye...', reflexion:'Evita ocasiones.'},
+  {categoria:'tentacion', titulo:'Sé fuerte', versiculo:'Efesios 6:11', cita:'Armadura de Dios...', reflexion:'Defiéndete espiritualmente.'},
+  {categoria:'tentacion', titulo:'Pureza', versiculo:'Salmo 119:9', cita:'Guarda tu camino...', reflexion:'La Palabra limpia.'},
+
+  {categoria:'motivacion', titulo:'Haz el bien', versiculo:'Gálatas 6:9', cita:'No te canses...', reflexion:'Persevera.'},
+  {categoria:'motivacion', titulo:'Levántate', versiculo:'Isaías 40:31', cita:'Tendrán fuerzas...', reflexion:'Dios renueva.'},
+  {categoria:'motivacion', titulo:'Valentía', versiculo:'Josué 1:9', cita:'Sé fuerte...', reflexion:'Dios está contigo.'},
+  {categoria:'motivacion', titulo:'Confía', versiculo:'Salmo 56:3', cita:'En ti confío...', reflexion:'Entrega el miedo.'},
+
+  {categoria:'caridad', titulo:'Ayuda', versiculo:'Mateo 25:40', cita:'Lo hiciste a mí...', reflexion:'Sirve a Cristo.'},
+  {categoria:'caridad', titulo:'Amor real', versiculo:'1 Juan 3:18', cita:'Ama con hechos...', reflexion:'Ama de verdad.'},
+  {categoria:'caridad', titulo:'Dar', versiculo:'2 Corintios 9:7', cita:'Dador alegre...', reflexion:'Da con amor.'},
+  {categoria:'caridad', titulo:'Generosidad', versiculo:'Proverbios 11:25', cita:'Será prosperado...', reflexion:'Comparte.'},
+
+  {categoria:'confianza', titulo:'Confía en Dios', versiculo:'Proverbios 3:5', cita:'Confía...', reflexion:'Dios guía.'},
+  {categoria:'confianza', titulo:'No temas', versiculo:'Isaías 41:10', cita:'Estoy contigo...', reflexion:'Dios sostiene.'},
+  {categoria:'confianza', titulo:'Refugio', versiculo:'Salmo 46:1', cita:'Refugio...', reflexion:'Dios protege.'},
+  {categoria:'confianza', titulo:'Guía', versiculo:'Salmo 32:8', cita:'Te enseñaré...', reflexion:'Dios dirige.'}
 ];
 
-const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza','Oraciones'];
+const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza'];
 
-function normalize(str){
-  return str.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-}
+function normalize(s){return s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();}
 
 // APP
 function App(){
-  const [category,setCategory] = React.useState('Todas');
+  const [cat,setCat] = React.useState('Todas');
 
-  const filtered = category==='Todas'
-    ? cardsData
-    : cardsData.filter(c=>normalize(c.categoria)===normalize(category));
+  const filtered = cat==='Todas'?cardsData:cardsData.filter(c=>normalize(c.categoria)===normalize(cat));
 
-  return e('div',{className:'min-h-screen flex flex-col'},
+  return e('div',null,
 
     // HEADER
-    e('header',{className:'text-center p-4'},
-      e('div',{className:'flex justify-center items-center gap-2 text-yellow-400'},
-        e('i',{className:'bi bi-cross'}),
-        e('h1',{className:'text-2xl font-bold'},'Palabra del Padre'),
-        e('i',{className:'bi bi-dove'})
-      ),
-      e('p',{className:'text-sm text-gray-300 mt-1'},'Reflexiones para tu vida diaria con Dios')
+    e('div',{className:'text-center p-5'},
+      e('h1',{className:'text-3xl font-bold text-yellow-300'},"✝ Palabra del Padre 🕊"),
+      e('p',{className:'text-gray-300 text-sm'},"Encuentra a Dios en tu vida diaria")
     ),
 
-    // ACOMPAÑAMIENTO
-    e('div',{className:'text-center mt-3'},
+    // BOTÓN ACOMPAÑAMIENTO
+    e('div',{className:'text-center mb-4'},
       e('button',{
-        className:'bg-purple-600 px-4 py-2 rounded-lg shadow hover:bg-purple-500',
+        className:'bg-purple-600 px-5 py-2 rounded-xl shadow hover:bg-purple-500',
         onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')
-      },
-        e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento diario'
-      )
+      },"💬 Acompañamiento espiritual")
     ),
 
     // CARDS
-    e('div',{className:'grid grid-cols-1 md:grid-cols-2 gap-4 p-4'},
-      filtered.map((c,i)=>e(Card,{key:i,...c}))
+    e('div',{className:'grid md:grid-cols-2 gap-4 p-4'},
+      filtered.map((c,i)=>e(Card,{...c,key:i}))
     ),
 
-    // DONACIÓN (MEJORADA)
-    e('div',{className:'text-center mt-6 mb-4'},
-      e('p',{className:'text-sm text-gray-300 mb-2'},
+    // DONACIÓN
+    e('div',{className:'text-center mt-6 mb-6'},
+      e('p',{className:'text-gray-300 text-sm mb-2'},
         'Tu apoyo permite que más personas reciban la Palabra de Dios'
       ),
       e('button',{
         className:'bg-yellow-400 text-black px-6 py-3 rounded-xl shadow-lg hover:bg-yellow-300',
-        onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX','_blank')
-      },
-        e('i',{className:'bi bi-heart-fill mr-2'}),'Apoya esta misión'
-      )
+        onClick:()=>window.open('https://www.paypal.com/donate?hosted_button_id=XXXXX')
+      },"🙏 Apoya esta misión")
     ),
 
-    e(FloatingCategories,{categories,setCategory})
+    e(Floating,{categories,setCat})
   );
 }
 
 // CARD
-function Card({titulo,versiculo,cita,reflexion,categoria}){
-  const [open,setOpen] = React.useState(false);
+function Card(props){
+  const [open,setOpen]=React.useState(false);
 
   return e('div',{
-    className:`glass p-4 rounded-xl shadow cursor-pointer border border-white/10`,
+    className:'glass p-4 rounded-xl border border-white/10 cursor-pointer',
     onClick:()=>setOpen(!open)
   },
-
-    e('div',{className:'flex items-center gap-2 mb-1'},
-      e('i',{className:'bi bi-book text-yellow-300'}),
-      e('h2',{className:'font-bold'},titulo)
-    ),
-
-    e('p',{className:'text-sm text-gray-300'},versiculo),
+    e('h2',{className:'font-bold text-yellow-200'},props.titulo),
+    e('p',{className:'text-sm text-gray-300'},props.versiculo),
 
     open && e('div',{className:'mt-2'},
-      e('p',{className:'italic whitespace-pre-line mb-2'},`"${cita}"`),
-      e('p',{className:'text-sm'},reflexion),
+      e('p',{className:'italic mb-2'},"\""+props.cita+"\""),
+      e('p',null,props.reflexion),
 
-      // ICONOS RELIGIOSOS DECORATIVOS
-      e('div',{className:'flex gap-2 mt-2 text-yellow-300'},
-        e('i',{className:'bi bi-cross'}),
-        e('i',{className:'bi bi-dove'}),
-        e('i',{className:'bi bi-stars'})
-      ),
+      e('div',{className:'flex gap-2 text-yellow-300 mt-2'},"✝","🕊","📖"),
 
-      // COMPARTIR
       e('div',{className:'flex gap-2 mt-3'},
-        e('a',{href:'#',className:'share-btn bg-blue-600'},e('i',{className:'bi bi-facebook'})),
-        e('a',{href:'#',className:'share-btn bg-green-600'},e('i',{className:'bi bi-whatsapp'}))
-      )
-    )
-  );
-}
+        e('button',{className:'share-btn bg-blue-600'},"f"),
+        e('button',{className:'share-btn bg-pink-600'},"ig"),
+        e('button',{className:'share-btn bg-green-600'},"wa"),
 
-// BOTÓN FLOTANTE
-function FloatingCategories({categories,setCategory}){
-  const [open,setOpen] = React.useState(false);
-
-  return e('div',{className:'fixed bottom-6 right-6 z-50'},
-
-    e('button',{
-      className:'bg-indigo-600 px-4 py-3 rounded-full shadow-lg',
-      onClick:()=>setOpen(!open)
-    },'☰'),
-
-    open && e('div',{className:'mt-2 flex flex-col gap-2'},
-      categories.map((c,i)=>
+        // 📸 IMAGEN PRO
         e('button',{
-          key:i,
-          className:'bg-indigo-500 px-3 py-1 category-btn',
-          onClick:()=>{setCategory(c); setOpen(false);}
-        },c)
+          className:'share-btn bg-gray-700',
+          onClick:(ev)=>{
+            ev.stopPropagation();
+
+            const div = document.createElement("div");
+            div.style.width="400px";
+            div.style.padding="30px";
+            div.style.background="linear-gradient(135deg,#3b1f5f,#1e293b)";
+            div.style.color="white";
+            div.style.borderRadius="20px";
+            div.style.textAlign="center";
+
+            div.innerHTML = `
+              <div style="color:#facc15;font-size:18px;">✝ Palabra del Padre 🕊</div>
+              <div style="margin-top:10px;font-size:14px;">${props.versiculo}</div>
+              <div style="margin-top:15px;font-size:18px;font-style:italic;">"${props.cita}"</div>
+              <div style="margin-top:15px;font-size:14px;">${props.reflexion}</div>
+              <div style="margin-top:20px;font-size:12px;">Comparte la Palabra 🙏</div>
+            `;
+
+            document.body.appendChild(div);
+
+            html2canvas(div).then(canvas=>{
+              const link=document.createElement('a');
+              link.download='palabra.png';
+              link.href=canvas.toDataURL();
+              link.click();
+              document.body.removeChild(div);
+            });
+          }
+        },"📸")
       )
     )
   );
 }
 
-// RENDER
+// FLOAT
+function Floating({categories,setCat}){
+  const [open,setOpen]=React.useState(false);
+
+  return e('div',{className:'fixed bottom-6 right-6'},
+    e('button',{className:'bg-indigo-600 px-4 py-3 rounded-full shadow-lg',onClick:()=>setOpen(!open)},"☰"),
+    open && e('div',{className:'flex flex-col mt-2 gap-2'},
+      categories.map((c,i)=>
+        e('button',{key:i,className:'bg-indigo-500 px-3 py-1 category-btn',onClick:()=>{setCat(c);setOpen(false)}},c)
+      )
+    )
+  );
+}
+
 ReactDOM.createRoot(document.getElementById('root')).render(e(App));
 </script>
 
