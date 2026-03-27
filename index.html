@@ -15,7 +15,6 @@
 <!-- PWA -->
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#2a1e3b">
-
 <style>
   body { background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); }
   .share-btn { 
@@ -29,9 +28,7 @@
   .category-btn { 
     border: 1px solid rgba(255,255,255,0.4); 
     border-radius: 0.375rem; 
-    transition: transform 0.2s;
   }
-  .category-btn:hover { transform: scale(1.05); }
 </style>
 </head>
 <body class="text-white font-sans">
@@ -41,14 +38,14 @@
 <script>
 const e = React.createElement;
 
-// Datos de cards (5 categorías + Oraciones, 4 cards cada una)
+// Datos de cards
 const cardsData = [
-  // Paz (antes Ansiedad)
-  {categoria:'paz', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en manos de Dios.'},
-  {categoria:'paz', titulo:'Paz en tu corazón', versiculo:'Juan 14:27', cita:'La paz os dejo, mi paz os doy; no como el mundo la da, yo os la doy.', reflexion:'Busca la paz de Dios en tu corazón cada día.'},
-  {categoria:'paz', titulo:'Entrega tus cargas', versiculo:'1 Pedro 5:7', cita:'Echando toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.', reflexion:'No cargues solo tus preocupaciones, Dios está contigo.'},
-  {categoria:'paz', titulo:'Confía en Dios', versiculo:'Proverbios 3:5', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y deja que Él guíe tus pasos.'},
-  
+  // Ansiedad
+  {categoria:'ansiedad', titulo:'No tengas miedo', versiculo:'Filipenses 4:6-7', cita:'No se inquieten por nada; más bien, en toda ocasión, con oración y ruego, presenten sus peticiones a Dios y denle gracias.', reflexion:'Confía en Dios y deja tus preocupaciones en manos de Dios.'},
+  {categoria:'ansiedad', titulo:'Paz en tu corazón', versiculo:'Juan 14:27', cita:'La paz os dejo, mi paz os doy; no como el mundo la da, yo os la doy.', reflexion:'Busca la paz de Dios en tu corazón cada día.'},
+  {categoria:'ansiedad', titulo:'Entrega tus cargas', versiculo:'1 Pedro 5:7', cita:'Echando toda vuestra ansiedad sobre él, porque él tiene cuidado de vosotros.', reflexion:'No cargues solo tus preocupaciones, Dios está contigo.'},
+  {categoria:'ansiedad', titulo:'Confía en Dios', versiculo:'Proverbios 3:5', cita:'Confía en el Señor con todo tu corazón y no te apoyes en tu propia prudencia.', reflexion:'Ríndete a Dios y deja que Él guíe tus pasos.'},
+
   // Tentación
   {categoria:'tentacion', titulo:'Resiste la tentación', versiculo:'1 Corintios 10:13', cita:'No les ha sobrevenido ninguna tentación que no sea humana; pero fiel es Dios, que no permitirá que ustedes sean tentados más allá de lo que puedan resistir.', reflexion:'Dios te da la fuerza para superar cualquier tentación.'},
   {categoria:'tentacion', titulo:'Huye del mal', versiculo:'2 Timoteo 2:22', cita:'Huye también de las pasiones juveniles; sigue la justicia, la fe, el amor y la paz.', reflexion:'Alejarte de lo que no agrada a Dios es un acto de sabiduría.'},
@@ -80,16 +77,16 @@ const cardsData = [
   {categoria:'oraciones', titulo:'Oración de protección', versiculo:'Protección diaria', cita:'Ángel de Dios, mi guardián, ilumíname y protégeme hoy y siempre.', reflexion:'Útil para llevar y rezar en cualquier momento.'}
 ];
 
-const categories = [
-  {id:'Todas', label:'Todas', color:'bg-indigo-600'},
-  {id:'paz', label:'Paz', color:'bg-blue-600'},
-  {id:'tentacion', label:'Tentación', color:'bg-red-600'},
-  {id:'motivacion', label:'Motivación', color:'bg-green-600'},
-  {id:'caridad', label:'Caridad', color:'bg-yellow-500'},
-  {id:'confianza', label:'Confianza', color:'bg-purple-600'},
-  {id:'oraciones', label:'Oraciones', color:'bg-pink-600'}
-];
-
+const categories = ['Todas','Ansiedad','Tentación','Motivación','Caridad','Confianza','Oraciones'];
+const categoryColors = {
+  'ansiedad':'bg-blue-600', 
+  'tentacion':'bg-red-600', 
+  'motivacion':'bg-green-600', 
+  'caridad':'bg-yellow-500', 
+  'confianza':'bg-purple-600',
+  'oraciones':'bg-pink-600',
+  'todas':'bg-indigo-600'
+};
 function normalize(str){return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();}
 
 // App principal
@@ -100,7 +97,7 @@ function App() {
     : cardsData.filter(c=>normalize(c.categoria) === normalize(category));
   return e('div',{className:'min-h-screen flex flex-col'},
     e('header',{className:'flex justify-between items-center p-4 bg-gray-800 shadow'},
-      e('h1',{className:'text-xl font-bold text-center flex-1'},'Palabra del Padre'),
+      e('h1',{className:'text-xl font-bold'},'Palabra del Padre'),
       e('button',{className:'flex items-center bg-green-600 px-3 py-1 rounded hover:bg-green-500', onClick:()=>{if(window.deferredPrompt){window.deferredPrompt.prompt(); window.deferredPrompt.userChoice.then(()=>window.deferredPrompt=null)}}},
         e('i',{className:'bi bi-phone mr-2'}), 'Instalar'
       )
@@ -123,17 +120,17 @@ function App() {
   );
 }
 
-// Card con borde sutil y glass
+// Card con borde y Modo Oración
 function Card({titulo, versiculo, cita, reflexion, categoria}){
   const [expanded, setExpanded] = React.useState(false);
-  const color = categories.find(c=>normalize(c.id)===normalize(categoria))?.color || 'bg-gray-600';
-  return e('div',{className:`${color} bg-opacity-30 backdrop-blur-sm p-4 rounded shadow transform transition-all duration-300 hover:scale-105 cursor-pointer border border-white/20`, onClick:()=>setExpanded(!expanded)},
-    e('h2',{className:'text-lg font-bold flex items-center justify-center'},titulo),
-    e('h3',{className:'text-sm text-gray-200 flex justify-center mb-2'},versiculo),
+  const color = categoryColors[normalize(categoria)] || 'bg-gray-600';
+  return e('div',{className:`${color} p-4 rounded shadow transform transition-all duration-300 hover:scale-105 cursor-pointer border border-white/20`, onClick:()=>setExpanded(!expanded)},
+    e('h2',{className:'text-lg font-bold'},titulo),
+    e('h3',{className:'text-sm text-gray-200'},versiculo),
     e('div',{className:`overflow-hidden transition-all duration-500 ${expanded ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'}`},
       e('p',{className:'italic mb-2'},`"${cita}"`),
       e('p',null,reflexion),
-      e('div',{className:'flex space-x-2 mt-2 justify-center'},
+      e('div',{className:'flex space-x-2 mt-2'},
         e('a',{href:'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(window.location.href), target:'_blank', className:'share-btn bg-blue-700 hover:bg-blue-600'},
           e('i',{className:'bi bi-facebook text-white'})
         ),
@@ -143,20 +140,26 @@ function Card({titulo, versiculo, cita, reflexion, categoria}){
         e('a',{href:'https://api.whatsapp.com/send?text='+encodeURIComponent(cita+' - '+reflexion), target:'_blank', className:'share-btn bg-green-600 hover:bg-green-500'},
           e('i',{className:'bi bi-whatsapp text-white'})
         )
+      ),
+      e('div',{className:'mt-2 text-center'},
+        e('button',{className:'flex items-center bg-indigo-600 px-3 py-1 rounded hover:bg-indigo-500 mx-auto', onClick:()=>window.open('modo_oracion.html','_blank')},
+          e('i',{className:'bi bi-book mr-2'}),'Modo Oración'
+        )
       )
     )
   );
 }
 
-// Floating Categories con nombres espirituales, sin transparencia
-function FloatingCategories({categories,setCategory,category}) {
-  const [open,setOpen] = React.useState(false);
+// Floating Categories
+function FloatingCategories({categories, setCategory, category}) {
+  const [open, setOpen] = React.useState(false);
   return e('div',{className:'fixed bottom-24 right-6 z-50 flex flex-col items-end'},
     e('button',{className:'bg-indigo-600 text-white px-4 py-2 rounded-full shadow-lg hover:scale-110 transition transform mb-2', onClick:()=>setOpen(!open)}, 'Categorías'),
     open && e('div',{className:'flex flex-col space-y-2 transition-all duration-300'},
-      categories.map((cat,i)=>
-        e('button',{key:i, className:`category-btn ${cat.color} text-white px-4 py-2 rounded shadow`, onClick:()=>{setCategory(cat.id); setOpen(false);}}, cat.label)
-      )
+      categories.map((cat,i)=>{
+        const color = categoryColors[normalize(cat)] || 'bg-gray-600';
+        return e('button',{key:i, className:`${color} category-btn text-white px-3 py-1 rounded whitespace-nowrap`, onClick:()=>{setCategory(cat); setOpen(false);}},cat)
+      })
     )
   );
 }
@@ -164,7 +167,7 @@ function FloatingCategories({categories,setCategory,category}) {
 // Render
 ReactDOM.createRoot(document.getElementById('root')).render(e(App));
 window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); window.deferredPrompt = e; });
-
 </script>
+
 </body>
 </html>
