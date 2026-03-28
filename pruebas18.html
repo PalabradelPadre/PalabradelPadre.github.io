@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palabra del Padre</title>
+
+  <!-- Cargar estilos de Tailwind CSS y Bootstrap Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    /* Estilos para la interfaz */
+    body {
+      background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+      font-family: sans-serif;
+      color: white;
+    }
+    .card-glass {
+      backdrop-filter: blur(10px);
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 1rem;
+      transition: all 0.2s;
+    }
+    .highlight { background-color: yellow; color: black; font-weight: bold; }
+    .carousel-container { overflow-x: auto; display: flex; gap: 1rem; padding: 1rem; }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script>
+    // Definición de componentes de la interfaz sin JSX
+    const { useState, useEffect } = React;
+
+    const categories = [
+      { id: 'todas', label: 'Todas', icon: 'bi-list' },
+      { id: 'paz', label: 'Paz', icon: 'bi-dove-fill' },
+      { id: 'fortaleza', label: 'Fortaleza', icon: 'bi-shield-fill' }
+      // Agrega más categorías si es necesario
+    ];
+
+    // Función para normalizar texto y eliminar acentos
+    function normalize(str) {
+      return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    // Componente principal de la app
+    function App() {
+      const [cardsData, setCardsData] = useState([]);
+      const [category, setCategory] = useState('todas');
+      const [search, setSearch] = useState('');
+
+      // Cargar los datos del JSON
+      useEffect(() => {
+        fetch('cards.json')
+          .then(res => res.json())
+          .then(data => setCardsData(data))
+          .catch(err => console.error('Error cargando JSON', err));
+      }, []);
+
+      // Filtrar las tarjetas según la categoría seleccionada y la búsqueda
+      let filteredCards = category === 'todas'
+        ? cardsData
+        : cardsData.filter(c => normalize(c.categoria) === category);
+
+      if (search) {
+        const words = normalize(search).split(' ').filter(Boolean);
+        filteredCards = filteredCards.filter(c => {
+          const content = normalize(`${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`);
+          return words.every(w => content.includes(w));
+        });
+      }
+
+      // Componente para mostrar cada tarjeta
+      function Card({ titulo, versiculo, cita, reflexion, search }) {
+        return React.createElement('div', { className: 'card-glass' },
+          React.createElement('h2', null, titulo),
+          React.createElement('h3', null, versiculo),
+          React.createElement('p', null, cita),
+          React.createElement('p', null, reflexion)
+        );
+      }
+
+      // Renderizar el componente de la app
+      return React.createElement('div', null,
+        React.createElement('header', null,
+          React.createElement('h1', null, 'Palabra del Padre')
+        ),
+        React.createElement('div', null,
+          React.createElement('input', {
+            type: 'text',
+            placeholder: 'Busca por palabra, versículo o tema...',
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+            className: 'w-full p-3 rounded-xl'
+          })
+        ),
+        React.createElement('div', { className: 'carousel-container' },
+          filteredCards.map((card, i) => React.createElement(Card, { key: i, ...card, search }))
+        ),
+        React.createElement('footer', null,
+          '“Porque el que siembra generosamente, también segará generosamente.” — Lucas 6:38'
+        )
+      );
+    }
+
+    // Renderizar la app en el DOM
+    ReactDOM.render(React.createElement(App), document.getElementById('root'));
+  </script>
+
+</body>
+</html>
