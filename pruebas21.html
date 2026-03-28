@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palabra del Padre</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+      font-family: sans-serif;
+    }
+    .card-glass {
+      backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 1.5rem;
+      transition: all 0.3s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .card-glass:hover { transform: scale(1.03); }
+    .share-btn { 
+      width: 36px; height: 36px; 
+      display: flex; align-items: center; justify-content: center; 
+      border-radius: 50%; 
+      transition: transform 0.2s; 
+      border: 1px solid rgba(255, 255, 255, 0.5); 
+    }
+    .share-btn:hover { transform: scale(1.2); }
+    .highlight { background-color: yellow; color: black; font-weight: bold; }
+    .floating-btn {
+      background-color: rgba(59,31,95,0.85);
+      color: white;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .floating-btn:hover { transform: scale(1.05); }
+    .floating-btn.diario-btn {
+      background-color: rgba(255,255,255,0.85);
+      color: #3b1f5f;
+    }
+
+    .evangelizar-btn {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      background-color: #ffcc00;
+      color: #3b1f5f;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      transition: transform 0.2s;
+    }
+    .evangelizar-btn:hover { transform: scale(1.05); }
+
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #f3f4f6;
+      font-style: italic;
+      font-size: 0.95rem;
+      position: relative;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .footer.show { opacity: 1; }
+
+    .install-btn {
+      background-color: #4CAF50;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      cursor: pointer;
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      transition: transform 0.2s;
+    }
+    .install-btn:hover { transform: scale(1.05); }
+  </style>
+</head>
+<body class="text-white">
+  <div id="root"></div>
+
+  <script>
+    const e = React.createElement;
+
+    const categories = [
+      {id:'todas', label:'Todas', icon:'bi-list', color:'bg-indigo-600/50'},
+      {id:'paz', label:'Paz', icon:'bi-dove-fill', color:'bg-blue-400/30'},
+      {id:'fortaleza', label:'Fortaleza', icon:'bi-shield-fill', color:'bg-red-400/30'},
+      {id:'inspiracion', label:'Inspiración', icon:'bi-lightning-fill', color:'bg-green-400/30'},
+      {id:'amor', label:'Amor al prójimo', icon:'bi-heart-fill', color:'bg-yellow-300/30'},
+      {id:'fe', label:'Fe y Confianza', icon:'bi-star-fill', color:'bg-purple-400/30'},
+      {id:'devocion', label:'Devoción', icon:'bi-book-fill', color:'bg-pink-400/30'},
+      {id:'evangelio', label:'Evangelio', icon:'bi-calendar-event-fill', color:'bg-orange-400/30'}
+    ];
+
+    function normalize(str){
+      return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function highlightText(text, search){
+      if(!search) return text;
+      const words = normalize(search).split(' ').filter(Boolean);
+      let result = text;
+      words.forEach(word => {
+        const re = new RegExp(`(${word})`, 'gi');
+        result = result.replace(re, '<span class="highlight">$1</span>');
+      });
+      return e('span', { dangerouslySetInnerHTML: { __html: result } });
+    }
+
+    function App() {
+      const [cardsData, setCardsData] = React.useState([]);
+      const [category, setCategory] = React.useState('todas');
+      const [search, setSearch] = React.useState('');
+      const [installPrompt, setInstallPrompt] = React.useState(null);
+      const [showModal, setShowModal] = React.useState(false);
+      const [showFooter, setShowFooter] = React.useState(false);
+
+      React.useEffect(() => {
+        fetch('cards.json')
+          .then(res => res.json())
+          .then(data => setCardsData(data))
+          .catch(err => console.error('Error cargando JSON', err));
+      }, []);
+
+      React.useEffect(() => {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          setInstallPrompt(e);
+        });
+      }, []);
+
+      React.useEffect(() => {
+        setShowFooter(true);
+        const timer = setTimeout(() => setShowFooter(false), 5000);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const handleInstall = async () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+      };
+
+      let filteredCards = category === 'todas'
+        ? cardsData
+        : cardsData.filter(c => normalize(c.categoria) === category);
+
+      if (search) {
+        const words = normalize(search).split(' ').filter(Boolean);
+        filteredCards = filteredCards.filter(c => {
+          const content = normalize(`${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`);
+          return words.every(w => content.includes(w));
+        });
+      }
+
+      const heroCard = cardsData.find(c => c.categoria === 'evangelio');
+
+      return e('div', { className: 'min-h-screen flex flex-col' },
+        e('header', { className: 'flex justify-center items-center p-4 bg-gray-800 shadow relative' },
+          e('h1', { className: 'text-2xl font-bold flex items-center gap-2' },
+            e('i', { className: 'bi bi-book-fill text-yellow-400' }), 'Palabra del Padre', e('i', { className: 'bi bi-dove-fill text-white' })
+          )
+        ),
+        e('div', { className: 'mx-4 my-2' },
+          e('input', {
+            type: 'text',
+            placeholder: 'Busca por palabra, versículo o tema...',
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+            className: 'w-full p-3 rounded-xl text-gray-900'
+          })
+        ),
+        installPrompt && e('div', { className: 'text-center my-2' },
+          e('button', { onClick: handleInstall, className: 'install-btn' }, 'Instalar App 📲')
+        ),
+        heroCard && e(HeroCard, { ...heroCard }),
+        e('div', { className: 'flex justify-center my-4' },
+          e('a', { href: 'https://m.me/tucanal', target: '_blank', className: 'bg-blue-600 px-6 py-3 rounded hover:bg-blue-500 text-white font-bold' }, 'Acompañamiento')
+        ),
+        e(FloatingCategories, { categories, setCategory, category }),
+        e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4' },
+          filteredCards.map((card, i) => e(Card, { key: i, ...card, search }))
+        ),
+        e('button', { className: 'evangelizar-btn', onClick: () => setShowModal(true) },
+          e('i', { className: 'bi bi-book-half' }), ' Evangelizar'
+        ),
+        showModal && e(Modal, { onClose: () => setShowModal(false) }),
+        e('footer', { className: `footer ${showFooter ? 'show' : ''}` },
+          '“Porque el que siembra generosamente, también segará generosamente.” — Lucas 6:38'
+        )
+      );
+    }
+
+    function Card({ id, titulo, versiculo, cita, reflexion, categoria, search }) {
+      const [expanded, setExpanded] = React.useState(false);
+      const catObj = categories.find(c => normalize(c.id) === normalize(categoria)) || { color: 'bg-gray-600/30' };
+
+      const shareCard = (platform) => {
+        const text = `${cita}\n${versiculo}\nFuente: ${window.location.href}`;
+        if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      return e('div', { className: `card-glass cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
+        e('h2', { className: 'text-lg font-bold' }, highlightText(titulo, search)),
+        e('h3', { className: 'text-sm' }, highlightText(versiculo, search)),
+        expanded && e('div', { className: 'mt-2' },
+          e('p', null, highlightText(cita, search)),
+          e('p', null, highlightText(reflexion, search))
+        ),
+        e('div', { className: 'flex justify-between mt-2 items-center' },
+          e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
+          e('button', { onClick: () => shareCard('facebook'), className: 'share-btn' }, e('i', { className: 'bi bi-facebook text-blue-500' })),
+          e('button', { className: 'floating-btn diario-btn' }, e('i', { className: 'bi bi-journal-text' }), 'Mi Diario')
+        )
+      );
+    }
+
+    function HeroCard({ titulo, versiculo, cita, reflexion }) {
+      const shareCard = (platform) => {
+        const text = `${cita}\n${versiculo}\nFuente: ${window.location.href}`;
+        if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      return e('div', { className: 'card-glass mx-4 my-4' },
+        e('h2', { className: 'text-2xl font-bold mb-2' }, titulo),
+        e('h3', { className: 'text-lg mb-2' }, versiculo),
+        e('p', { className: 'mb-2' }, cita),
+        e('p', { className: 'text-sm mb-2' }, reflexion),
+        e('div', { className: 'flex gap-2 mt-2 justify-end' },
+          e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
+          e('button', { onClick: () => shareCard('facebook'), className: 'share-btn' }, e('i', { className: 'bi bi-facebook text-blue-500' }))
+        )
+      );
+    }
+
+    function FloatingCategories({ categories, setCategory, category }) {
+      const [open, setOpen] = React.useState(false);
+      return e('div', { className: 'fixed bottom-6 right-6 z-50 flex flex-col items-end' },
+        e('button', { className: 'floating-btn', onClick: () => setOpen(!open) },
+          e('i', { className: 'bi bi-list' }), 'Palabra'
+        ),
+        open && e('div', { className: 'flex flex-col space-y-2 mt-2' },
+          categories.map((cat, i) => e('button', {
+            key: i,
+            onClick: () => { setCategory(cat.id); setOpen(false); },
+            className: `px-4 py-2 rounded flex items-center gap-2 ${cat.color}`
+          }, e('i', { className: `bi ${cat.icon}` }), cat.label))
+        )
+      );
+    }
+
+    function Modal({ onClose }) {
+      return e('div', { className: 'modal-bg fixed inset-0 bg-black/50 flex justify-center items-center', onClick: onClose },
+        e('div', { className: 'bg-white text-gray-900 p-4 rounded shadow max-w-sm w-full', onClick: e => e.stopPropagation() },
+          e('h2', { className: 'text-xl font-bold mb-2' }, 'Evangelizar'),
+          e('p', null, 'Comparte tus reflexiones o apoya la app:'),
+          e('div', { className: 'flex flex-col gap-2 mt-2' },
+            e('a', { href: 'https://m.me/tucanal', target: '_blank', className: 'bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 text-white' }, 'Compartir en Messenger'),
+            e('a', { href: 'https://paypal.me/tucuenta', target: '_blank', className: 'bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-white' }, 'Donar'),
+            e('a', { href: 'https://tuapp.com/version2', target: '_blank', className: 'bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 text-white' }, 'Versión 2')
+          ),
+          e('button', { onClick: onClose, className: 'mt-2 px-4 py-2 bg-gray-500 rounded hover:bg-gray-400 text-white' }, 'Cerrar')
+        )
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+  </script>
+</body>
+</html>
