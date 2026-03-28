@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabra del Padre</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body {
+  background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+  font-family: sans-serif;
+}
+
+.card-glass {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255,255,255,0.15);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.3);
+  padding: 1rem;
+  transition: all 0.2s;
+}
+.card-glass:hover { transform: scale(1.03); }
+
+/* Cards de evangelio destacado */
+.card-evangelio {
+  border: 2px solid #FFD700;
+  background-color: rgba(255,255,255,0.25);
+  box-shadow: 0 0 10px rgba(255,255,0,0.7);
+}
+
+.share-btn { 
+  width: 36px; height: 36px; 
+  display:flex; align-items:center; justify-content:center; 
+  border-radius:50%; 
+  transition: transform 0.2s; 
+  border: 1px solid rgba(255,255,255,0.5); 
+}
+.share-btn:hover { transform: scale(1.2); }
+
+.highlight { background-color: yellow; color: black; font-weight: bold; }
+
+.carousel-container {
+  overflow-x: auto;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  scroll-behavior: smooth;
+}
+.carousel-card {
+  flex: 0 0 auto;
+  width: 280px;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Floating buttons */
+.floating-btn {
+  background-color: #FFD700; /* amarillo para Palabra */
+  color: #3b1f5f;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.floating-btn:hover { transform: scale(1.05); }
+
+/* Botones categorías con menos transparencia y borde */
+.category-btn {
+  border: 1px solid rgba(255,255,255,0.6);
+  backdrop-filter: blur(5px);
+  opacity: 0.85;
+}
+
+/* Modal */
+.modal-bg {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background-color: rgba(0,0,0,0.6);
+  display: flex; justify-content:center; align-items:center;
+  z-index: 1000;
+}
+.modal-content {
+  background-color:#2a1e3b; padding:2rem; border-radius:1rem;
+  max-width:400px; width:90%; color:white;
+}
+</style>
+</head>
+
+<body class="text-white">
+<div id="root"></div>
+
+<script>
+const e = React.createElement;
+
+const categories = [
+  {id:'todas', label:'Todas', icon:'bi-list', color:'bg-indigo-600/70'},
+  {id:'paz', label:'Paz', icon:'bi-dove-fill', color:'bg-blue-400/70'},
+  {id:'fortaleza', label:'Fortaleza', icon:'bi-shield-fill', color:'bg-red-400/70'},
+  {id:'inspiracion', label:'Inspiración', icon:'bi-lightning-fill', color:'bg-green-400/70'},
+  {id:'amor', label:'Amor al prójimo', icon:'bi-heart-fill', color:'bg-yellow-300/70'},
+  {id:'fe', label:'Fe y Confianza', icon:'bi-star-fill', color:'bg-purple-400/70'},
+  {id:'devocion', label:'Devoción', icon:'bi-book-fill', color:'bg-pink-400/70'},
+  {id:'evangelio', label:'Evangelio', icon:'bi-calendar-event-fill', color:'bg-orange-400/70'}
+];
+
+function normalize(str){
+  return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+function highlightText(text, search){
+  if(!search) return text;
+  const words = normalize(search).split(' ').filter(Boolean);
+  let result = text;
+  words.forEach(word=>{
+    const re = new RegExp(`(${word})`,'gi');
+    result = result.replace(re,'<span class="highlight">$1</span>');
+  });
+  return e('span',{dangerouslySetInnerHTML:{__html:result}});
+}
+
+function App() {
+  const [cardsData, setCardsData] = React.useState([]);
+  const [category, setCategory] = React.useState('todas');
+  const [search, setSearch] = React.useState('');
+  const [installPrompt, setInstallPrompt] = React.useState(null);
+  const [showModal,setShowModal] = React.useState(false);
+
+  React.useEffect(()=>{
+    fetch('cards.json')
+      .then(res => res.json())
+      .then(data => setCardsData(data))
+      .catch(err => console.error('Error cargando JSON', err));
+  },[]);
+
+  React.useEffect(()=>{
+    window.addEventListener('beforeinstallprompt', (e)=>{
+      e.preventDefault();
+      setInstallPrompt(e);
+    });
+  },[]);
+
+  const handleInstall = async () => {
+    if(!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+  };
+
+  let filteredCards = category==='todas'
+    ? cardsData
+    : cardsData.filter(c=>normalize(c.categoria)===category);
+
+  if(search){
+    const words = normalize(search).split(' ').filter(Boolean);
+    filteredCards = filteredCards.filter(c=>{
+      const content = normalize(`${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`);
+      return words.every(w => content.includes(w));
+    });
+  }
+
+  const carouselCards = cardsData.filter(c=>c.categoria==='evangelio');
+
+  return e('div',{className:'min-h-screen flex flex-col'},
+    // Install button arriba
+    installPrompt && e('div',{className:'text-center my-2'},
+      e('button',{
+        onClick: handleInstall,
+        className:'bg-green-500 px-4 py-2 rounded shadow hover:bg-green-400'
+      }, 'Instalar App 📲')
+    ),
+
+    // Header
+    e('header',{className:'flex justify-center items-center p-4 bg-gray-800 shadow relative'},
+      e('h1',{className:'text-2xl font-bold flex items-center gap-2'}, 
+        e('i',{className:'bi bi-book-fill text-yellow-400'}),'Palabra del Padre', e('i',{className:'bi bi-dove-fill text-white'})
+      )
+    ),
+
+    // Botón acompañamiento (Messenger)
+    e('div',{className:'text-center my-2'},
+      e('a',{href:'https://m.me/tucanal', target:'_blank', className:'bg-blue-600 px-4 py-2 rounded shadow hover:bg-blue-500'}, 
+        e('i',{className:'bi bi-chat-dots-fill'}),' Acompañamiento'
+      )
+    ),
+
+    // Search
+    e('div',{className:'mx-4 my-2'},
+      e('input',{
+        type:'text',
+        placeholder:'Busca por palabra, versículo o tema...',
+        value: search,
+        onChange: (e)=>setSearch(e.target.value),
+        className:'w-full p-3 rounded-xl text-gray-900'
+      })
+    ),
+
+    // Carousel animado
+    e('div',{className:'carousel-container'},
+      carouselCards.map((card,i)=>e(CarouselCard,{key:i,...card}))
+    ),
+
+    // Floating categories
+    e(FloatingCategories,{categories, setCategory, category}),
+
+    // Cards principales
+    e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
+      filteredCards.map((card,i)=>e(Card,{key:i,...card, search}))
+    ),
+
+    // Footer con botón Evangelizar
+    e('footer',{className:'text-center py-4 text-gray-300'},
+      e('button',{onClick:()=>setShowModal(true), className:'bg-purple-500 px-4 py-2 rounded hover:bg-purple-400'}, 'Evangelizar'),
+      showModal && e(Modal,{onClose:()=>setShowModal(false)})
+    )
+  );
+}
+
+// Card principal
+function Card({id,titulo, versiculo, cita, reflexion, categoria, search}) {
+  const [expanded,setExpanded] = React.useState(false);
+  const catObj = categories.find(c=>normalize(c.id)===normalize(categoria)) || {color:'bg-gray-600/30'};
+  const isEvangelio = categoria==='evangelio';
+
+  const shareCard = (platform)=>{
+    const text = `${cita}\n${versiculo}\nFuente: ${window.location.href}`;
+    if(platform==='whatsapp'){
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
+    }
+    if(platform==='facebook'){
+      const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`;
+      window.open(fbUrl,'_blank');
+    }
+  };
+
+  return e('div',{
+    className:`${isEvangelio ? 'card-evangelio' : 'card-glass'} cursor-pointer ${catObj.color}`,
+    onClick:()=>setExpanded(!expanded)
+  },
+    e('h2',{className:'text-lg font-bold'}, highlightText(titulo, search)),
+    e('h3',{className:'text-sm'}, highlightText(versiculo, search)),
+    expanded && e('div',{className:'mt-2'},
+      e('p',null,highlightText(cita, search)),
+      e('p',null,highlightText(reflexion, search))
+    ),
+    e('div',{className:'flex justify-between mt-2 items-center'},
+      e('button',{onClick:()=>shareCard('whatsapp'), className:'share-btn'}, e('i',{className:'bi bi-whatsapp text-green-500'})),
+      e('button',{onClick:()=>shareCard('facebook'), className:'share-btn'}, e('i',{className:'bi bi-facebook text-blue-500'})),
+      e('button',{className:'bg-gray-400 text-black px-2 py-1 rounded'}, e('i',{className:'bi bi-journal-text'}), 'Mi Diario')
+    )
+  );
+}
+
+// Card del carousel (evangelio)
+function CarouselCard({titulo, versiculo, cita, reflexion}){
+  return e('div',{className:'carousel-card card-evangelio'},
+    e('h3',{className:'font-bold'}, versiculo),
+    e('p',null, cita),
+    e('p',{className:'text-sm mt-1'}, reflexion)
+  );
+}
+
+// Floating categories
+function FloatingCategories({categories,setCategory,category}){
+  const [open,setOpen] = React.useState(false);
+  return e('div',{className:'fixed bottom-6 right-6 z-50 flex flex-col items-end'},
+    e('button',{className:'floating-btn', onClick:()=>setOpen(!open)}, e('i',{className:'bi bi-list'}), 'Palabra'),
+    open && e('div',{className:'flex flex-col space-y-2 mt-2'},
+      categories.map((cat,i)=>e('button',{
+        key:i,
+        onClick:()=>{setCategory(cat.id); setOpen(false);},
+        className:`category-btn px-4 py-2 rounded flex items-center gap-2 ${cat.color}`
+      }, e('i',{className:`bi ${cat.icon}`}), cat.label))
+    )
+  );
+}
+
+// Modal Evangelizar
+function Modal({onClose}){
+  return e('div',{className:'modal-bg', onClick:onClose},
+    e('div',{className:'modal-content', onClick:e=>e.stopPropagation()},
+      e('h2',{className:'text-xl font-bold mb-2'},'Evangelizar'),
+      e('p',null,'Comparte tus reflexiones o apoya la app:'),
+      e('div',{className:'flex flex-col gap-2 mt-2'},
+        e('a',{href:'https://m.me/tucanal', target:'_blank', className:'bg-blue-600 px-4 py-2 rounded hover:bg-blue-500'}, 'Compartir en Messenger'),
+        e('a',{href:'https://paypal.me/tucuenta', target:'_blank', className:'bg-green-600 px-4 py-2 rounded hover:bg-green-500'}, 'Donar'),
+        e('a',{href:'https://tuapp.com/version2', target:'_blank', className:'bg-purple-600 px-4 py-2 rounded hover:bg-purple-500'}, 'Versión 2')
+      ),
+      e('button',{onClick:onClose,className:'mt-2 px-4 py-2 bg-gray-500 rounded hover:bg-gray-400'},'Cerrar')
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+
+// Service Worker sw.js
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg=>console.log('Service Worker sw.js registrado', reg.scope))
+      .catch(err=>console.error('Error SW sw.js',err));
+  });
+}
+</script>
+</body>
+</html>
