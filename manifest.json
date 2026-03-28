@@ -9,17 +9,17 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icono-192.png",
+      "src": "Palabra192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icono-512.png",
+      "src": "Palabra512.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "icono-maskable.png",
+      "src": "Palabra.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
