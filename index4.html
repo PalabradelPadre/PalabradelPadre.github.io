@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabra del Padre</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+body {
+  background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+  font-family: sans-serif;
+}
+.card-glass {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 1rem;
+}
+.highlight { background-color: yellow; color: black; font-weight: bold; }
+</style>
+</head>
+
+<body class="text-white">
+<div id="root"></div>
+
+<script>
+const e = React.createElement;
+
+const categories = [
+  {id:'todas', label:'Todas', color:'bg-indigo-600/50'},
+  {id:'paz', label:'Paz', color:'bg-blue-400/30'},
+  {id:'fortaleza', label:'Fortaleza', color:'bg-red-400/30'},
+  {id:'inspiracion', label:'Inspiración', color:'bg-green-400/30'},
+  {id:'amor', label:'Amor', color:'bg-yellow-300/30'},
+  {id:'fe', label:'Fe', color:'bg-purple-400/30'},
+  {id:'devocion', label:'Devoción', color:'bg-pink-400/30'}
+];
+
+function normalize(str){
+  return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+function highlightText(text, search){
+  if(!search) return text;
+
+  const words = normalize(search).split(' ').filter(Boolean);
+  let result = text;
+
+  words.forEach(word=>{
+    const re = new RegExp(`(${word})`,'gi');
+    result = result.replace(re,'<span class="highlight">$1</span>');
+  });
+
+  return e('span',{dangerouslySetInnerHTML:{__html:result}});
+}
+
+function App(){
+  const [cards,setCards] = React.useState([]);
+  const [category,setCategory] = React.useState('todas');
+  const [search,setSearch] = React.useState('');
+
+  // 🔥 CARGAR JSON AUTOMÁTICAMENTE
+  React.useEffect(()=>{
+    fetch('cards.json')
+      .then(res=>res.json())
+      .then(data=>setCards(data))
+      .catch(err=>console.error('Error cargando JSON:',err));
+  },[]);
+
+  let filtered = category==='todas'
+    ? cards
+    : cards.filter(c=>normalize(c.categoria)===category);
+
+  if(search){
+    const words = normalize(search).split(' ').filter(Boolean);
+
+    filtered = filtered.filter(c=>{
+      const content = normalize(
+        `${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`
+      );
+      return words.every(w=>content.includes(w));
+    });
+  }
+
+  return e('div',{className:'min-h-screen'},
+
+    e('header',{className:'p-4 bg-gray-800 text-center'},
+      e('h1',{className:'text-2xl font-bold'},'Palabra del Padre')
+    ),
+
+    e('div',{className:'p-4'},
+      e('input',{
+        value:search,
+        onChange:e=>setSearch(e.target.value),
+        placeholder:'Buscar...',
+        className:'w-full p-2 rounded text-black'
+      })
+    ),
+
+    e('div',{className:'fixed bottom-6 right-6'},
+      categories.map((cat,i)=>
+        e('button',{
+          key:i,
+          onClick:()=>setCategory(cat.id),
+          className:`m-1 px-3 py-2 rounded ${cat.color}`
+        },cat.label)
+      )
+    ),
+
+    e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
+      filtered.map((card,i)=>e(Card,{key:i,...card,search}))
+    )
+  );
+}
+
+function Card({titulo,versiculo,cita,reflexion,categoria,search}){
+  const [open,setOpen]=React.useState(false);
+
+  return e('div',{
+    className:'card-glass cursor-pointer',
+    onClick:()=>setOpen(!open)
+  },
+    e('h2',null,highlightText(titulo,search)),
+    e('h3',{className:'text-sm'},highlightText(versiculo,search)),
+
+    open && e('div',null,
+      e('p',null,highlightText(cita,search)),
+      e('p',null,highlightText(reflexion,search))
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+</script>
+</body>
+</html>
