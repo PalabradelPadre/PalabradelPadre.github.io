@@ -38,6 +38,7 @@ body {
   display: flex;
   gap: 1rem;
   padding: 1rem;
+  scroll-behavior: smooth;
 }
 .carousel-card {
   flex: 0 0 auto;
@@ -58,13 +59,12 @@ body {
 }
 .floating-btn:hover { transform: scale(1.05); }
 
-/* Botón evangelizar flotante */
 .evangelizar-btn {
   position: fixed;
   bottom: 1rem;
   left: 1rem;
-  background-color: #6b21a8;
-  color: white;
+  background-color: #ffcc00; /* Amarillo brillante */
+  color: #3b1f5f;
   padding: 0.75rem 1.25rem;
   border-radius: 9999px;
   font-weight: bold;
@@ -74,7 +74,6 @@ body {
 }
 .evangelizar-btn:hover { transform: scale(1.05); }
 
-/* Footer */
 .footer {
   text-align: center;
   padding: 2rem 1rem;
@@ -84,9 +83,26 @@ body {
   position: relative;
   background: rgba(0,0,0,0.3);
 }
-</style>
-</head>
 
+.install-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-weight: bold;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 50;
+  cursor: pointer;
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  transition: transform 0.2s;
+}
+.install-btn:hover { transform: scale(1.05); }
+
+</style>
+
+</head>
 <body class="text-white">
 <div id="root"></div>
 
@@ -160,14 +176,25 @@ function App() {
 
   const carouselCards = cardsData.filter(c=>c.categoria==='evangelio');
 
+  React.useEffect(()=>{
+    const container = document.querySelector('.carousel-container');
+    if(!container) return;
+    let scrollAmount = 0;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    const interval = setInterval(()=>{
+      scrollAmount += 2;
+      if(scrollAmount > maxScroll) scrollAmount = 0;
+      container.scrollTo({left: scrollAmount, behavior: 'smooth'});
+    }, 50);
+    return ()=> clearInterval(interval);
+  }, [carouselCards]);
+
   return e('div',{className:'min-h-screen flex flex-col'},
-    // Header
     e('header',{className:'flex justify-center items-center p-4 bg-gray-800 shadow relative'},
       e('h1',{className:'text-2xl font-bold flex items-center gap-2'}, 
         e('i',{className:'bi bi-book-fill text-yellow-400'}),'Palabra del Padre',e('i',{className:'bi bi-dove-fill text-white'})
       )
     ),
-    // Search
     e('div',{className:'mx-4 my-2'},
       e('input',{
         type:'text',
@@ -177,36 +204,29 @@ function App() {
         className:'w-full p-3 rounded-xl text-gray-900'
       })
     ),
-    // Install button
     installPrompt && e('div',{className:'text-center my-2'},
       e('button',{
         onClick: handleInstall,
-        className:'bg-green-500 px-4 py-2 rounded shadow hover:bg-green-400'
+        className:'install-btn'
       }, 'Instalar App 📲')
     ),
-    // Carousel de evangelio
     e('div',{className:'carousel-container'},
       carouselCards.map((card,i)=>e(CarouselCard,{key:i,...card}))
     ),
-    // Floating categories
     e(FloatingCategories,{categories, setCategory, category}),
-    // Cards principales
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
       filteredCards.map((card,i)=>e(Card,{key:i,...card, search}))
     ),
-    // Botón evangelizar flotante
     e('button',{className:'evangelizar-btn', onClick:()=>setShowModal(true)}, 
-      e('i',{className:'bi bi-megaphone-fill'}),' Evangelizar'
+      e('i',{className:'bi bi-book-half'}), ' Evangelizar'
     ),
     showModal && e(Modal,{onClose:()=>setShowModal(false)}),
-    // Footer con cita bíblica
     e('footer',{className:'footer'}, 
-      '“Cada uno dé como propuso en su corazón, no con tristeza ni por obligación; porque Dios ama al dador alegre.” — 2 Corintios 9:7'
+      '“Porque el que siembra generosamente, también segará generosamente.” — Lucas 6:38'
     )
   );
 }
 
-// Card principal (diseño original)
 function Card({id,titulo, versiculo, cita, reflexion, categoria, search}) {
   const [expanded,setExpanded] = React.useState(false);
   const catObj = categories.find(c=>normalize(c.id)===normalize(categoria)) || {color:'bg-gray-600/30'};
@@ -237,7 +257,6 @@ function Card({id,titulo, versiculo, cita, reflexion, categoria, search}) {
   );
 }
 
-// Card del carousel
 function CarouselCard({titulo, versiculo, cita, reflexion}){
   const shareCard = (platform)=>{
     const text = `${cita}\n${versiculo}\nFuente: ${window.location.href}`;
@@ -260,7 +279,6 @@ function CarouselCard({titulo, versiculo, cita, reflexion}){
   );
 }
 
-// Floating categories
 function FloatingCategories({categories,setCategory,category}){
   const [open,setOpen] = React.useState(false);
   return e('div',{className:'fixed bottom-6 right-6 z-50 flex flex-col items-end'},
@@ -275,23 +293,35 @@ function FloatingCategories({categories,setCategory,category}){
   );
 }
 
-// Modal Evangelizar
 function Modal({onClose}){
-  return e('div',{className:'modal-bg', onClick:onClose},
-    e('div',{className:'modal-content', onClick:e=>e.stopPropagation()},
+  return e('div',{className:'modal-bg fixed inset-0 bg-black/50 flex justify-center items-center', onClick:onClose},
+    e('div',{className:'bg-white text-gray-900 p-4 rounded shadow max-w-sm w-full', onClick:e=>e.stopPropagation()},
       e('h2',{className:'text-xl font-bold mb-2'},'Evangelizar'),
       e('p',null,'Comparte tus reflexiones o apoya la app:'),
       e('div',{className:'flex flex-col gap-2 mt-2'},
-        e('a',{href:'https://m.me/tucanal', target:'_blank', className:'bg-blue-600 px-4 py-2 rounded hover:bg-blue-500'}, 'Compartir en Messenger'),
-        e('a',{href:'https://paypal.me/tucuenta', target:'_blank', className:'bg-green-600 px-4 py-2 rounded hover:bg-green-500'}, 'Donar'),
-        e('a',{href:'https://tuapp.com/version2', target:'_blank', className:'bg-purple-600 px-4 py-2 rounded hover:bg-purple-500'}, 'Versión 2')
+        e('a',{href:'https://m.me/tucanal', target:'_blank', className:'bg-blue-600 px-4 py-2 rounded hover:bg-blue-500 text-white'}, 'Compartir en Messenger'),
+        e('a',{href:'https://paypal.me/tucuenta', target:'_blank', className:'bg-green-600 px-4 py-2 rounded hover:bg-green-500 text-white'}, 'Donar'),
+        e('a',{href:'https://tuapp.com/version2', target:'_blank', className:'bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 text-white'}, 'Versión 2')
       ),
-      e('button',{onClick:onClose,className:'mt-2 px-4 py-2 bg-gray-500 rounded hover:bg-gray-400'},'Cerrar')
+      e('button',{onClick:onClose,className:'mt-2 px-4 py-2 bg-gray-500 rounded hover:bg-gray-400 text-white'},'Cerrar')
     )
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(e(App));
 </script>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').then(function(registration) {
+        console.log('Service Worker registrado con éxito:', registration);
+      }).catch(function(error) {
+        console.log('Error al registrar el Service Worker:', error);
+      });
+    });
+  }
+</script>
+
 </body>
 </html>
