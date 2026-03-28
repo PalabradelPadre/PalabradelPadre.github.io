@@ -5,14 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palabra del Padre</title>
 
-<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- React + ReactDOM -->
 <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<!-- html2canvas para compartir cards -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
@@ -26,7 +22,6 @@ body {
   border-radius: 0.75rem;
   border: 1px solid rgba(255,255,255,0.2);
   padding: 1rem;
-  transition: all 0.3s;
 }
 .share-btn { 
   width: 36px; height: 36px; 
@@ -37,18 +32,25 @@ body {
 }
 .share-btn:hover { transform: scale(1.2); }
 .highlight { background-color: yellow; color: black; font-weight: bold; }
-.carousel { display:flex; overflow-x:auto; gap:1rem; scroll-behavior:smooth; padding:1rem 0; }
-.carousel::-webkit-scrollbar { display:none; }
+.carousel-container {
+  overflow-x: auto;
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+.carousel-card {
+  flex: 0 0 auto;
+  width: 280px;
+}
 </style>
 </head>
-<body class="text-white">
 
+<body class="text-white">
 <div id="root"></div>
 
 <script>
 const e = React.createElement;
 
-// Categorías
 const categories = [
   {id:'todas', label:'Todas', icon:'bi-list', color:'bg-indigo-600/50'},
   {id:'paz', label:'Paz', icon:'bi-dove-fill', color:'bg-blue-400/30'},
@@ -63,7 +65,6 @@ function normalize(str){
   return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 }
 
-// 🔥 Highlight palabras buscadas
 function highlightText(text, search){
   if(!search) return text;
   const words = normalize(search).split(' ').filter(Boolean);
@@ -77,23 +78,17 @@ function highlightText(text, search){
 
 function App() {
   const [cardsData, setCardsData] = React.useState([]);
-  const [evangelioData, setEvangelioData] = React.useState([]);
   const [category, setCategory] = React.useState('todas');
   const [search, setSearch] = React.useState('');
   const [installPrompt, setInstallPrompt] = React.useState(null);
 
-  // 🔥 Cargar JSON
   React.useEffect(()=>{
     fetch('cards.json')
       .then(res => res.json())
-      .then(data => {
-        setCardsData(data.cards);
-        setEvangelioData(data.evangelio || []);
-      })
+      .then(data => setCardsData(data))
       .catch(err => console.error('Error cargando JSON', err));
   },[]);
 
-  // 🔥 Evento instalación
   React.useEffect(()=>{
     window.addEventListener('beforeinstallprompt', (e)=>{
       e.preventDefault();
@@ -107,7 +102,6 @@ function App() {
     await installPrompt.userChoice;
   };
 
-  // 🔥 Filtrado cards
   let filteredCards = category==='todas'
     ? cardsData
     : cardsData.filter(c=>normalize(c.categoria)===category);
@@ -120,15 +114,20 @@ function App() {
     });
   }
 
+  const carouselCards = cardsData.filter(c=>c.categoria==='evangelio');
+
   return e('div',{className:'min-h-screen flex flex-col'},
 
+    // Header
     e('header',{className:'flex justify-center items-center p-4 bg-gray-800 shadow relative'},
       e('h1',{className:'text-2xl font-bold flex items-center gap-2'}, 
-        e('i',{className:'bi bi-book-fill text-yellow-400'}),'Palabra del Padre', e('i',{className:'bi bi-dove-fill text-white'})
+        e('i',{className:'bi bi-book-fill text-yellow-400'}),
+        'Palabra del Padre',
+        e('i',{className:'bi bi-dove-fill text-white'})
       )
     ),
 
-    // 🔥 Buscador
+    // Search
     e('div',{className:'mx-4 my-2'},
       e('input',{
         type:'text',
@@ -139,12 +138,7 @@ function App() {
       })
     ),
 
-    // 🔥 Carrusel evangelio del día
-    e('div',{className:'carousel mx-4 my-4'},
-      evangelioData.map((card,i)=>e(Card,{key:i,...card, search}))
-    ),
-
-    // 🔥 Botón instalar
+    // Install button
     installPrompt && e('div',{className:'text-center my-2'},
       e('button',{
         onClick: handleInstall,
@@ -152,28 +146,32 @@ function App() {
       }, 'Instalar App 📲')
     ),
 
-    // 🔥 Botón flotante categorías
+    // Carousel de evangelio
+    e('div',{className:'carousel-container'},
+      carouselCards.map((card,i)=>e('div',{key:i,className:'carousel-card card-glass shadow'},
+        e('h3',{className:'font-bold'},card.versiculo),
+        e('p',null,card.cita),
+        e('p',{className:'text-sm mt-1'},card.reflexion)
+      ))
+    ),
+
+    // Floating categories
     e(FloatingCategories,{categories, setCategory, category}),
 
-    // 🔥 Cards principales
+    // Cards principales
     e('div',{className:'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'},
       filteredCards.map((card,i)=>e(Card,{key:i,...card, search}))
     ),
 
-    // 🔥 Botón de acompañamiento
-    e('div',{className:'text-center mt-4 mb-8'},
-      e('button',{
-        className:'flex items-center bg-purple-600 px-4 py-2 rounded hover:bg-purple-500 mx-auto',
-        onClick:()=>window.open('https://m.me/tuPaginaMessenger','_blank')
-      }, e('i',{className:'bi bi-chat-left-text mr-2'}),'Acompañamiento')
-    ),
-
-    e('footer',{className:'text-center py-4 text-gray-300'},'Gracias por apoyar esta herramienta de crecimiento espiritual.')
+    // Footer
+    e('footer',{className:'text-center py-4 text-gray-300'},
+      'Gracias por apoyar esta herramienta de crecimiento espiritual.'
+    )
   );
 }
 
-// 🔥 Card con botón "Mi Diario Espiritual" y compartir
-function Card({titulo, versiculo, cita, reflexion, categoria, search, id}) {
+// Card component
+function Card({id,titulo, versiculo, cita, reflexion, categoria, search}) {
   const [expanded,setExpanded] = React.useState(false);
   const catObj = categories.find(c=>normalize(c.id)===normalize(categoria)) || {color:'bg-gray-600/30'};
   const cardRef = React.useRef();
@@ -183,51 +181,61 @@ function Card({titulo, versiculo, cita, reflexion, categoria, search, id}) {
       canvas.toBlob(blob=>{
         const file = new File([blob], 'card.png', {type:'image/png'});
         const url = URL.createObjectURL(file);
-
-        const text = encodeURIComponent(`${cita}\n${reflexion}\nFuente: ${window.location.href}`);
+        const text = encodeURIComponent(`${cita}\n\nFuente: ${window.location.href}`);
 
         if(platform==='whatsapp'){
           window.open(`https://api.whatsapp.com/send?text=${text}`,'_blank');
-        } else if(platform==='facebook'){
-          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${text}`,'_blank');
-        } else if(platform==='instagram'){
-          alert('Instagram no permite compartir directamente desde web. Descarga la imagen y compártela.');
-          window.open(url,'_blank');
+        }
+        if(platform==='facebook'){
+          const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${text}`;
+          window.open(fbUrl,'_blank');
         }
       });
     });
   };
 
-  return e('div',{ref:cardRef, className:`card-glass shadow transform transition-all duration-300 hover:scale-105 cursor-pointer ${catObj.color} border border-white/20 p-4`, onClick:()=>setExpanded(!expanded)},
-    e('h2',{className:'text-lg font-bold flex items-center gap-1'}, highlightText(titulo, search)),
-    e('h3',{className:'text-sm text-gray-200'},versiculo),
-    e('div',{className:`overflow-hidden transition-all duration-500 ${expanded?'max-h-96 opacity-100 mt-2':'max-h-0 opacity-0'}`},
-      e('p',{className:'italic mb-2'},highlightText(`"${cita}"`, search)),
-      e('p',null,highlightText(reflexion, search)),
-      e('div',{className:'flex space-x-2 mt-2'},
-        e('button',{className:'share-btn bg-blue-700 hover:bg-blue-600', onClick:(e)=>{e.stopPropagation(); shareCard('facebook');}}, e('i',{className:'bi bi-facebook text-white'})),
-        e('button',{className:'share-btn bg-pink-600 hover:bg-pink-500', onClick:(e)=>{e.stopPropagation(); shareCard('instagram');}}, e('i',{className:'bi bi-instagram text-white'})),
-        e('button',{className:'share-btn bg-green-600 hover:bg-green-500', onClick:(e)=>{e.stopPropagation(); shareCard('whatsapp');}}, e('i',{className:'bi bi-whatsapp text-white'})),
-        e('button',{className:'ml-auto px-2 py-1 bg-white text-gray-900 rounded hover:bg-gray-200 text-sm', onClick:(e)=>{e.stopPropagation(); alert('Abrir Mi Diario Espiritual');}}, 'Mi Diario Espiritual')
-      )
+  return e('div',{
+    ref:cardRef,
+    className:`card-glass shadow transform hover:scale-105 cursor-pointer ${catObj.color}`
+  },
+    e('h2',{className:'text-lg font-bold', onClick:()=>setExpanded(!expanded)}, highlightText(titulo, search)),
+    e('h3',{className:'text-sm'}, highlightText(versiculo, search)),
+    expanded && e('div',{className:'mt-2'},
+      e('p',null,highlightText(cita, search)),
+      e('p',null,highlightText(reflexion, search))
+    ),
+    // Footer buttons inside card
+    e('div',{className:'flex justify-between mt-2 items-center'},
+      e('button',{
+        onClick:()=>shareCard('whatsapp'),
+        className:'share-btn'
+      }, e('i',{className:'bi bi-whatsapp text-green-500'})),
+      e('button',{
+        onClick:()=>shareCard('facebook'),
+        className:'share-btn'
+      }, e('i',{className:'bi bi-facebook text-blue-500'})),
+      e('button',{
+        className:'bg-yellow-400 text-black px-2 py-1 rounded'
+      }, 'Mi Diario Espiritual')
     )
   );
 }
 
-// 🔥 Botón flotante categorías
+// Floating categories
 function FloatingCategories({categories,setCategory,category}){
   const [open,setOpen] = React.useState(false);
   return e('div',{className:'fixed bottom-6 right-6 z-50 flex flex-col items-end'},
-    e('button',{className:`bg-white/10 backdrop-blur-lg border border-white/20 text-white px-4 py-3 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.3)] hover:scale-110 active:scale-95 transition-all duration-300 flex items-center gap-2 mb-2`, onClick:()=>setOpen(!open)},
-      e('i',{className:`bi ${open ? 'bi-x-lg' : 'bi-list'} text-white/80 text-lg`}),
-      'Palabra'
-    ),
-    e('div',{className:`flex flex-col space-y-2 transition-all duration-300 origin-bottom-right ${open ? 'opacity-100 scale-100' : 'opacity-0 scale-75 pointer-events-none'}`},
+    e('button',{
+      className:'bg-white/10 text-white px-4 py-3 rounded-full mb-2 flex items-center gap-2',
+      onClick:()=>setOpen(!open)
+    }, e('i',{className:'bi bi-list'}), 'Palabra'),
+    open && e('div',{className:'flex flex-col space-y-2 mt-2'},
       categories.map((cat,i)=>
-        e('button',{key:i,onClick:()=>{setCategory(cat.id); setOpen(false);},className:`flex items-center gap-2 px-4 py-2 rounded-full backdrop-blur-md border border-white/20 ${cat.color} text-white/90 shadow-lg hover:scale-105 hover:bg-white/20 transition-all duration-200`},
-          e('i',{className:`${cat.icon} text-white/80`}),
-          cat.label
-        )
+        e('button',{
+          key:i,
+          onClick:()=>{setCategory(cat.id); setOpen(false);},
+          className:`px-4 py-2 rounded flex items-center gap-2 ${cat.color}`
+        }, e('i',{className:`bi ${cat.icon}`}), cat.label)
       )
     )
   );
