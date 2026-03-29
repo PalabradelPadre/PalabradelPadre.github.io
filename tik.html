@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabra del Padre</title>
+
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  overflow:hidden;
+  color:white;
+}
+
+/* 🔥 FEED */
+#feed{
+  position:fixed;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+.card{
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:2rem;
+  transition:transform 0.35s ease, opacity 0.35s ease;
+}
+
+/* 🔎 SEARCH */
+#searchMode{
+  position:fixed;
+  inset:0;
+  background:#1a1a2e;
+  display:none;
+  flex-direction:column;
+}
+
+#searchInput{
+  padding:1rem;
+  border:none;
+  font-size:1rem;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:10px;
+  padding:1rem;
+  overflow:auto;
+}
+
+.gridCard{
+  background:#ffffff10;
+  padding:1rem;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* FLOATING */
+.floating{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  background:white;
+  color:black;
+  padding:10px 15px;
+  border-radius:20px;
+  cursor:pointer;
+  z-index:10;
+}
+
+.categories{
+  position:fixed;
+  bottom:70px;
+  left:20px;
+  display:none;
+  flex-direction:column;
+  gap:5px;
+}
+
+.categories button{
+  padding:8px;
+  border:none;
+  border-radius:10px;
+}
+
+.show{display:flex}
+
+.topbar{
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+}
+
+.btn{
+  background:#00000050;
+  border:none;
+  color:white;
+  padding:10px;
+  border-radius:50%;
+  margin:5px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔥 FEED -->
+<div id="feed"></div>
+
+<!-- 🔎 SEARCH -->
+<div id="searchMode">
+  <input id="searchInput" placeholder="Buscar versículo...">
+  <div id="results" class="grid"></div>
+</div>
+
+<!-- TOP BUTTONS -->
+<div class="topbar">
+  <button class="btn" id="openSearch">🔎</button>
+  <button class="btn" id="closeSearch" style="display:none;">✕</button>
+</div>
+
+<!-- FLOAT -->
+<div class="floating" id="toggleCat">☰</div>
+<div class="categories" id="categories"></div>
+
+<script>
+// =====================
+// 🎨 CONFIG
+// =====================
+const colors={
+  paz:"#4facfe",
+  fortaleza:"#ff6a6a",
+  amor:"#fbc2eb",
+  fe:"#a18cd1",
+  evangelio:"#f6d365",
+  todas:"#333"
+};
+
+// =====================
+// STATE
+// =====================
+let data=[], filtered=[], index=0, category="todas";
+
+// =====================
+// LOAD
+// =====================
+fetch("cards.json")
+.then(r=>r.json())
+.then(json=>{
+  data=json;
+  applyFilter();
+});
+
+// =====================
+// FILTER
+// =====================
+function applyFilter(){
+  filtered=data.filter(c=>{
+    if(category==="todas") return true;
+    return c.categoria===category;
+  });
+  index=0;
+  render();
+}
+
+// =====================
+// FEED RENDER
+// =====================
+function createCard(c,pos){
+  const el=document.createElement("div");
+  el.className="card";
+  el.style.background=`linear-gradient(${colors[c.categoria]}, black)`;
+  el.style.transform=`translateY(${pos*100}%)`;
+
+  const t=document.createElement("h2");
+  t.textContent=c.titulo;
+
+  const v=document.createElement("h4");
+  v.textContent=c.versiculo;
+
+  const p=document.createElement("p");
+  p.textContent=c.cita;
+
+  el.appendChild(t);
+  el.appendChild(v);
+  el.appendChild(p);
+
+  return el;
+}
+
+function render(){
+  const feed=document.getElementById("feed");
+  feed.innerHTML="";
+
+  if(!filtered.length) return;
+
+  const prev=filtered[index-1];
+  const cur=filtered[index];
+  const next=filtered[index+1];
+
+  if(prev) feed.appendChild(createCard(prev,-1));
+  feed.appendChild(createCard(cur,0));
+  if(next) feed.appendChild(createCard(next,1));
+}
+
+// =====================
+// SWIPE ANIMADO
+// =====================
+let startY=0;
+
+document.addEventListener("touchstart",e=>{
+  startY=e.touches[0].clientY;
+});
+
+document.addEventListener("touchend",e=>{
+  const diff=startY-e.changedTouches[0].clientY;
+
+  if(diff>60 && index<filtered.length-1){
+    index++;
+    render();
+  }
+  if(diff<-60 && index>0){
+    index--;
+    render();
+  }
+});
+
+// =====================
+// SEARCH MODE
+// =====================
+const searchMode=document.getElementById("searchMode");
+
+document.getElementById("openSearch").onclick=()=>{
+  searchMode.style.display="flex";
+  document.getElementById("closeSearch").style.display="inline";
+};
+
+document.getElementById("closeSearch").onclick=()=>{
+  searchMode.style.display="none";
+  document.getElementById("closeSearch").style.display="none";
+};
+
+document.getElementById("searchInput").addEventListener("input",()=>{
+  const val=document.getElementById("searchInput").value.toLowerCase();
+  const results=document.getElementById("results");
+  results.innerHTML="";
+
+  data.filter(c=>{
+    return (c.titulo+c.cita+c.reflexion).toLowerCase().includes(val);
+  }).forEach(c=>{
+    const div=document.createElement("div");
+    div.className="gridCard";
+    div.textContent=c.titulo;
+
+    div.onclick=()=>{
+      index=data.indexOf(c);
+      searchMode.style.display="none";
+      render();
+    };
+
+    results.appendChild(div);
+  });
+});
+
+// =====================
+// CATEGORÍAS
+// =====================
+const catBox=document.getElementById("categories");
+
+["todas","paz","fortaleza","amor","fe","evangelio"]
+.forEach(cat=>{
+  const b=document.createElement("button");
+  b.textContent=cat;
+  b.onclick=()=>{
+    category=cat;
+    applyFilter();
+    catBox.classList.remove("show");
+  };
+  catBox.appendChild(b);
+});
+
+document.getElementById("toggleCat").onclick=()=>{
+  catBox.classList.toggle("show");
+};
+</script>
+
+</body>
+</html>
