@@ -1,4 +1,4 @@
-const CACHE_NAME = 'palabra-del-padre-v7'; // cambia versión cada actualización
+const CACHE_NAME = 'palabra-del-padre-v7'; 
 const urlsToCache = [
   './',
   './index.html',
@@ -7,23 +7,24 @@ const urlsToCache = [
   './icono.png'
 ];
 
-// Instalación del SW
+// Instalación
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
-      .then(() => self.skipWaiting()) // activa inmediatamente
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activación del SW
+// Activación
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
         keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key)) // borra caches viejos
+            .map(key => caches.delete(key))
       )
-    ).then(() => self.clients.claim()) // toma control inmediato
+    ).then(() => self.clients.claim())
   );
 });
 
@@ -32,11 +33,12 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // Actualiza cache con la última versión
-        const resClone = response.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+        if (event.request.method === 'GET' && response && response.status === 200) {
+          const resClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
+        }
         return response;
       })
-      .catch(() => caches.match(event.request)) // fallback cache si no hay conexión
+      .catch(() => caches.match(event.request))
   );
 });
