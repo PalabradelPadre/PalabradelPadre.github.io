@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palabra del Día</title>
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f0f2f5;
+    }
+
+    /* Hero card */
+    .hero-card {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.5);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Cards estilo cristal */
+    .card-cristal {
+      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.25);
+      border-radius: 15px;
+      margin-bottom: 20px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card-cristal:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Diferentes colores por categoría */
+    .categoria-paz { border-left: 5px solid #00a8cc; }
+    .categoria-fortaleza { border-left: 5px solid #f39c12; }
+    .categoria-inspiracion { border-left: 5px solid #9b59b6; }
+    .categoria-amor { border-left: 5px solid #e74c3c; }
+    .categoria-fe { border-left: 5px solid #2ecc71; }
+    .categoria-devocion { border-left: 5px solid #34495e; }
+    .categoria-evangelio { border-left: 5px solid #3498db; }
+
+    /* Botón flotante */
+    .btn-floating {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(52, 152, 219, 0.85);
+      color: white;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    /* Buscador */
+    #searchInput {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body class="container py-4">
+
+  <!-- Hero Card -->
+  <div class="hero-card">
+    <h2>Bienvenido a la Palabra del Día</h2>
+    <p>Encuentra inspiración, paz y reflexión en cada versículo</p>
+    <button class="btn btn-primary me-2">Acompañamiento</button>
+    <button class="btn btn-secondary">Evangelizar</button>
+  </div>
+
+  <!-- Buscador -->
+  <input type="text" id="searchInput" class="form-control" placeholder="Buscar por título o versículo...">
+
+  <!-- Contenedor de cards -->
+  <div class="row" id="cardsContainer">
+    <!-- Cards se cargarán aquí -->
+  </div>
+
+  <!-- Botón flotante de categorías -->
+  <div class="btn-floating" id="btnCategorias" title="Categorías">📚</div>
+
+  <!-- Scripts -->
+  <script>
+    // Traer datos de cards.json
+    async function loadCards() {
+      try {
+        const response = await fetch('cards.json');
+        const data = await response.json();
+        displayCards(data);
+      } catch (error) {
+        console.error('Error cargando cards:', error);
+      }
+    }
+
+    // Mostrar cards
+    function displayCards(cards) {
+      const container = document.getElementById('cardsContainer');
+      container.innerHTML = '';
+      cards.forEach(card => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-lg-4';
+        col.innerHTML = `
+          <div class="card card-cristal categoria-${card.categoria}">
+            <div class="card-body">
+              <h5 class="card-title">${card.titulo}</h5>
+              <p class="card-text"><em>"${card.cita}"</em></p>
+              <p class="text-muted">${card.versiculo}</p>
+              <hr>
+              <p>${card.reflexion}</p>
+              <button class="btn btn-sm btn-outline-secondary mt-2">Mi Diario</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(col);
+      });
+    }
+
+    // Filtrar cards por búsqueda
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const term = this.value.toLowerCase();
+      fetch('cards.json')
+        .then(res => res.json())
+        .then(data => {
+          const filtered = data.filter(card =>
+            card.titulo.toLowerCase().includes(term) ||
+            card.versiculo.toLowerCase().includes(term)
+          );
+          displayCards(filtered);
+        });
+    });
+
+    // Cargar cards al inicio
+    loadCards();
+  </script>
+
+</body>
+</html>
