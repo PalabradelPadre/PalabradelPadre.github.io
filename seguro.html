@@ -15,29 +15,26 @@ body{
 
 #app{
   height:100vh;
-  overflow-y:scroll;
-  scroll-snap-type:y mandatory;
+  position:relative;
 }
 
 .card{
-  height:100vh;
+  position:absolute;
+  width:100%;
+  height:100%;
   display:flex;
   flex-direction:column;
   justify-content:center;
   align-items:center;
   text-align:center;
   padding:2rem;
-  scroll-snap-align:start;
-  transition:0.5s;
+  transition:transform 0.4s ease, opacity 0.4s;
 }
-
-h1{font-size:1.5rem;}
-p{max-width:600px}
 
 .overlay{
   position:absolute;
-  bottom:100px;
   right:15px;
+  bottom:120px;
   display:flex;
   flex-direction:column;
   gap:15px;
@@ -47,20 +44,23 @@ p{max-width:600px}
   background:rgba(0,0,0,0.4);
   border:none;
   color:white;
-  padding:10px;
+  padding:12px;
   border-radius:50%;
-  cursor:pointer;
+  font-size:18px;
+}
+
+.fav.active{
+  background:red;
 }
 
 .floating{
   position:fixed;
   bottom:20px;
   left:20px;
-  background:#fff;
-  color:#000;
+  background:white;
+  color:black;
   padding:10px 15px;
   border-radius:20px;
-  cursor:pointer;
 }
 
 .categories{
@@ -76,19 +76,9 @@ p{max-width:600px}
   padding:8px;
   border:none;
   border-radius:10px;
-  cursor:pointer;
 }
 
 .show{display:flex}
-
-.fade{
-  animation:fade .5s ease;
-}
-
-@keyframes fade{
-  from{opacity:0; transform:translateY(20px)}
-  to{opacity:1; transform:translateY(0)}
-}
 </style>
 </head>
 
@@ -96,12 +86,12 @@ p{max-width:600px}
 
 <div id="app"></div>
 
-<div class="floating" id="toggleCat">☰ Categorías</div>
+<div class="floating" id="toggleCat">☰</div>
 <div class="categories" id="categories"></div>
 
 <script>
 // =====================
-// 🎨 Colores por categoría
+// 🎨 CONFIG
 // =====================
 const colors = {
   paz:"#4facfe",
@@ -113,36 +103,41 @@ const colors = {
 };
 
 // =====================
-// 📊 Estado
+// 📊 STATE
 // =====================
 let data = [];
+let filtered = [];
+let index = 0;
 let category = "todas";
 
+// favoritos
+let favorites = JSON.parse(localStorage.getItem("fav")||"[]");
+
 // =====================
-// 📥 Cargar datos
+// 📥 LOAD
 // =====================
 fetch("cards.json")
 .then(r=>r.json())
 .then(json=>{
   data = json;
-  render();
+  applyFilter();
 });
 
 // =====================
-// 🎛 Categorías
+// 🎛 CATEGORÍAS
 // =====================
 const catBox = document.getElementById("categories");
 
 ["todas","paz","fortaleza","amor","fe","evangelio"]
 .forEach(cat=>{
-  const btn = document.createElement("button");
-  btn.textContent = cat;
-  btn.onclick = ()=>{
+  const b = document.createElement("button");
+  b.textContent = cat;
+  b.onclick = ()=>{
     category = cat;
-    render();
+    applyFilter();
     catBox.classList.remove("show");
   };
-  catBox.appendChild(btn);
+  catBox.appendChild(b);
 });
 
 document.getElementById("toggleCat").onclick = ()=>{
@@ -150,68 +145,132 @@ document.getElementById("toggleCat").onclick = ()=>{
 };
 
 // =====================
-// 🎨 Render tipo TikTok
+// 🔄 FILTER
 // =====================
+function applyFilter(){
+  filtered = data.filter(c=>{
+    if(category==="todas") return true;
+    return c.categoria === category;
+  });
+  index = 0;
+  render();
+}
+
+// =====================
+// 🎨 RENDER PRO
+// =====================
+function createCard(c, pos){
+  const card = document.createElement("div");
+  card.className = "card";
+
+  card.style.background = `linear-gradient(180deg, ${colors[c.categoria]||"#333"}, #000)`;
+  card.style.transform = `translateY(${pos*100}%)`;
+
+  const t = document.createElement("h2");
+  t.textContent = c.titulo;
+
+  const v = document.createElement("h4");
+  v.textContent = c.versiculo;
+
+  const p = document.createElement("p");
+  p.textContent = c.cita;
+
+  const r = document.createElement("p");
+  r.textContent = c.reflexion;
+
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+
+  const share = document.createElement("button");
+  share.className = "btn";
+  share.textContent = "📤";
+
+  const fav = document.createElement("button");
+  fav.className = "btn fav";
+  fav.textContent = "❤️";
+
+  if(favorites.includes(c.id)) fav.classList.add("active");
+
+  share.onclick = ()=>{
+    const text = `${c.cita}\n${c.versiculo}`;
+    window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(text));
+  };
+
+  fav.onclick = ()=>{
+    if(favorites.includes(c.id)){
+      favorites = favorites.filter(f=>f!==c.id);
+      fav.classList.remove("active");
+    }else{
+      favorites.push(c.id);
+      fav.classList.add("active");
+    }
+    localStorage.setItem("fav", JSON.stringify(favorites));
+  };
+
+  overlay.appendChild(share);
+  overlay.appendChild(fav);
+
+  card.appendChild(t);
+  card.appendChild(v);
+  card.appendChild(p);
+  card.appendChild(r);
+  card.appendChild(overlay);
+
+  return card;
+}
+
 function render(){
   const app = document.getElementById("app");
   app.innerHTML = "";
 
-  let filtered = data.filter(c=>{
-    if(category==="todas") return true;
-    return c.categoria === category;
-  });
+  if(!filtered.length) return;
 
-  filtered.forEach(c=>{
-    const card = document.createElement("div");
-    card.className = "card fade";
+  // solo 3 cards (performance PRO)
+  const prev = filtered[index-1];
+  const current = filtered[index];
+  const next = filtered[index+1];
 
-    // fondo dinámico
-    card.style.background = `linear-gradient(180deg, ${colors[c.categoria] || "#333"}, #000)`;
-
-    const title = document.createElement("h1");
-    title.textContent = c.titulo;
-
-    const verse = document.createElement("h3");
-    verse.textContent = c.versiculo;
-
-    const cita = document.createElement("p");
-    cita.textContent = c.cita;
-
-    const reflex = document.createElement("p");
-    reflex.textContent = c.reflexion;
-
-    const overlay = document.createElement("div");
-    overlay.className = "overlay";
-
-    const share = document.createElement("button");
-    share.className = "btn";
-    share.textContent = "📤";
-
-    const diario = document.createElement("button");
-    diario.className = "btn";
-    diario.textContent = "📓";
-
-    share.onclick = ()=>{
-      const text = `${c.cita}\n${c.versiculo}`;
-      window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(text));
-    };
-
-    diario.onclick = ()=>{
-      window.location.href = "/midiario.html";
-    };
-
-    overlay.appendChild(share);
-    overlay.appendChild(diario);
-
-    card.appendChild(title);
-    card.appendChild(verse);
-    card.appendChild(cita);
-    card.appendChild(reflex);
-    card.appendChild(overlay);
-
-    app.appendChild(card);
-  });
+  if(prev) app.appendChild(createCard(prev,-1));
+  app.appendChild(createCard(current,0));
+  if(next) app.appendChild(createCard(next,1));
 }
+
+// =====================
+// 📱 SWIPE PRO
+// =====================
+let startY = 0;
+
+document.addEventListener("touchstart", e=>{
+  startY = e.touches[0].clientY;
+});
+
+document.addEventListener("touchend", e=>{
+  let endY = e.changedTouches[0].clientY;
+  let diff = startY - endY;
+
+  if(diff > 50 && index < filtered.length-1){
+    index++;
+    render();
+  }
+
+  if(diff < -50 && index > 0){
+    index--;
+    render();
+  }
+});
+
+// =====================
+// 🖱 DESKTOP SCROLL
+// =====================
+document.addEventListener("wheel", e=>{
+  if(e.deltaY > 0 && index < filtered.length-1){
+    index++;
+    render();
+  } else if(e.deltaY < 0 && index > 0){
+    index--;
+    render();
+  }
+});
 </script>
 
 </body>
