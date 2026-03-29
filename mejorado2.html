@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palabra del Padre PRO</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      color: white;
+    }
+
+    /* Cards estilo glass */
+    .card-glass {
+      backdrop-filter: blur(12px);
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 1.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .card-glass:hover { 
+      transform: scale(1.03); 
+      box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+    }
+
+    /* Hero Card */
+    .hero-card {
+      max-width: 800px;
+      margin: 1rem auto;
+      text-align: center;
+    }
+
+    /* Botón flotante */
+    .floating-btn {
+      background-color: rgba(0, 123, 255, 0.85);
+      color: white;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    .floating-btn:hover { 
+      transform: scale(1.05); 
+      background-color: rgba(0, 123, 255, 1);
+    }
+
+    /* Botón Mi Diario */
+    .diario-btn {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      padding: 0.75rem 1.5rem;
+      border-radius: 9999px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      cursor: pointer;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.2s;
+    }
+    .diario-btn:hover { transform: scale(1.05); }
+
+    /* Buscador */
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      border: none;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      outline: none;
+      color: #3b1f5f;
+    }
+
+    /* Resaltado de búsqueda */
+    .highlight { 
+      background-color: yellow; 
+      color: black; 
+      font-weight: bold; 
+    }
+
+    /* Footer animado */
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #f3f4f6;
+      font-style: italic;
+      font-size: 0.95rem;
+      position: relative;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .footer.show { opacity: 1; }
+
+    /* Botón evangelizar fijo */
+    .evangelizar-btn {
+      position: fixed;
+      bottom: 5rem;
+      left: 1rem;
+      background-color: #ffcc00;
+      color: #3b1f5f;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    .evangelizar-btn:hover { transform: scale(1.05); }
+
+    /* Contenedor de cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header class="flex justify-center items-center p-4 bg-gray-800 shadow relative">
+    <h1 class="text-2xl font-bold flex items-center gap-2">
+      <i class="bi bi-book-fill text-yellow-400"></i>
+      Palabra del Padre PRO
+      <i class="bi bi-dove-fill text-white"></i>
+    </h1>
+  </header>
+
+  <div class="mx-4 my-2">
+    <input id="searchInput" class="search-input" type="text" placeholder="Busca por palabra, versículo o tema...">
+  </div>
+
+  <!-- Hero Card (Evangelio) -->
+  <div id="heroCard" class="hero-card"></div>
+
+  <!-- Botón flotante para categorías -->
+  <div class="fixed bottom-20 right-6 z-50">
+    <div id="floatingCategoriesBtn" class="floating-btn">
+      <i class="bi bi-list"></i> Palabra
+    </div>
+    <div id="categoriesMenu" class="flex flex-col space-y-2 mt-2 hidden"></div>
+  </div>
+
+  <!-- Cards -->
+  <div id="cardsContainer" class="cards-grid"></div>
+
+  <!-- Botón Evangelizar -->
+  <button class="evangelizar-btn" id="evangelizarBtn">
+    <i class="bi bi-book-half"></i> Evangelizar
+  </button>
+
+  <!-- Botón Mi Diario -->
+  <button class="diario-btn" id="diarioBtn">
+    <i class="bi bi-journal-text"></i> Mi Diario
+  </button>
+
+  <footer class="footer" id="footer">“Porque el que siembra generosamente, también segará generosamente.” — Lucas 6:38</footer>
+
+  <script>
+    // Categorías
+    const categories = [
+      {id:'todas', label:'Todas', icon:'bi-list', color:'bg-indigo-600/50'},
+      {id:'paz', label:'Paz', icon:'bi-dove-fill', color:'bg-blue-400/50'},
+      {id:'fortaleza', label:'Fortaleza', icon:'bi-shield-fill', color:'bg-red-400/50'},
+      {id:'inspiracion', label:'Inspiración', icon:'bi-lightning-fill', color:'bg-green-400/50'},
+      {id:'amor', label:'Amor al prójimo', icon:'bi-heart-fill', color:'bg-yellow-300/50'},
+      {id:'fe', label:'Fe y Confianza', icon:'bi-star-fill', color:'bg-purple-400/50'},
+      {id:'devocion', label:'Devoción', icon:'bi-book-fill', color:'bg-pink-400/50'},
+      {id:'evangelio', label:'Evangelio', icon:'bi-calendar-event-fill', color:'bg-orange-400/50'}
+    ];
+
+    let cardsData = [];
+    let selectedCategory = 'todas';
+    const cardsContainer = document.getElementById('cardsContainer');
+    const heroCardDiv = document.getElementById('heroCard');
+    const searchInput = document.getElementById('searchInput');
+
+    function normalize(str){
+      return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function highlightText(text, search){
+      if(!search) return text;
+      const words = normalize(search).split(' ').filter(Boolean);
+      let result = text;
+      words.forEach(word => {
+        const re = new RegExp(`(${word})`, 'gi');
+        result = result.replace(re, '<span class="highlight">$1</span>');
+      });
+      return result;
+    }
+
+    // Cargar JSON
+    fetch('cards.json')
+      .then(res => res.json())
+      .then(data => {
+        cardsData = data;
+        renderHeroCard();
+        renderCards();
+      })
+      .catch(err => console.error('Error cargando JSON', err));
+
+    function renderHeroCard(){
+      const hero = cardsData.find(c => normalize(c.categoria) === 'evangelio');
+      if(!hero) return;
+      heroCardDiv.innerHTML = `
+        <div class="card-glass mx-4 my-4">
+          <h2 class="text-2xl font-bold mb-2">${hero.titulo}</h2>
+          <h3 class="text-lg mb-2">${hero.versiculo}</h3>
+          <p class="mb-2">${hero.cita}</p>
+          <p class="text-sm mb-2">${hero.reflexion}</p>
+          <div class="flex gap-2 mt-2 justify-center">
+            <button class="floating-btn" onclick="shareCard('${hero.cita}', '${hero.versiculo}', 'whatsapp')"><i class="bi bi-whatsapp text-green-500"></i></button>
+            <button class="floating-btn" onclick="shareCard('${hero.cita}', '${hero.versiculo}', 'facebook')"><i class="bi bi-facebook text-blue-500"></i></button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderCards(){
+      const search = normalize(searchInput.value);
+      let filteredCards = selectedCategory === 'todas' ? cardsData : cardsData.filter(c => normalize(c.categoria) === selectedCategory);
+      if(search){
+        const words = search.split(' ').filter(Boolean);
+        filteredCards = filteredCards.filter(c => {
+          const content = normalize(`${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`);
+          return words.every(w => content.includes(w));
+        });
+      }
+
+      cardsContainer.innerHTML = '';
+      filteredCards.forEach(card => {
+        if(normalize(card.categoria) === 'evangelio') return; // Hero ya está
+        const cardDiv = document.createElement('div');
+        cardDiv.className = `card-glass cursor-pointer ${categories.find(cat => normalize(cat.id) === normalize(card.categoria))?.color || ''}`;
+        cardDiv.innerHTML = `
+          <h2 class="text-lg font-bold">${highlightText(card.titulo, search)}</h2>
+          <h3 class="text-sm">${highlightText(card.versiculo, search)}</h3>
+          <p class="mt-2">${highlightText(card.cita, search)}</p>
+          <p>${highlightText(card.reflexion, search)}</p>
+          <div class="flex gap-2 mt-2 justify-end">
+            <button class="floating-btn" onclick="shareCard('${card.cita}', '${card.versiculo}', 'whatsapp')"><i class="bi bi-whatsapp text-green-500"></i></button>
+            <button class="floating-btn" onclick="shareCard('${card.cita}', '${card.versiculo}', 'facebook')"><i class="bi bi-facebook text-blue-500"></i></button>
+          </div>
+        `;
+        cardsContainer.appendChild(cardDiv);
+      });
+    }
+
+    searchInput.addEventListener('input', renderCards);
+
+    // Botón flotante categorías
+    const floatingBtn = document.getElementById('floatingCategoriesBtn');
+    const categoriesMenu = document.getElementById('categoriesMenu');
+
+    floatingBtn.addEventListener('click', () => categoriesMenu.classList.toggle('hidden'));
+
+    categories.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = `px-4 py-2 rounded flex items-center gap-2 ${cat.color}`;
+      btn.innerHTML = `<i class="bi ${cat.icon}"></i> ${cat.label}`;
+      btn.addEventListener('click', () => {
+        selectedCategory = cat.id;
+        categoriesMenu.classList.add('hidden');
+        renderCards();
+      });
+      categoriesMenu.appendChild(btn);
+    });
+
+    // Footer temporal
+    const footer = document.getElementById('footer');
+    footer.classList.add('show');
+    setTimeout(() => footer.classList.remove('show'), 5000);
+
+    // Compartir
+    function shareCard(cita, versiculo, platform){
+      const text = `${cita}\n${versiculo}\nFuente: ${window.location.href}`;
+      if(platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+      if(platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
+    }
+
+  </script>
+
+</body>
+</html>
