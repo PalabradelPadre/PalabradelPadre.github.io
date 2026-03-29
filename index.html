@@ -332,12 +332,12 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
 
         // 2. Colaborar versión 2
         e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
-          e('p', null, 'Apoya la creación de la versión 2, con más funciones como agregar tus propias cards.'),
+          e('p', null, 'Apoya la creación de la versión 2, con más funciones como agregar tus propias citas bíblicas.'),
           e('a', {
             href: 'https://m.me/tucanal?ref=' + encodeURIComponent('Hola, quiero apoyar la versión 2 de la app.'),
             target: '_blank',
             className: 'flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition'
-          }, e('i', { className: 'bi bi-lightning-fill' }), 'Colaborar')
+          }, e('i', { className: 'bi bi-lightning-fill' }), 'Enviar Mensaje')
         ),
 
         // 3. Apoyo económico
@@ -347,7 +347,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
             href: 'https://paypal.me/tucuenta',
             target: '_blank',
             className: 'flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition'
-          }, e('i', { className: 'bi bi-currency-dollar' }), 'Donar')
+          }, e('i', { className: 'bi bi-heart-fill' }), 'Colaborar')
         ),
 
         // 4. Ofrecer oración
@@ -357,7 +357,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
             href: 'https://youtube.com/tuvideo', // tu video de oración
             target: '_blank',
             className: 'flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition'
-          }, e('i', { className: 'bi bi-heart-fill' }), 'Oración')
+          }, e('i', { className: 'bi bi-pray' }), 'Oración')
         )
       )
     )
