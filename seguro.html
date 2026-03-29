@@ -8,14 +8,17 @@
 <style>
 body{
   margin:0;
-  overflow:hidden;
   font-family:sans-serif;
+  overflow:hidden;
   color:white;
 }
 
-#app{
-  height:100vh;
-  position:relative;
+/* 🔥 FEED */
+#feed{
+  position:fixed;
+  width:100%;
+  height:100%;
+  overflow:hidden;
 }
 
 .card{
@@ -28,31 +31,40 @@ body{
   align-items:center;
   text-align:center;
   padding:2rem;
-  transition:transform 0.4s ease, opacity 0.4s;
+  transition:transform 0.35s ease, opacity 0.35s ease;
 }
 
-.overlay{
-  position:absolute;
-  right:15px;
-  bottom:120px;
-  display:flex;
+/* 🔎 SEARCH */
+#searchMode{
+  position:fixed;
+  inset:0;
+  background:#1a1a2e;
+  display:none;
   flex-direction:column;
-  gap:15px;
 }
 
-.btn{
-  background:rgba(0,0,0,0.4);
+#searchInput{
+  padding:1rem;
   border:none;
-  color:white;
-  padding:12px;
-  border-radius:50%;
-  font-size:18px;
+  font-size:1rem;
 }
 
-.fav.active{
-  background:red;
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+  gap:10px;
+  padding:1rem;
+  overflow:auto;
 }
 
+.gridCard{
+  background:#ffffff10;
+  padding:1rem;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* FLOATING */
 .floating{
   position:fixed;
   bottom:20px;
@@ -61,6 +73,8 @@ body{
   color:black;
   padding:10px 15px;
   border-radius:20px;
+  cursor:pointer;
+  z-index:10;
 }
 
 .categories{
@@ -79,13 +93,44 @@ body{
 }
 
 .show{display:flex}
+
+.topbar{
+  position:fixed;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+}
+
+.btn{
+  background:#00000050;
+  border:none;
+  color:white;
+  padding:10px;
+  border-radius:50%;
+  margin:5px;
+}
 </style>
 </head>
 
 <body>
 
-<div id="app"></div>
+<!-- 🔥 FEED -->
+<div id="feed"></div>
 
+<!-- 🔎 SEARCH -->
+<div id="searchMode">
+  <input id="searchInput" placeholder="Buscar versículo...">
+  <div id="results" class="grid"></div>
+</div>
+
+<!-- TOP BUTTONS -->
+<div class="topbar">
+  <button class="btn" id="openSearch">🔎</button>
+  <button class="btn" id="closeSearch" style="display:none;">✕</button>
+</div>
+
+<!-- FLOAT -->
 <div class="floating" id="toggleCat">☰</div>
 <div class="categories" id="categories"></div>
 
@@ -93,7 +138,7 @@ body{
 // =====================
 // 🎨 CONFIG
 // =====================
-const colors = {
+const colors={
   paz:"#4facfe",
   fortaleza:"#ff6a6a",
   amor:"#fbc2eb",
@@ -103,174 +148,151 @@ const colors = {
 };
 
 // =====================
-// 📊 STATE
+// STATE
 // =====================
-let data = [];
-let filtered = [];
-let index = 0;
-let category = "todas";
-
-// favoritos
-let favorites = JSON.parse(localStorage.getItem("fav")||"[]");
+let data=[], filtered=[], index=0, category="todas";
 
 // =====================
-// 📥 LOAD
+// LOAD
 // =====================
 fetch("cards.json")
 .then(r=>r.json())
 .then(json=>{
-  data = json;
+  data=json;
   applyFilter();
 });
 
 // =====================
-// 🎛 CATEGORÍAS
+// FILTER
 // =====================
-const catBox = document.getElementById("categories");
+function applyFilter(){
+  filtered=data.filter(c=>{
+    if(category==="todas") return true;
+    return c.categoria===category;
+  });
+  index=0;
+  render();
+}
+
+// =====================
+// FEED RENDER
+// =====================
+function createCard(c,pos){
+  const el=document.createElement("div");
+  el.className="card";
+  el.style.background=`linear-gradient(${colors[c.categoria]}, black)`;
+  el.style.transform=`translateY(${pos*100}%)`;
+
+  const t=document.createElement("h2");
+  t.textContent=c.titulo;
+
+  const v=document.createElement("h4");
+  v.textContent=c.versiculo;
+
+  const p=document.createElement("p");
+  p.textContent=c.cita;
+
+  el.appendChild(t);
+  el.appendChild(v);
+  el.appendChild(p);
+
+  return el;
+}
+
+function render(){
+  const feed=document.getElementById("feed");
+  feed.innerHTML="";
+
+  if(!filtered.length) return;
+
+  const prev=filtered[index-1];
+  const cur=filtered[index];
+  const next=filtered[index+1];
+
+  if(prev) feed.appendChild(createCard(prev,-1));
+  feed.appendChild(createCard(cur,0));
+  if(next) feed.appendChild(createCard(next,1));
+}
+
+// =====================
+// SWIPE ANIMADO
+// =====================
+let startY=0;
+
+document.addEventListener("touchstart",e=>{
+  startY=e.touches[0].clientY;
+});
+
+document.addEventListener("touchend",e=>{
+  const diff=startY-e.changedTouches[0].clientY;
+
+  if(diff>60 && index<filtered.length-1){
+    index++;
+    render();
+  }
+  if(diff<-60 && index>0){
+    index--;
+    render();
+  }
+});
+
+// =====================
+// SEARCH MODE
+// =====================
+const searchMode=document.getElementById("searchMode");
+
+document.getElementById("openSearch").onclick=()=>{
+  searchMode.style.display="flex";
+  document.getElementById("closeSearch").style.display="inline";
+};
+
+document.getElementById("closeSearch").onclick=()=>{
+  searchMode.style.display="none";
+  document.getElementById("closeSearch").style.display="none";
+};
+
+document.getElementById("searchInput").addEventListener("input",()=>{
+  const val=document.getElementById("searchInput").value.toLowerCase();
+  const results=document.getElementById("results");
+  results.innerHTML="";
+
+  data.filter(c=>{
+    return (c.titulo+c.cita+c.reflexion).toLowerCase().includes(val);
+  }).forEach(c=>{
+    const div=document.createElement("div");
+    div.className="gridCard";
+    div.textContent=c.titulo;
+
+    div.onclick=()=>{
+      index=data.indexOf(c);
+      searchMode.style.display="none";
+      render();
+    };
+
+    results.appendChild(div);
+  });
+});
+
+// =====================
+// CATEGORÍAS
+// =====================
+const catBox=document.getElementById("categories");
 
 ["todas","paz","fortaleza","amor","fe","evangelio"]
 .forEach(cat=>{
-  const b = document.createElement("button");
-  b.textContent = cat;
-  b.onclick = ()=>{
-    category = cat;
+  const b=document.createElement("button");
+  b.textContent=cat;
+  b.onclick=()=>{
+    category=cat;
     applyFilter();
     catBox.classList.remove("show");
   };
   catBox.appendChild(b);
 });
 
-document.getElementById("toggleCat").onclick = ()=>{
+document.getElementById("toggleCat").onclick=()=>{
   catBox.classList.toggle("show");
 };
-
-// =====================
-// 🔄 FILTER
-// =====================
-function applyFilter(){
-  filtered = data.filter(c=>{
-    if(category==="todas") return true;
-    return c.categoria === category;
-  });
-  index = 0;
-  render();
-}
-
-// =====================
-// 🎨 RENDER PRO
-// =====================
-function createCard(c, pos){
-  const card = document.createElement("div");
-  card.className = "card";
-
-  card.style.background = `linear-gradient(180deg, ${colors[c.categoria]||"#333"}, #000)`;
-  card.style.transform = `translateY(${pos*100}%)`;
-
-  const t = document.createElement("h2");
-  t.textContent = c.titulo;
-
-  const v = document.createElement("h4");
-  v.textContent = c.versiculo;
-
-  const p = document.createElement("p");
-  p.textContent = c.cita;
-
-  const r = document.createElement("p");
-  r.textContent = c.reflexion;
-
-  const overlay = document.createElement("div");
-  overlay.className = "overlay";
-
-  const share = document.createElement("button");
-  share.className = "btn";
-  share.textContent = "📤";
-
-  const fav = document.createElement("button");
-  fav.className = "btn fav";
-  fav.textContent = "❤️";
-
-  if(favorites.includes(c.id)) fav.classList.add("active");
-
-  share.onclick = ()=>{
-    const text = `${c.cita}\n${c.versiculo}`;
-    window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(text));
-  };
-
-  fav.onclick = ()=>{
-    if(favorites.includes(c.id)){
-      favorites = favorites.filter(f=>f!==c.id);
-      fav.classList.remove("active");
-    }else{
-      favorites.push(c.id);
-      fav.classList.add("active");
-    }
-    localStorage.setItem("fav", JSON.stringify(favorites));
-  };
-
-  overlay.appendChild(share);
-  overlay.appendChild(fav);
-
-  card.appendChild(t);
-  card.appendChild(v);
-  card.appendChild(p);
-  card.appendChild(r);
-  card.appendChild(overlay);
-
-  return card;
-}
-
-function render(){
-  const app = document.getElementById("app");
-  app.innerHTML = "";
-
-  if(!filtered.length) return;
-
-  // solo 3 cards (performance PRO)
-  const prev = filtered[index-1];
-  const current = filtered[index];
-  const next = filtered[index+1];
-
-  if(prev) app.appendChild(createCard(prev,-1));
-  app.appendChild(createCard(current,0));
-  if(next) app.appendChild(createCard(next,1));
-}
-
-// =====================
-// 📱 SWIPE PRO
-// =====================
-let startY = 0;
-
-document.addEventListener("touchstart", e=>{
-  startY = e.touches[0].clientY;
-});
-
-document.addEventListener("touchend", e=>{
-  let endY = e.changedTouches[0].clientY;
-  let diff = startY - endY;
-
-  if(diff > 50 && index < filtered.length-1){
-    index++;
-    render();
-  }
-
-  if(diff < -50 && index > 0){
-    index--;
-    render();
-  }
-});
-
-// =====================
-// 🖱 DESKTOP SCROLL
-// =====================
-document.addEventListener("wheel", e=>{
-  if(e.deltaY > 0 && index < filtered.length-1){
-    index++;
-    render();
-  } else if(e.deltaY < 0 && index > 0){
-    index--;
-    render();
-  }
-});
 </script>
 
 </body>
