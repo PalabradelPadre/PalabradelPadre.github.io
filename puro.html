@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Palabra del Padre</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-<link rel="manifest" href="/manifest.json">
 
 <style>
 :root {
@@ -20,7 +19,8 @@
 }
 
 body {
-  margin:0; font-family: sans-serif; background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); color: #fff;
+  margin:0; font-family:sans-serif; background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); color:#fff;
+  overflow-x:hidden;
 }
 
 header {
@@ -28,7 +28,7 @@ header {
 }
 
 input#search {
-  width: 90%; max-width:600px; padding:0.8rem; border-radius:1rem; border:none; margin:1rem auto; display:block; font-size:1rem;
+  width:90%; max-width:600px; padding:0.8rem; border-radius:1rem; border:none; margin:1rem auto; display:block; font-size:1rem;
 }
 
 .cards-container {
@@ -44,34 +44,54 @@ input#search {
   cursor:pointer; position:relative;
 }
 .card:hover { transform: scale(1.03); }
+.card h3 { margin:0 0 0.5rem 0; font-size:1.2rem; }
+.card p { margin:0.3rem 0; font-size:0.9rem; }
 
 .highlight { background-color: #ffeb3b; color:#000; font-weight:bold; padding:0 2px; border-radius:3px; }
 
+/* Botón TikTok */
+.tiktokBtn{
+  position:absolute; bottom:10px; right:10px; padding:6px 12px; border-radius:15px;
+  border:none; background: rgba(0,0,0,0.4); color:#fff; font-weight:bold; cursor:pointer;
+  transition: transform 0.2s;
+}
+.tiktokBtn:hover { transform: scale(1.1); }
+
 /* Floating Button */
 .floatingBtn{
-  position:fixed; bottom:20px; right:20px; background:#ffcc00; color:#3b1f5f;
+  position:fixed; bottom:20px; right:20px; background: rgba(255,204,0,0.7); color:#3b1f5f;
   padding:10px 16px; border-radius:25px; font-weight:bold; cursor:pointer; z-index:50;
   display:flex; align-items:center; gap:5px; transition: transform 0.2s;
 }
 .floatingBtn:hover { transform: scale(1.05); }
 
+/* Botón Diario */
+.diarioBtn{
+  position:fixed; bottom:80px; right:20px; background: rgba(128,128,128,0.7); color:#fff;
+  padding:10px 16px; border-radius:25px; font-weight:bold; cursor:pointer; z-index:50;
+  display:flex; align-items:center; gap:5px; transition: transform 0.2s;
+}
+.diarioBtn:hover { transform: scale(1.05); }
+
 .categories{
-  position:fixed; bottom:70px; right:20px; display:none; flex-direction:column; gap:6px; z-index:50;
+  position:fixed; bottom:140px; right:20px; display:none; flex-direction:column; gap:6px; z-index:50;
 }
 .categories button{
   padding:8px 14px; border:none; border-radius:20px; cursor:pointer; font-weight:bold; transition: transform 0.2s;
 }
 .categories button:hover { transform: scale(1.05); }
 
-.share-btn{
-  display:inline-flex; justify-content:center; align-items:center;
-  width:36px; height:36px; border-radius:50%; margin-right:5px; border:1px solid rgba(255,255,255,0.5);
-  cursor:pointer; transition: transform 0.2s;
+/* TikTok full screen */
+.tiktokView{
+  position:fixed; top:0; left:0; width:100%; height:100%; background:#000; color:#fff;
+  display:flex; justify-content:center; align-items:center; flex-direction:column; padding:1rem; z-index:100;
 }
-.share-btn:hover { transform: scale(1.2); }
-
-/* TikTok scroll effect */
-.card.tiktok { margin-bottom:20px; }
+.tiktokView p { font-size:1.2rem; text-align:center; margin:0.5rem 0; }
+.tiktokView .closeBtn{
+  position:absolute; top:20px; right:20px; padding:10px 16px; background:#fff; color:#000; border:none; border-radius:25px; font-weight:bold; cursor:pointer;
+  transition: transform 0.2s;
+}
+.tiktokView .closeBtn:hover { transform: scale(1.05); }
 </style>
 </head>
 
@@ -82,18 +102,29 @@ input#search {
 
 <div class="cards-container" id="cardsContainer"></div>
 
-<!-- Botón flotante -->
+<!-- Botones flotantes -->
 <div class="floatingBtn" id="toggleCategories"><i class="bi bi-list"></i> Palabra</div>
+<div class="diarioBtn" id="miDiario"><i class="bi bi-journal-text"></i> Mi Diario</div>
 <div class="categories" id="categoriesContainer"></div>
 
+<!-- TikTok View -->
+<div id="tiktokView" class="tiktokView" style="display:none;">
+  <button class="closeBtn" onclick="closeTikTok()">Cerrar</button>
+  <div id="tiktokContent"></div>
+</div>
+
 <script>
-const cardsData = [
-  { titulo:"Amor Divino", versiculo:"Juan 3:16", cita:"Dios amó tanto al mundo", reflexion:"Reflexiona sobre su amor", categoria:"amor" },
-  { titulo:"Paz Interior", versiculo:"Filipenses 4:7", cita:"La paz de Dios", reflexion:"Vive en tranquilidad", categoria:"paz" },
-  { titulo:"Fe y Confianza", versiculo:"Hebreos 11:1", cita:"La fe es la certeza", reflexion:"Confía en Él", categoria:"fe" },
-  { titulo:"Fortaleza en Cristo", versiculo:"Isaías 40:31", cita:"Los que esperan en Jehová", reflexion:"Renuevan fuerzas", categoria:"fortaleza" },
-  { titulo:"Evangelio del día", versiculo:"Mateo 5:14", cita:"Ustedes son la luz", reflexion:"Ilumina con tu vida", categoria:"evangelio" }
-];
+// Cargar JSON
+async function loadCards(){
+  try{
+    const res = await fetch('cards.json');
+    const data = await res.json();
+    return data;
+  }catch(e){
+    console.error('Error cargando cards.json', e);
+    return [];
+  }
+}
 
 const categoryStyles = {
   todas: { bg: '#6b5b95', text: '#fff' },
@@ -106,11 +137,11 @@ const categoryStyles = {
   evangelio: { bg: '#f5a623', text: '#000' }
 };
 
-const categories = Object.keys(categoryStyles);
 const cardsContainer = document.getElementById('cardsContainer');
 const categoriesContainer = document.getElementById('categoriesContainer');
 const searchInput = document.getElementById('search');
 let currentCategory = "todas";
+let allCards = [];
 
 function highlightText(text, search){
   if(!search) return text;
@@ -123,9 +154,27 @@ function highlightText(text, search){
   return escaped;
 }
 
+function renderCards(data){
+  cardsContainer.innerHTML = "";
+  data.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = "card";
+    card.style.backgroundColor = categoryStyles[c.categoria]?.bg || '#444';
+    card.style.color = categoryStyles[c.categoria]?.text || '#fff';
+    card.innerHTML = `
+      <h3>${highlightText(c.titulo, searchInput.value)}</h3>
+      <p>${highlightText(c.versiculo, searchInput.value)}</p>
+      <p>${highlightText(c.cita, searchInput.value)}</p>
+      <p>${highlightText(c.reflexion, searchInput.value)}</p>
+      <button class="tiktokBtn" onclick="openTikTok('${c.id}')">Ver TikTok</button>
+    `;
+    cardsContainer.appendChild(card);
+  });
+}
+
 function filterCards(){
   const search = searchInput.value.toLowerCase();
-  let filtered = cardsData.filter(c=>{
+  let filtered = allCards.filter(c=>{
     if(currentCategory !== "todas" && c.categoria !== currentCategory) return false;
     if(!search) return true;
     const content = `${c.titulo} ${c.cita} ${c.versiculo} ${c.reflexion}`.toLowerCase();
@@ -134,29 +183,9 @@ function filterCards(){
   renderCards(filtered);
 }
 
-function renderCards(data){
-  cardsContainer.innerHTML = "";
-  data.forEach(c=>{
-    const card = document.createElement('div');
-    card.className = "card tiktok";
-    card.style.backgroundColor = categoryStyles[c.categoria].bg;
-    card.style.color = categoryStyles[c.categoria].text;
-    card.innerHTML = `
-      <h3>${highlightText(c.titulo, searchInput.value)}</h3>
-      <p>${highlightText(c.versiculo, searchInput.value)}</p>
-      <p>${highlightText(c.cita, searchInput.value)}</p>
-      <p>${highlightText(c.reflexion, searchInput.value)}</p>
-      <div style="margin-top:5px; display:flex;">
-        <div class="share-btn" onclick="shareCard('whatsapp','${c.cita} - ${c.versiculo}')"><i class="bi bi-whatsapp text-green-500"></i></div>
-        <div class="share-btn" onclick="shareCard('facebook','${c.cita} - ${c.versiculo}')"><i class="bi bi-facebook text-blue-500"></i></div>
-      </div>
-    `;
-    cardsContainer.appendChild(card);
-  });
-}
-
 function renderCategories(){
   categoriesContainer.innerHTML="";
+  const categories = Object.keys(categoryStyles);
   categories.forEach(cat=>{
     const btn = document.createElement('button');
     btn.textContent = cat;
@@ -171,19 +200,34 @@ function renderCategories(){
   });
 }
 
-searchInput.addEventListener('input', filterCards);
 document.getElementById('toggleCategories').addEventListener('click', ()=>{
   categoriesContainer.style.display = categoriesContainer.style.display==="flex"?"none":"flex";
 });
 
-function shareCard(platform,text){
-  if(platform==='whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
-  if(platform==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent(text)}`,'_blank');
+searchInput.addEventListener('input', filterCards);
+
+// TikTok mode
+function openTikTok(id){
+  const card = allCards.find(c=>c.id===id);
+  if(!card) return;
+  document.getElementById('tiktokContent').innerHTML = `
+    <h2>${card.titulo}</h2>
+    <p><b>${card.versiculo}</b></p>
+    <p>${card.cita}</p>
+    <p>${card.reflexion}</p>
+  `;
+  document.getElementById('tiktokView').style.display="flex";
+}
+function closeTikTok(){
+  document.getElementById('tiktokView').style.display="none";
 }
 
-// Inicial
-renderCategories();
-filterCards();
+// Inicializar
+(async ()=>{
+  allCards = await loadCards();
+  renderCategories();
+  filterCards();
+})();
 </script>
 </body>
 </html>
