@@ -8,159 +8,137 @@
 <style>
 body{
   margin:0;
+  overflow:hidden;
   font-family:sans-serif;
   color:white;
-  background:linear-gradient(#2a1e3b,#3b1f5f);
 }
 
-header{
-  text-align:center;
-  padding:1rem;
-  background:#00000040;
-  font-weight:bold;
-}
-
-.container{
-  padding:1rem;
-  max-width:1000px;
-  margin:auto;
-}
-
-input{
-  width:100%;
-  padding:0.8rem;
-  border-radius:10px;
-  border:none;
-  margin-bottom:1rem;
-}
-
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:1rem;
+#app{
+  height:100vh;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
 }
 
 .card{
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(10px);
-  padding:1rem;
-  border-radius:15px;
-  cursor:pointer;
-  transition:0.25s;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:2rem;
+  scroll-snap-align:start;
+  transition:0.5s;
 }
 
-.card:hover{ transform:scale(1.02); }
+h1{font-size:1.5rem;}
+p{max-width:600px}
 
-.hidden{ display:none; }
+.overlay{
+  position:absolute;
+  bottom:100px;
+  right:15px;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
 
-button{
+.btn{
+  background:rgba(0,0,0,0.4);
   border:none;
-  padding:0.4rem 0.7rem;
-  border-radius:8px;
+  color:white;
+  padding:10px;
+  border-radius:50%;
   cursor:pointer;
 }
-
-.whatsapp{ background:#25D366;color:white }
-.facebook{ background:#1877F2;color:white }
 
 .floating{
   position:fixed;
   bottom:20px;
-  right:20px;
-  background:#007bff;
-  padding:0.8rem;
-  border-radius:50%;
+  left:20px;
+  background:#fff;
+  color:#000;
+  padding:10px 15px;
+  border-radius:20px;
   cursor:pointer;
 }
 
 .categories{
   position:fixed;
   bottom:70px;
-  right:20px;
+  left:20px;
   display:none;
   flex-direction:column;
   gap:5px;
 }
 
 .categories button{
-  background:white;
-  color:black;
+  padding:8px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
 }
 
-.show{ display:flex }
+.show{display:flex}
 
-.install-btn{
-  position:fixed;
-  top:10px;
-  right:10px;
-  display:none;
-  background:#4CAF50;
-  color:white;
+.fade{
+  animation:fade .5s ease;
 }
 
-footer{
-  text-align:center;
-  padding:2rem 1rem;
-  opacity:0.7;
+@keyframes fade{
+  from{opacity:0; transform:translateY(20px)}
+  to{opacity:1; transform:translateY(0)}
 }
 </style>
 </head>
 
 <body>
 
-<header>📖 Palabra del Padre</header>
+<div id="app"></div>
 
-<button id="installBtn" class="install-btn">📲</button>
-
-<div class="container">
-<input id="search" placeholder="Buscar...">
-<div id="cards" class="grid"></div>
-</div>
-
-<div id="toggleCat" class="floating">☰</div>
-<div id="categories" class="categories"></div>
-
-<footer>Lucas 6:38</footer>
+<div class="floating" id="toggleCat">☰ Categorías</div>
+<div class="categories" id="categories"></div>
 
 <script>
 // =====================
-// 🔐 Seguridad básica
+// 🎨 Colores por categoría
 // =====================
-function safeText(text){
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div;
-}
-
-function normalize(str){
-  return (str||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-}
+const colors = {
+  paz:"#4facfe",
+  fortaleza:"#ff6a6a",
+  amor:"#fbc2eb",
+  fe:"#a18cd1",
+  evangelio:"#f6d365",
+  todas:"#333"
+};
 
 // =====================
 // 📊 Estado
 // =====================
-let cardsData = [];
+let data = [];
 let category = "todas";
 
-const categories = [
-  {id:'todas', label:'Todas'},
-  {id:'paz', label:'Paz'},
-  {id:'fortaleza', label:'Fortaleza'},
-  {id:'amor', label:'Amor'},
-  {id:'fe', label:'Fe'},
-  {id:'evangelio', label:'Evangelio'}
-];
+// =====================
+// 📥 Cargar datos
+// =====================
+fetch("cards.json")
+.then(r=>r.json())
+.then(json=>{
+  data = json;
+  render();
+});
 
 // =====================
-// 🎛 UI categorías
+// 🎛 Categorías
 // =====================
 const catBox = document.getElementById("categories");
 
-categories.forEach(cat=>{
+["todas","paz","fortaleza","amor","fe","evangelio"]
+.forEach(cat=>{
   const btn = document.createElement("button");
-  btn.textContent = cat.label;
+  btn.textContent = cat;
   btn.onclick = ()=>{
-    category = cat.id;
+    category = cat;
     render();
     catBox.classList.remove("show");
   };
@@ -172,117 +150,67 @@ document.getElementById("toggleCat").onclick = ()=>{
 };
 
 // =====================
-// 📥 Cargar datos
-// =====================
-fetch("cards.json")
-.then(r=>r.json())
-.then(data=>{
-  cardsData = data;
-  render();
-})
-.catch(()=>console.warn("No se pudo cargar cards.json"));
-
-// =====================
-// 🎨 Render seguro
+// 🎨 Render tipo TikTok
 // =====================
 function render(){
-  const container = document.getElementById("cards");
-  container.innerHTML = "";
+  const app = document.getElementById("app");
+  app.innerHTML = "";
 
-  const search = normalize(document.getElementById("search").value);
-
-  let filtered = cardsData.filter(c=>{
+  let filtered = data.filter(c=>{
     if(category==="todas") return true;
-    return normalize(c.categoria)===category;
+    return c.categoria === category;
   });
-
-  if(search){
-    filtered = filtered.filter(c=>{
-      return normalize(
-        c.titulo + c.cita + c.reflexion + c.versiculo
-      ).includes(search);
-    });
-  }
 
   filtered.forEach(c=>{
     const card = document.createElement("div");
-    card.className = "card";
+    card.className = "card fade";
 
-    const title = safeText(c.titulo);
-    const verse = safeText(c.versiculo);
-    const cita = safeText(c.cita);
-    const reflex = safeText(c.reflexion);
+    // fondo dinámico
+    card.style.background = `linear-gradient(180deg, ${colors[c.categoria] || "#333"}, #000)`;
 
-    const content = document.createElement("div");
-    content.className = "hidden";
+    const title = document.createElement("h1");
+    title.textContent = c.titulo;
 
-    content.appendChild(cita);
-    content.appendChild(reflex);
+    const verse = document.createElement("h3");
+    verse.textContent = c.versiculo;
 
-    const btnW = document.createElement("button");
-    btnW.className = "whatsapp";
-    btnW.textContent = "WhatsApp";
+    const cita = document.createElement("p");
+    cita.textContent = c.cita;
 
-    const btnF = document.createElement("button");
-    btnF.className = "facebook";
-    btnF.textContent = "Facebook";
+    const reflex = document.createElement("p");
+    reflex.textContent = c.reflexion;
 
-    const text = `${c.cita}\n${c.versiculo}\n${location.href}`;
+    const overlay = document.createElement("div");
+    overlay.className = "overlay";
 
-    btnW.onclick = (e)=>{
-      e.stopPropagation();
+    const share = document.createElement("button");
+    share.className = "btn";
+    share.textContent = "📤";
+
+    const diario = document.createElement("button");
+    diario.className = "btn";
+    diario.textContent = "📓";
+
+    share.onclick = ()=>{
+      const text = `${c.cita}\n${c.versiculo}`;
       window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(text));
     };
 
-    btnF.onclick = (e)=>{
-      e.stopPropagation();
-      window.open("https://facebook.com/sharer/sharer.php?u="+location.href);
+    diario.onclick = ()=>{
+      window.location.href = "/midiario.html";
     };
 
-    content.appendChild(btnW);
-    content.appendChild(btnF);
+    overlay.appendChild(share);
+    overlay.appendChild(diario);
 
     card.appendChild(title);
     card.appendChild(verse);
-    card.appendChild(content);
+    card.appendChild(cita);
+    card.appendChild(reflex);
+    card.appendChild(overlay);
 
-    card.onclick = ()=>{
-      content.classList.toggle("hidden");
-    };
-
-    container.appendChild(card);
+    app.appendChild(card);
   });
-}
-
-// =====================
-// 🔍 Buscar
-// =====================
-document.getElementById("search").addEventListener("input", render);
-
-// =====================
-// 📲 PWA install
-// =====================
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
-
-window.addEventListener("beforeinstallprompt", e=>{
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "block";
-});
-
-installBtn.onclick = async ()=>{
-  if(!deferredPrompt) return;
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-};
-
-// =====================
-// ⚙ Service Worker
-// =====================
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("swr.js")
-  .catch(()=>console.warn("SW error"));
 }
 </script>
 
