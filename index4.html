@@ -327,50 +327,28 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
   });
 </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
 
-  // 1️⃣ Ajustar transparencia de las cards
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Ajusta solo la transparencia de las cards
   function setCardTransparency() {
     document.querySelectorAll('.card-glass').forEach(card => {
-      const bg = getComputedStyle(card).backgroundColor; // obtiene el color actual
-      const rgba = bg.replace(/rgba?\((\d+), (\d+), (\d+)(?:, [\d.]+)?\)/, 'rgba($1, $2, $3, 0.35)');
-      card.style.backgroundColor = rgba; // cambia solo el alpha
+      // Si la card ya tiene un background-color rgba, solo cambiamos el alpha
+      const style = getComputedStyle(card);
+      const match = style.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+)(?:, [\d.]+)?\)/);
+
+      if (match) {
+        const r = match[1], g = match[2], b = match[3];
+        card.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.35)`; // alpha deseado
+      }
     });
   }
 
   setCardTransparency();
 
-  // Observa cambios en el DOM por si se crean nuevas cards dinámicas
-  const cardObserver = new MutationObserver(() => setCardTransparency());
-  cardObserver.observe(document.getElementById('root'), { childList: true, subtree: true });
-
-
-  // 2️⃣ Activar botones "Mi Diario"
-  function initMiDiarioButton() {
-    const diarioButtons = document.querySelectorAll('.diario-btn');
-    diarioButtons.forEach(btn => {
-      if (!btn.dataset.miDiarioInit) {
-        btn.addEventListener('click', () => {
-          window.location.href = '/midiario.html';
-        });
-        btn.dataset.miDiarioInit = 'true';
-      }
-    });
-  }
-
-  initMiDiarioButton();
-
-  const diarioObserver = new MutationObserver(() => initMiDiarioButton());
-  diarioObserver.observe(document.getElementById('root'), { childList: true, subtree: true });
-
-
-  // 3️⃣ Subir un poco el botón "Palabra"
-  const palabraBtn = document.querySelector('.floating-btn');
-  if(palabraBtn){
-    palabraBtn.style.bottom = '4rem'; // sube 3rem desde el bottom original
-  }
-
+  // Observa cambios en el DOM para nuevas cards
+  const observer = new MutationObserver(() => setCardTransparency());
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
 });
 </script>
   
