@@ -15,6 +15,10 @@
       background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
       font-family: sans-serif;
     }
+
+    .card-transparent {
+  @apply bg-white/35; /* 35% de opacidad */
+}
     .card-glass {
       backdrop-filter: blur(12px);
       background-color: rgba(255, 255, 255, 0.2);
@@ -232,7 +236,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
         if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
       };
 
-      return e('div', { className: `card-glass cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
+      return e('div', { className: `card-glass card-transparent cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
         e('h2', { className: 'text-lg font-bold' }, highlightText(titulo, search)),
         e('h3', { className: 'text-sm' }, highlightText(versiculo, search)),
         expanded && e('div', { className: 'mt-2' },
