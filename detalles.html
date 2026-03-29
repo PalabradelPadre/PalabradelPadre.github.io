@@ -1,0 +1,68 @@
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // 1️⃣ Poner comillas en todas las citas bíblicas (selector de <p> dentro de .card-glass y HeroCard)
+  document.querySelectorAll('.card-glass p, .hero-card p').forEach(p => {
+    if (!p.dataset.quoted) {  // evitar duplicar comillas
+      p.textContent = `“${p.textContent}”`;
+      p.dataset.quoted = 'true';
+    }
+  });
+
+  // 2️⃣ Asegurar que el footer esté visible y por encima de botones flotantes
+  const footer = document.querySelector('footer.footer');
+  if (footer) {
+    footer.style.position = 'fixed';
+    footer.style.bottom = '0';
+    footer.style.left = '0';
+    footer.style.width = '100%';
+    footer.style.background = 'rgba(0,0,0,0.5)';
+    footer.style.zIndex = '60';
+    footer.style.textAlign = 'center';
+    footer.style.padding = '1rem 0.5rem';
+    footer.style.fontStyle = 'italic';
+    footer.style.fontSize = '0.95rem';
+    footer.style.color = '#f3f4f6';
+    footer.classList.add('show'); // para mostrarlo automáticamente
+  }
+
+  // 3️⃣ Botón instalar PWA
+  let deferredPrompt;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Crear botón instalar si no existe
+    if (!document.querySelector('.install-btn')) {
+      const installBtn = document.createElement('button');
+      installBtn.textContent = 'Instalar App 📲';
+      installBtn.className = 'install-btn';
+      installBtn.style.position = 'fixed';
+      installBtn.style.bottom = '1rem';
+      installBtn.style.right = '1rem';
+      installBtn.style.zIndex = '50';
+      installBtn.style.padding = '0.75rem 1.5rem';
+      installBtn.style.borderRadius = '9999px';
+      installBtn.style.fontWeight = 'bold';
+      installBtn.style.backgroundColor = '#4CAF50';
+      installBtn.style.color = 'white';
+      installBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+      installBtn.style.cursor = 'pointer';
+
+      installBtn.addEventListener('click', async () => {
+        installBtn.disabled = true;
+        deferredPrompt.prompt();
+        const choiceResult = await deferredPrompt.userChoice;
+        if (choiceResult.outcome === 'accepted') {
+          console.log('PWA instalada');
+        } else {
+          console.log('PWA rechazada');
+        }
+        deferredPrompt = null;
+      });
+
+      document.body.appendChild(installBtn);
+    }
+  });
+});
+</script>
