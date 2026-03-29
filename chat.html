@@ -11,6 +11,29 @@
       background: #f0f2f5;
     }
 
+    .btn-floating {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(52, 152, 219, 0.9); /* azul con transparencia */
+  color: white;
+  font-size: 1.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+
+.btn-floating:hover {
+  transform: scale(1.1);
+}
+
     /* Hero card */
     .hero-card {
       backdrop-filter: blur(10px);
@@ -87,9 +110,8 @@
     <!-- Cards se cargarán aquí -->
   </div>
 
-  <!-- Botón flotante de categorías -->
-  <div class="btn-floating" id="btnCategorias" title="Categorías">📚</div>
-
+ <!-- Botón flotante de categorías -->
+<div class="btn-floating" id="btnCategorias" title="Categorías">📚</div>
   <!-- Scripts -->
   <script>
     // Traer datos de cards.json
@@ -142,6 +164,58 @@
 
     // Cargar cards al inicio
     loadCards();
+
+// Categorías disponibles
+const categorias = ['paz', 'fortaleza', 'inspiracion', 'amor', 'fe', 'devocion', 'evangelio'];
+
+// Mostrar menú flotante al hacer click
+document.getElementById('btnCategorias').addEventListener('click', () => {
+  let menu = document.getElementById('categoriaMenu');
+  
+  if (!menu) {
+    menu = document.createElement('div');
+    menu.id = 'categoriaMenu';
+    menu.style.position = 'fixed';
+    menu.style.bottom = '90px';
+    menu.style.right = '20px';
+    menu.style.background = 'rgba(52, 152, 219, 0.9)';
+    menu.style.padding = '10px';
+    menu.style.borderRadius = '10px';
+    menu.style.zIndex = 1001;
+    menu.style.display = 'flex';
+    menu.style.flexDirection = 'column';
+    menu.style.gap = '10px';
+    
+    categorias.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+      btn.className = 'btn btn-sm btn-light';
+      btn.addEventListener('click', () => filterByCategory(cat));
+      menu.appendChild(btn);
+    });
+
+    const btnAll = document.createElement('button');
+    btnAll.textContent = 'Todas';
+    btnAll.className = 'btn btn-sm btn-secondary';
+    btnAll.addEventListener('click', () => loadCards());
+    menu.appendChild(btnAll);
+
+    document.body.appendChild(menu);
+  } else {
+    menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+  }
+});
+
+// Función para filtrar cards por categoría
+function filterByCategory(categoria) {
+  fetch('cards.json')
+    .then(res => res.json())
+    .then(data => {
+      const filtered = data.filter(card => card.categoria === categoria);
+      displayCards(filtered);
+    });
+}
+    
   </script>
 
 </body>
