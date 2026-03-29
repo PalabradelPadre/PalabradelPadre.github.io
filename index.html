@@ -85,26 +85,59 @@
     .footer.show { opacity: 1; }
 
 .install-btn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 0.6rem 1.1rem;
-  border-radius: 9999px;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(145deg, #4CAF50, #45A049);
+  color: #fff;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.8rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
   z-index: 50;
   cursor: pointer;
-
   position: fixed;
-  top: 1rem;      /* arriba */
-  right: 1rem;    /* derecha */
-  transition: transform 0.2s, opacity 0.3s;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.rem;
+  overflow: hidden;          /* necesario para el ripple */
+  transition: transform 0.2s, opacity 0.3s, box-shadow 0.2s;
 }
-.install-btn:hover { transform: scale(1.05); }
+
+.install-btn i {
+  font-size: 1rem;
+}
+
+.install-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* efecto ripple */
+.install-btn::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: inherit;
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.4s, opacity 0.6s;
+}
+
+.install-btn:active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition: 0s;
+}
+
 .install-btn.hidden {
   opacity: 0;
   pointer-events: none;
 }
-
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
