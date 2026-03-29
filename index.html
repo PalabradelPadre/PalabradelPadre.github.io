@@ -457,24 +457,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let deferredPrompt = null;
 
+  function isAppInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+  }
+
+  // 🔴 OCULTAR SI YA ESTÁ INSTALADA
+  if (isAppInstalled()) {
+    btn.classList.add('hidden');
+  }
+
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    btn.classList.remove('hidden'); // mostrar botón cuando la PWA esté disponible
+
+    // Solo mostrar si NO está instalada
+    if (!isAppInstalled()) {
+      btn.classList.remove('hidden');
+    }
   });
 
   btn.addEventListener('click', async () => {
     if (!deferredPrompt) return;
+
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
-    console.log('Resultado instalación:', choice.outcome);
+
     if (choice.outcome === 'accepted') {
-      btn.classList.add('hidden'); // ocultar al instalar
+      btn.classList.add('hidden');
     }
+
+    deferredPrompt = null;
   });
 
   window.addEventListener('appinstalled', () => {
-    btn.classList.add('hidden'); // ocultar si se instala por otro método
+    btn.classList.add('hidden');
     deferredPrompt = null;
   });
 });
