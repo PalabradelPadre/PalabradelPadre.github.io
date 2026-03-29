@@ -308,45 +308,61 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
     onClick: onClose
   },
     e('div', {
-      className: 'bg-white text-gray-900 p-6 rounded-xl shadow-xl max-w-md w-full relative transform transition-transform scale-90 animate-scale-up',
+      className: 'bg-yellow-300 text-black p-6 rounded-xl shadow-xl max-w-md w-full relative transform transition-transform scale-90 animate-scale-up',
       onClick: e => e.stopPropagation()
     },
-      // Botón de cerrar
       e('button', {
         onClick: onClose,
-        className: 'absolute top-3 right-3 text-gray-600 hover:text-gray-900 font-bold text-lg'
+        className: 'absolute top-3 right-3 text-black font-bold text-lg hover:text-gray-800'
       }, '✕'),
 
-      // Título
-      e('h2', { className: 'text-2xl font-bold mb-4 text-center text-purple-600' }, 'Evangelizar'),
+      e('h2', { className: 'text-2xl font-bold mb-4 text-center' }, 'Evangelizar'),
 
-      // Texto
-      e('p', { className: 'text-gray-700 mb-4 text-center' }, 'Comparte tus reflexiones o apoya la app:'),
+      e('div', { className: 'flex flex-col gap-4' },
 
-      // Botones principales
-      e('div', { className: 'flex flex-col gap-3' },
-        e('a', {
-          href: 'https://m.me/tucanal',
-          target: '_blank',
-          className: 'flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition'
-        }, e('i', { className: 'bi bi-chat-dots' }), 'Compartir en Messenger'),
+        // 1. Sugerir card con mensaje predefinido
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, '¿Quieres ayudar agregando una nueva cita bíblica?'),
+          e('a', {
+            href: 'https://m.me/tucanal?ref=' + encodeURIComponent('Hola, quiero sugerir una nueva card bíblica.'),
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition'
+          }, e('i', { className: 'bi bi-chat-dots' }), 'Enviar Mensaje')
+        ),
 
-        e('a', {
-          href: 'https://paypal.me/tucuenta',
-          target: '_blank',
-          className: 'flex items-center justify-center gap-2 px-4 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-500 transition'
-        }, e('i', { className: 'bi bi-currency-dollar' }), 'Donar'),
+        // 2. Colaborar versión 2
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, 'Apoya la creación de la versión 2, con más funciones como agregar tus propias cards.'),
+          e('a', {
+            href: 'https://m.me/tucanal?ref=' + encodeURIComponent('Hola, quiero apoyar la versión 2 de la app.'),
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition'
+          }, e('i', { className: 'bi bi-lightning-fill' }), 'Colaborar')
+        ),
 
-        e('a', {
-          href: 'https://tuapp.com/version2',
-          target: '_blank',
-          className: 'flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-500 transition'
-        }, e('i', { className: 'bi bi-box-arrow-up-right' }), 'Versión 2')
+        // 3. Apoyo económico
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, 'Con tu aporte económico, ayudas a mantener y mejorar la app.'),
+          e('a', {
+            href: 'https://paypal.me/tucuenta',
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition'
+          }, e('i', { className: 'bi bi-currency-dollar' }), 'Donar')
+        ),
+
+        // 4. Ofrecer oración
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, 'Ofrece una oración.'),
+          e('a', {
+            href: 'https://youtube.com/tuvideo', // tu video de oración
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition'
+          }, e('i', { className: 'bi bi-heart-fill' }), 'Oración')
+        )
       )
     )
   );
 }
-
     ReactDOM.createRoot(document.getElementById('root')).render(e(App));
   </script>
 
