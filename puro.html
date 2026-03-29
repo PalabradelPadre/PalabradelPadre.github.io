@@ -1,241 +1,33 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Palabra del Padre</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+<!-- Botón flotante Palabra -->
+<button class="floating-btn">
+  <i class="bi bi-book"></i> Palabra
+</button>
+
 <style>
-/* General */
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to bottom, #1b0a2a, #2b0f3f);
-  color: #fff;
-}
-
-/* Buscador */
-#searchBox {
-  width: 90%;
-  max-width: 600px;
-  display: block;
-  margin: 1rem auto;
-  padding: 0.8rem 1rem;
-  border-radius: 1rem;
-  border: none;
-  font-size: 1rem;
-  outline: none;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-/* Hero Card */
-.hero-card {
-  backdrop-filter: blur(15px);
-  background-color: rgba(255,255,255,0.15);
-  border-radius: 1.5rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 2rem 1.5rem;
-  margin: 1rem auto;
-  max-width: 600px;
-  text-align: center;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-}
-.hero-card h2 { margin-bottom: 1rem; }
-.hero-card p { font-size: 1.2rem; margin-bottom: 1.5rem; }
-.hero-card button {
-  margin: 0.3rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  font-weight: bold;
-  transition: transform 0.2s;
-  background-color: rgba(255,255,255,0.3);
-  color: #fff;
-}
-.hero-card button:hover { transform: scale(1.05); background-color: rgba(255,255,255,0.45); }
-
-/* Cards tipo cristal */
-.card {
-  backdrop-filter: blur(12px);
-  background-color: rgba(255,255,255,0.08);
-  border-radius: 1rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 1.2rem;
-  margin: 1rem auto;
-  max-width: 500px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-/* Colores por categoria borde izquierdo */
-.paz { border-left: 6px solid rgba(59,130,246,0.9); }
-.fortaleza { border-left: 6px solid rgba(239,68,68,0.9); }
-.inspiracion { border-left: 6px solid rgba(16,185,129,0.9); }
-.amor { border-left: 6px solid rgba(250,204,21,0.9); }
-.fe { border-left: 6px solid rgba(168,85,247,0.9); }
-.devocion { border-left: 6px solid rgba(236,72,153,0.9); }
-.evangelio { border-left: 6px solid rgba(249,115,22,0.9); }
-
-/* Botón Mi Diario */
-.diario-btn {
-  background-color: rgba(128,128,128,0.7);
-  border: none;
-  color: #fff;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  font-weight: bold;
-  margin-top: 0.5rem;
-}
-.diario-btn:hover { transform: scale(1.1); }
-
-/* Botón Meditación */
-.meditation-btn {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background-color: rgba(255,255,255,0.3);
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.7rem;
-  color: #fff;
-  cursor: pointer;
-}
-.meditation-btn:hover { background-color: rgba(255,255,255,0.5); }
-
-/* Botón Compartir */
-.share-btn {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  background-color: rgba(255,255,255,0.25);
-  border: none;
-  padding: 0.4rem 0.7rem;
-  border-radius: 0.7rem;
-  color: #fff;
-  cursor: pointer;
-}
-.share-btn:hover { background-color: rgba(255,255,255,0.45); }
-
-/* Botón flotante Palabra */
+/* Botón flotante Palabra mejorado */
 .floating-btn {
   position: fixed;
   bottom: 2rem;
   right: 2rem;
-  background-color: rgba(255,255,255,0.15);
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6); /* azul degradado */
   color: #fff;
   font-weight: bold;
-  padding: 0.8rem 1.2rem;
-  border-radius: 9999px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  padding: 1rem 1.5rem;
+  border-radius: 2rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  border: none;
 }
-.floating-btn:hover { background-color: rgba(255,255,255,0.25); }
-
-/* Línea divisoria */
-.divider {
-  border-top: 1px solid rgba(255,255,255,0.3);
-  margin: 0.5rem 0;
+.floating-btn i {
+  font-size: 1.2rem;
 }
-
-/* Animación fade in */
-@keyframes fadeIn { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
-.card { animation: fadeIn 0.3s ease forwards; }
-
+.floating-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.45);
+  background: linear-gradient(135deg, #3b82f6, #60a5fa); /* degradado hover */
+}
 </style>
-</head>
-<body>
-
-<!-- Buscador -->
-<input type="text" id="searchBox" placeholder="Busca por palabra, versículo o tema...">
-
-<!-- Hero Card -->
-<div class="hero-card">
-  <h2>Bienvenido a Palabra del Padre</h2>
-  <p>Encuentra inspiración, paz y fortaleza en cada versículo bíblico.</p>
-  <button id="acompanamiento-btn">Acompañamiento</button>
-</div>
-
-<!-- Contenedor de cards -->
-<div id="cardsContainer"></div>
-
-<!-- Botón flotante Palabra -->
-<button class="floating-btn"><i class="bi bi-list"></i> Palabra</button>
-
-<script>
-// Colores por categoría
-const categoryColors = {
-  paz:'paz', fortaleza:'fortaleza', inspiracion:'inspiracion',
-  amor:'amor', fe:'fe', devocion:'devocion', evangelio:'evangelio'
-};
-
-let allCards = [];
-fetch('cards.json')
-  .then(res => res.json())
-  .then(data => {
-    allCards = data;
-    renderCards(allCards);
-  })
-  .catch(err => console.error(err));
-
-const searchInput = document.getElementById('searchBox');
-searchInput.addEventListener('input', () => {
-  const query = searchInput.value.toLowerCase();
-  const filtered = allCards.filter(card => 
-    card.titulo.toLowerCase().includes(query) ||
-    card.versiculo.toLowerCase().includes(query) ||
-    card.cita.toLowerCase().includes(query) ||
-    card.reflexion.toLowerCase().includes(query)
-  );
-  renderCards(filtered);
-});
-
-function renderCards(cards) {
-  const container = document.getElementById('cardsContainer');
-  container.innerHTML = '';
-  cards.forEach(card => {
-    const div = document.createElement('div');
-    div.className = `card ${categoryColors[card.categoria] || ''}`;
-    div.innerHTML = `
-      <button class="share-btn"><i class="bi bi-share-fill"></i> Compartir</button>
-      <h3>${card.titulo}</h3>
-      <p>${card.cita}</p>
-      <p><i>${card.versiculo}</i></p>
-      <div class="divider"></div>
-      <p>${card.reflexion}</p>
-      <button class="diario-btn">Mi Diario</button>
-      <button class="meditation-btn"><i class="bi bi-arrows-fullscreen"></i> Meditación</button>
-    `;
-    container.appendChild(div);
-
-    // Compartir
-    div.querySelector('.share-btn').addEventListener('click', (e) => {
-      e.stopPropagation();
-      const text = `${card.cita} - ${card.versiculo} (${window.location.href})`;
-      navigator.clipboard.writeText(text).then(()=> alert('Cita copiada al portapapeles'));
-    });
-
-    // Expansión de card
-    div.addEventListener('click', e => {
-      if(!e.target.classList.contains('diario-btn') && !e.target.classList.contains('meditation-btn') && !e.target.classList.contains('share-btn')) {
-        div.classList.toggle('expanded');
-      }
-    });
-
-    // Meditación
-    div.querySelector('.meditation-btn').addEventListener('click', (e)=>{
-      e.stopPropagation();
-      alert('Modo Meditación activado (scroll tipo TikTok)');
-    });
-  });
-}
-</script>
-
-</body>
-</html>
