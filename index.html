@@ -213,9 +213,19 @@
             className: 'w-full p-3 rounded-xl text-gray-900'
           })
         ),
-        installPrompt && e('div', { className: 'text-center my-2' },
-          e('button', { onClick: handleInstall, className: 'install-btn' }, 'Instalar App 📲')
-        ),
+        e('div', { className: 'text-center my-2' },
+  e('button', { 
+    onClick: () => {
+      if (installPrompt) {
+        installPrompt.prompt();
+        installPrompt.userChoice.then(choice => console.log('Resultado instalación:', choice.outcome));
+      } else {
+        alert('El evento de instalación aún no está disponible.');
+      }
+    }, 
+    className: 'install-btn' 
+  }, 'Instalar App 📲')
+),
    heroCard && e(HeroCard, { ...heroCard }),
 e('div', { className: 'flex justify-center my-4' },
   e('a', 
@@ -393,38 +403,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
   });
 </script>
 
-<script>
-let deferredPrompt;
 
-// Escucha el evento beforeinstallprompt
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-
-  // Crea el botón si no existe
-  if (!document.getElementById('install-btn')) {
-    const btn = document.createElement('button');
-    btn.id = 'install-btn';
-    btn.textContent = 'Instalar App 📲';
-    btn.className = 'install-btn'; // Usa tu clase CSS
-    btn.style.position = 'fixed';
-    btn.style.bottom = '1rem';
-    btn.style.right = '1rem';
-    btn.style.zIndex = '50';
-    document.body.appendChild(btn);
-
-    btn.addEventListener('click', async () => {
-      btn.disabled = true;
-      deferredPrompt.prompt();
-      const choice = await deferredPrompt.userChoice;
-      console.log('Instalación:', choice.outcome);
-      // Oculta el botón después de instalar o cancelar
-      btn.style.display = 'none';
-      deferredPrompt = null;
-    });
-  }
-});
-</script>
   
 </body>
 </html>
