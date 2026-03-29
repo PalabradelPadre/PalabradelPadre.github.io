@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabra del Padre</title>
+
+<style>
+:root{
+  --bg:#0f0f1a;
+  --card:#ffffff10;
+  --accent:#6C63FF;
+}
+
+body{
+  margin:0;
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+  background:var(--bg);
+  color:white;
+  overflow:hidden;
+}
+
+/* 🔥 FEED */
+#feed{
+  position:fixed;
+  inset:0;
+}
+
+.card{
+  position:absolute;
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:2rem;
+  text-align:center;
+  transition:transform .4s ease;
+}
+
+.card h2{font-size:1.6rem;}
+.card h4{opacity:.7}
+
+/* 🔎 SEARCH UI */
+#searchMode{
+  position:fixed;
+  inset:0;
+  background:#0f0f1a;
+  display:none;
+  flex-direction:column;
+}
+
+.search-bar{
+  margin:1rem;
+  padding:.8rem 1rem;
+  border-radius:20px;
+  background:#ffffff15;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.search-bar input{
+  flex:1;
+  border:none;
+  background:none;
+  color:white;
+  font-size:1rem;
+  outline:none;
+}
+
+/* resultados */
+.results{
+  flex:1;
+  overflow:auto;
+  padding:1rem;
+}
+
+.result-card{
+  background:var(--card);
+  padding:1rem;
+  border-radius:16px;
+  margin-bottom:10px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.result-card:hover{
+  background:#ffffff20;
+  transform:scale(1.02);
+}
+
+/* floating */
+.floating{
+  position:fixed;
+  bottom:20px;
+  left:20px;
+  background:white;
+  color:black;
+  padding:10px 14px;
+  border-radius:20px;
+}
+
+.categories{
+  position:fixed;
+  bottom:70px;
+  left:20px;
+  display:none;
+  flex-direction:column;
+  gap:6px;
+}
+
+.categories button{
+  border:none;
+  padding:8px;
+  border-radius:10px;
+}
+
+/* top buttons */
+.topbar{
+  position:fixed;
+  top:15px;
+  left:50%;
+  transform:translateX(-50%);
+}
+
+.icon-btn{
+  background:#ffffff20;
+  border:none;
+  color:white;
+  padding:10px;
+  border-radius:50%;
+  margin:5px;
+  backdrop-filter:blur(10px);
+}
+</style>
+</head>
+
+<body>
+
+<div id="feed"></div>
+
+<!-- 🔎 SEARCH -->
+<div id="searchMode">
+  <div class="search-bar">
+    🔎
+    <input id="searchInput" placeholder="Buscar palabra, versículo...">
+  </div>
+  <div id="results" class="results"></div>
+</div>
+
+<div class="topbar">
+  <button class="icon-btn" id="openSearch">🔍</button>
+  <button class="icon-btn" id="closeSearch" style="display:none;">✕</button>
+</div>
+
+<div class="floating" id="toggleCat">☰</div>
+<div class="categories" id="categories"></div>
+
+<script>
+// =====================
+// STATE
+// =====================
+let data=[], filtered=[], index=0, category="todas";
+
+// =====================
+// LOAD
+// =====================
+fetch("cards.json")
+.then(r=>r.json())
+.then(json=>{
+  data=json;
+  applyFilter();
+});
+
+// =====================
+// FILTER
+// =====================
+function applyFilter(){
+  filtered=data.filter(c=>{
+    return category==="todas" || c.categoria===category;
+  });
+  index=0;
+  render();
+}
+
+// =====================
+// FEED
+// =====================
+function createCard(c,pos){
+  const el=document.createElement("div");
+  el.className="card";
+  el.style.transform=`translateY(${pos*100}%)`;
+  el.style.background=`linear-gradient(#6C63FF, #000)`;
+
+  const t=document.createElement("h2");
+  t.textContent=c.titulo;
+
+  const v=document.createElement("h4");
+  v.textContent=c.versiculo;
+
+  const p=document.createElement("p");
+  p.textContent=c.cita;
+
+  el.appendChild(t);
+  el.appendChild(v);
+  el.appendChild(p);
+
+  return el;
+}
+
+function render(){
+  const feed=document.getElementById("feed");
+  feed.innerHTML="";
+
+  const prev=filtered[index-1];
+  const cur=filtered[index];
+  const next=filtered[index+1];
+
+  if(prev) feed.appendChild(createCard(prev,-1));
+  if(cur) feed.appendChild(createCard(cur,0));
+  if(next) feed.appendChild(createCard(next,1));
+}
+
+// =====================
+// SWIPE
+// =====================
+let startY=0;
+
+document.addEventListener("touchstart",e=>{
+  startY=e.touches[0].clientY;
+});
+
+document.addEventListener("touchend",e=>{
+  let diff=startY-e.changedTouches[0].clientY;
+
+  if(diff>50 && index<filtered.length-1){index++; render();}
+  if(diff<-50 && index>0){index--; render();}
+});
+
+// =====================
+// SEARCH
+// =====================
+const searchMode=document.getElementById("searchMode");
+
+openSearch.onclick=()=>{
+  searchMode.style.display="flex";
+  closeSearch.style.display="inline";
+};
+
+closeSearch.onclick=()=>{
+  searchMode.style.display="none";
+  closeSearch.style.display="none";
+};
+
+searchInput.addEventListener("input",()=>{
+  const val=searchInput.value.toLowerCase();
+  const results=document.getElementById("results");
+  results.innerHTML="";
+
+  data.filter(c=>{
+    return (c.titulo+c.cita+c.reflexion).toLowerCase().includes(val);
+  }).forEach(c=>{
+    const div=document.createElement("div");
+    div.className="result-card";
+
+    const t=document.createElement("strong");
+    t.textContent=c.titulo;
+
+    const p=document.createElement("p");
+    p.textContent=c.cita.slice(0,80)+"...";
+
+    div.appendChild(t);
+    div.appendChild(p);
+
+    div.onclick=()=>{
+      index=data.indexOf(c);
+      searchMode.style.display="none";
+      render();
+    };
+
+    results.appendChild(div);
+  });
+});
+
+// =====================
+// CATEGORÍAS
+// =====================
+["todas","paz","fortaleza","amor","fe","evangelio"]
+.forEach(cat=>{
+  const b=document.createElement("button");
+  b.textContent=cat;
+  b.onclick=()=>{
+    category=cat;
+    applyFilter();
+    document.getElementById("categories").style.display="none";
+  };
+  categories.appendChild(b);
+});
+
+toggleCat.onclick=()=>{
+  categories.style.display=
+    categories.style.display==="flex"?"none":"flex";
+};
+</script>
+
+</body>
+</html>
