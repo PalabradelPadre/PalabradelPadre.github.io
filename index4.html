@@ -16,11 +16,7 @@
       font-family: sans-serif;
     }
 
-  /* Clase para ajustar la transparencia sin alterar el color Tailwind */
-  .card-opacity {
-    background-color: inherit; /* mantiene el color de Tailwind */
-    opacity: 0.55;             /* ajusta solo la transparencia */
-  }
+
     .card-glass {
       backdrop-filter: blur(12px);
       background-color: rgba(255, 255, 255, 0.2);
@@ -238,7 +234,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
         if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
       };
 
-      return e('div', { className: `card-glass card-opacity cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
+      return e('div', { className: `card-glass cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
         e('h2', { className: 'text-lg font-bold' }, highlightText(titulo, search)),
         e('h3', { className: 'text-sm' }, highlightText(versiculo, search)),
         expanded && e('div', { className: 'mt-2' },
@@ -334,29 +330,6 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
 </script>
 
 
-  <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Ajusta solo la transparencia de las cards
-  function setCardTransparency() {
-    document.querySelectorAll('.card-glass').forEach(card => {
-      // Si la card ya tiene un background-color rgba, solo cambiamos el alpha
-      const style = getComputedStyle(card);
-      const match = style.backgroundColor.match(/rgba?\((\d+), (\d+), (\d+)(?:, [\d.]+)?\)/);
-
-      if (match) {
-        const r = match[1], g = match[2], b = match[3];
-        card.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.35)`; // alpha deseado
-      }
-    });
-  }
-
-  setCardTransparency();
-
-  // Observa cambios en el DOM para nuevas cards
-  const observer = new MutationObserver(() => setCardTransparency());
-  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
-});
-</script>
   
 </body>
 </html>
