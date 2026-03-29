@@ -299,5 +299,33 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
 
     ReactDOM.createRoot(document.getElementById('root')).render(e(App));
   </script>
+
+<script>
+  // Esperamos a que el DOM esté cargado
+  document.addEventListener('DOMContentLoaded', () => {
+    // Función para actualizar todos los botones "Mi Diario"
+    function initMiDiarioButton() {
+      // Selecciona todos los botones con la clase 'diario-btn'
+      const diarioButtons = document.querySelectorAll('.diario-btn');
+      diarioButtons.forEach(btn => {
+        // Evita duplicar el evento si ya se añadió
+        if (!btn.dataset.miDiarioInit) {
+          btn.addEventListener('click', () => {
+            window.location.href = '/midiario.html';
+          });
+          btn.dataset.miDiarioInit = 'true';
+        }
+      });
+    }
+
+    // Ejecuta la función al cargar
+    initMiDiarioButton();
+
+    // Observa cambios en el DOM para detectar nuevos botones (por ejemplo, si se renderiza otra card)
+    const observer = new MutationObserver(() => initMiDiarioButton());
+    observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  });
+</script>
+  
 </body>
 </html>
