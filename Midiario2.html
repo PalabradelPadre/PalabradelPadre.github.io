@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Diario</title>
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+    color: white;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #3b1f5f;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  header i {
+    font-size: 1.5rem;
+  }
+  header h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .date {
+    text-align: center;
+    margin: 1rem 0;
+    font-size: 1.2rem;
+  }
+
+  .search-container {
+    text-align: center;
+    margin: 1rem;
+  }
+  .search-container input {
+    width: 90%;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 1rem;
+  }
+
+  .cards-circle {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+  .cards-circle a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #ffcc00;
+    color: #3b1f5f;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .info-container {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .info-container textarea {
+    width: 100%;
+    height: 100px;
+    border-radius: 0.5rem;
+    border: none;
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
+  .info-container button {
+    width: 150px;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    background: #10b981;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: flex-end;
+  }
+
+  .cards-saved {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .card-saved {
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  .card-saved h3 {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+  .card-saved p {
+    margin: 0.5rem 0 0 0;
+    display: none;
+  }
+  .card-saved.open p {
+    display: block;
+  }
+
+  .floating-evangelizar {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: #ffcc00;
+    color: #3b1f5f;
+    padding: 0.75rem 1.25rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 50;
+  }
+  .evangelizar-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .evangelizar-modal div {
+    background: #ffcc00;
+    color: #3b1f5f;
+    padding: 1rem;
+    border-radius: 1rem;
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .evangelizar-modal a {
+    text-decoration: none;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: bold;
+  }
+  .evangelizar-modal a:nth-child(2) { background: #3b82f6; } /* Sugerir */
+  .evangelizar-modal a:nth-child(3) { background: #10b981; } /* Apoyar */
+  .evangelizar-modal a:nth-child(4) { background: #f59e0b; } /* Donar */
+  .evangelizar-modal a:nth-child(5) { background: #ef4444; } /* Oración */
+  .evangelizar-modal button {
+    background: none;
+    border: none;
+    align-self: flex-end;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .info-note {
+    font-size: 0.8rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+  }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <i class="bi bi-journal-text"></i>
+  <h1>Mi Diario</h1>
+</header>
+
+<div class="date" id="currentDate"></div>
+
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Buscar en tu diario...">
+</div>
+
+<div class="cards-circle">
+  <a href="#">📖</a>
+  <a href="#">✍️</a>
+  <a href="#">🙏</a>
+  <a href="#">💡</a>
+</div>
+
+<div class="info-container">
+  <div class="info-note">
+    Tus entradas se guardan **solo en este navegador**. Si borras el historial, se eliminarán. Nada se guarda en Internet.
+  </div>
+  <textarea id="diaryInput" placeholder="Escribe tus reflexiones aquí..."></textarea>
+  <button id="saveBtn">Guardar</button>
+</div>
+
+<div class="cards-saved" id="savedCards"></div>
+
+<button class="floating-evangelizar" id="evangelizarBtn">Evangelizar</button>
+
+<script>
+  // Fecha actual
+  const dateEl = document.getElementById('currentDate');
+  const today = new Date();
+  dateEl.textContent = today.toLocaleDateString();
+
+  // Guardar entrada
+  const saveBtn = document.getElementById('saveBtn');
+  const diaryInput = document.getElementById('diaryInput');
+  const savedCards = document.getElementById('savedCards');
+
+  function loadEntries() {
+    const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+    savedCards.innerHTML = '';
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    entries.forEach(entry => {
+      if (!entry.text.toLowerCase().includes(search)) return;
+      const card = document.createElement('div');
+      card.className = 'card-saved';
+      card.innerHTML = `<h3>${entry.date} ${entry.time}</h3><p>${entry.text}</p>`;
+      card.addEventListener('click', () => card.classList.toggle('open'));
+      savedCards.appendChild(card);
+    });
+  }
+
+  saveBtn.addEventListener('click', () => {
+    const text = diaryInput.value.trim();
+    if (!text) return alert('Escribe algo antes de guardar.');
+    const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+    const now = new Date();
+    entries.push({
+      date: now.toLocaleDateString(),
+      time: now.toLocaleTimeString(),
+      text
+    });
+    localStorage.setItem('diaryEntries', JSON.stringify(entries));
+    diaryInput.value = '';
+    loadEntries();
+  });
+
+  document.getElementById('searchInput').addEventListener('input', loadEntries);
+
+  // Cargar entradas al iniciar
+  loadEntries();
+
+  // Botón evangelizar
+  const evangelizarBtn = document.getElementById('evangelizarBtn');
+  evangelizarBtn.addEventListener('click', () => {
+    const overlay = document.createElement('div');
+    overlay.className = 'evangelizar-modal';
+    overlay.innerHTML = `
+      <div>
+        <button onclick="this.parentElement.parentElement.remove()">✕</button>
+        <a href="https://m.me/tucanal?ref=${encodeURIComponent('Hola, quiero sugerir una reflexión')}" target="_blank">Sugerir reflexión</a>
+        <a href="https://m.me/tucanal?ref=${encodeURIComponent('Hola, quiero apoyar la app')}" target="_blank">Apoyar desarrollo</a>
+        <a href="https://paypal.me/tucuenta" target="_blank">Colaborar con donación</a>
+        <a href="https://youtube.com/tuvideo" target="_blank">Oración 🙏</a>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  });
+</script>
+
+</body>
+</html>
