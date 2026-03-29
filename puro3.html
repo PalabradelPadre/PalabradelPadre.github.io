@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabra del Padre</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  /* BODY Y FONDO */
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* CABECERA */
+  header {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(0,0,0,0.3);
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  /* BUSCADOR */
+  .search-box {
+    margin: 0.5rem 1rem;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  /* HERO CARD */
+  .hero-card {
+    margin: 1rem;
+    padding: 1rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(12px);
+    background-color: rgba(255,255,255,0.2);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+  .hero-card h2 { margin: 0.5rem 0; font-size: 1.3rem; }
+  .hero-card h3 { margin: 0.3rem 0; font-size: 1rem; color: #fff8; }
+  .hero-card p { margin: 0.5rem 0; }
+
+  /* BOTÓN ACOMPAÑAMIENTO */
+  .acom-btn {
+    margin: 0 1rem 1rem 1rem;
+    background: #3b82f6;
+    color: white;
+    padding: 0.75rem;
+    border-radius: 1rem;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* CARDS */
+  .cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 1rem 6rem 1rem;
+  }
+  .card {
+    position: relative;
+    border-radius: 1rem;
+    padding: 1rem;
+    backdrop-filter: blur(12px);
+    background-color: rgba(255,255,255,0.15);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .card:hover { transform: scale(1.02); }
+
+  /* COLORES POR CATEGORÍA */
+  .paz { background-color: rgba(0,123,255,0.2); }
+  .fortaleza { background-color: rgba(220,53,69,0.2); }
+  .inspiracion { background-color: rgba(40,167,69,0.2); }
+  .amor { background-color: rgba(255,193,7,0.2); }
+  .fe { background-color: rgba(111,66,193,0.2); }
+  .devocion { background-color: rgba(255,99,132,0.2); }
+  .evangelio { background-color: rgba(255,133,27,0.2); }
+
+  .card h2 { margin: 0; font-size: 1.2rem; }
+  .card h3 { margin: 0.2rem 0; font-size: 0.9rem; color: #fff8; }
+  .card p { margin: 0.5rem 0; }
+
+  .card-line { border-top: 1px solid rgba(255,255,255,0.3); margin: 0.5rem 0; }
+
+  /* BOTONES DENTRO DE CARD */
+  .card-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .btn {
+    padding: 0.3rem 0.6rem;
+    border-radius: 1rem;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-weight: bold;
+  }
+  .btn-share { background: rgba(37,211,102,0.9); color: #000; }
+  .btn-diary { background: rgba(108,117,125,0.9); color: #fff; }
+  .btn-meditation { background: rgba(59,130,246,0.9); color: #fff; }
+
+  /* BOTÓN FLOTANTE */
+  .floating-btns {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    z-index: 50;
+  }
+  .floating-btns button {
+    padding: 0.6rem 1rem;
+    border-radius: 9999px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    background: rgba(59,130,246,0.95);
+    color: white;
+    backdrop-filter: blur(4px);
+    transition: transform 0.2s;
+  }
+  .floating-btns button:hover { transform: scale(1.05); }
+
+  /* HIGHLIGHT BUSQUEDA */
+  .highlight { background-color: yellow; color: black; font-weight: bold; }
+
+</style>
+</head>
+<body>
+
+<header>📖 Palabra del Padre</header>
+
+<div class="search-box">
+  <input type="text" id="searchInput" placeholder="Busca por palabra, versículo o tema...">
+</div>
+
+<!-- HERO CARD -->
+<div class="hero-card" id="heroCard">
+  <h2 id="heroTitle"></h2>
+  <h3 id="heroVerse"></h3>
+  <p id="heroQuote"></p>
+  <p class="card-line" id="heroReflection"></p>
+</div>
+
+<!-- BOTÓN ACOMPAÑAMIENTO -->
+<a class="acom-btn" href="https://m.me/tucanal" target="_blank">💬 Acompañamiento</a>
+
+<!-- CARDS -->
+<div class="cards-container" id="cardsContainer"></div>
+
+<!-- BOTONES FLOTANTES -->
+<div class="floating-btns">
+  <button id="palabraBtn">Palabra</button>
+  <button id="meditationBtn">Modo Meditación</button>
+</div>
+
+<script>
+const cardsData = [
+  {"id":"paz1","categoria":"paz","titulo":"No tengas miedo","versiculo":"Filipenses 4:6-7","cita":"No se inquieten por nada; más bien, presenten sus peticiones a Dios...","reflexion":"Confía en Dios y deja tus preocupaciones en sus manos."},
+  {"id":"fortaleza1","categoria":"fortaleza","titulo":"Resiste la tentación","versiculo":"1 Corintios 10:13","cita":"No les ha sobrevenido ninguna tentación que no sea común a los hombres...","reflexion":"Dios te da la fuerza para superar cualquier tentación."},
+  {"id":"inspiracion1","categoria":"inspiracion","titulo":"Actúa con bondad","versiculo":"Gálatas 6:9","cita":"No nos cansemos de hacer el bien...","reflexion":"Cada acto de bondad te acerca más a Dios."},
+  {"id":"amor1","categoria":"amor","titulo":"Ayuda a otros","versiculo":"Mateo 25:40","cita":"Les aseguro que todo lo que hicieron por uno de estos mis hermanos...","reflexion":"Hacer caridad es servir a Dios directamente."},
+  {"id":"fe1","categoria":"fe","titulo":"Confía en el Señor","versiculo":"Proverbios 3:5-6","cita":"Confía en el Señor con todo tu corazón...","reflexion":"Ríndete a Dios y Él guiará tus caminos."},
+  {"id":"devocion1","categoria":"devocion","titulo":"Oración a San Miguel","versiculo":"San Miguel Arcángel","cita":"San Miguel Arcángel, defiéndenos en la batalla...","reflexion":"Lleva esta oración en tu bolsillo."},
+  {"id":"evangelio3","categoria":"evangelio","titulo":"Evangelio de hoy","versiculo":"Juan 8:12","cita":"Yo soy la luz del mundo","reflexion":"Siguiendo a Jesús, encontramos dirección y claridad incluso en momentos de oscuridad."}
+];
+
+const heroCard = cardsData.find(c => c.categoria === 'evangelio');
+document.getElementById('heroTitle').textContent = heroCard.titulo;
+document.getElementById('heroVerse').textContent = heroCard.versiculo;
+document.getElementById('heroQuote').textContent = heroCard.cita;
+document.getElementById('heroReflection').textContent = heroCard.reflexion;
+
+const cardsContainer = document.getElementById('cardsContainer');
+const searchInput = document.getElementById('searchInput');
+
+function normalize(str){ return str.toLowerCase(); }
+
+function highlight(text, query){
+  if(!query) return text;
+  const words = query.toLowerCase().split(' ').filter(Boolean);
+  let result = text;
+  words.forEach(w=>{
+    result = result.replace(new RegExp(`(${w})`,'gi'), '<span class="highlight">$1</span>');
+  });
+  return result;
+}
+
+function renderCards(filter=''){
+  cardsContainer.innerHTML = '';
+  const filtered = cardsData.filter(c=>{
+    const content = `${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`.toLowerCase();
+    return content.includes(filter.toLowerCase());
+  });
+  filtered.forEach(card=>{
+    const div = document.createElement('div');
+    div.className = `card ${card.categoria}`;
+    div.innerHTML = `
+      <h2>${highlight(card.titulo, filter)}</h2>
+      <p>${highlight(card.cita, filter)}</p>
+      <h3>${highlight(card.versiculo, filter)}</h3>
+      <div class="card-line"></div>
+      <p>${highlight(card.reflexion, filter)}</p>
+      <div class="card-buttons">
+        <button class="btn btn-share">📤 Compartir</button>
+        <button class="btn btn-diary">📔 Mi Diario</button>
+      </div>
+    `;
+    const shareBtn = div.querySelector('.btn-share');
+    shareBtn.addEventListener('click', ()=>{
+      const text = `${card.cita}\n${card.versiculo}\nFuente: ${window.location.href}`;
+      prompt('Copiar para compartir:', text);
+    });
+    const diaryBtn = div.querySelector('.btn-diary');
+    diaryBtn.addEventListener('click', ()=>{
+      window.location.href = '/midiario.html';
+    });
+    cardsContainer.appendChild(div);
+  });
+}
+
+searchInput.addEventListener('input', ()=>{ renderCards(searchInput.value); });
+
+renderCards();
+
+document.getElementById('palabraBtn').addEventListener('click', ()=>{
+  alert('Botón Palabra presionado');
+});
+
+document.getElementById('meditationBtn').addEventListener('click', ()=>{
+  alert('Modo Meditación activado');
+});
+</script>
+
+</body>
+</html>
