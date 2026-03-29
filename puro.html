@@ -8,67 +8,70 @@
 <link rel="manifest" href="/manifest.json">
 
 <style>
-  :root {
-    --todas-bg: #6b5b95; --todas-text:#fff;
-    --paz-bg: #4a90e2; --paz-text:#fff;
-    --fortaleza-bg: #e94e77; --fortaleza-text:#fff;
-    --inspiracion-bg: #50e3c2; --inspiracion-text:#000;
-    --amor-bg: #f8e71c; --amor-text:#000;
-    --fe-bg: #9013fe; --fe-text:#fff;
-    --devocion-bg: #ff6f61; --devocion-text:#fff;
-    --evangelio-bg: #f5a623; --evangelio-text:#000;
-  }
+:root {
+  --todas-bg: #6b5b95; --todas-text:#fff;
+  --paz-bg: #4a90e2; --paz-text:#fff;
+  --fortaleza-bg: #e94e77; --fortaleza-text:#fff;
+  --inspiracion-bg: #50e3c2; --inspiracion-text:#000;
+  --amor-bg: #f8e71c; --amor-text:#000;
+  --fe-bg: #9013fe; --fe-text:#fff;
+  --devocion-bg: #ff6f61; --devocion-text:#fff;
+  --evangelio-bg: #f5a623; --evangelio-text:#000;
+}
 
-  body {
-    margin:0; font-family: sans-serif; background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); color: #fff;
-  }
+body {
+  margin:0; font-family: sans-serif; background: linear-gradient(to bottom, #2a1e3b, #3b1f5f); color: #fff;
+}
 
-  header {
-    text-align:center; padding:1rem; background: rgba(0,0,0,0.5); font-size:1.8rem; font-weight:bold;
-  }
+header {
+  text-align:center; padding:1rem; background: rgba(0,0,0,0.5); font-size:1.8rem; font-weight:bold;
+}
 
-  input#search {
-    width: 90%; max-width:600px; padding:0.8rem; border-radius:1rem; border:none; margin:1rem auto; display:block; font-size:1rem;
-  }
+input#search {
+  width: 90%; max-width:600px; padding:0.8rem; border-radius:1rem; border:none; margin:1rem auto; display:block; font-size:1rem;
+}
 
-  .cards-container {
-    display:flex; flex-direction:column; gap:1rem; padding:0 1rem; scroll-behavior:smooth;
-  }
+.cards-container {
+  display:flex; flex-direction:column; gap:1rem; padding:0 1rem; scroll-behavior:smooth;
+}
 
-  .card {
-    border-radius:1rem; padding:1rem; box-shadow:0 5px 15px rgba(0,0,0,0.3);
-    transition: transform 0.3s, background-color 0.3s;
-    cursor:pointer; position:relative;
-  }
-  .card:hover { transform: scale(1.03); }
+/* Cards tipo cristal */
+.card {
+  border-radius:1rem; padding:1rem; backdrop-filter: blur(12px);
+  background-color: rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  transition: transform 0.3s, background-color 0.3s;
+  cursor:pointer; position:relative;
+}
+.card:hover { transform: scale(1.03); }
 
-  .highlight { background-color: #ffeb3b; color:#000; font-weight:bold; padding:0 2px; border-radius:3px; }
+.highlight { background-color: #ffeb3b; color:#000; font-weight:bold; padding:0 2px; border-radius:3px; }
 
-  /* Floating Button */
-  .floatingBtn{
-    position:fixed; bottom:20px; right:20px; background:#ffcc00; color:#3b1f5f;
-    padding:10px 16px; border-radius:25px; font-weight:bold; cursor:pointer; z-index:50;
-    display:flex; align-items:center; gap:5px; transition: transform 0.2s;
-  }
-  .floatingBtn:hover { transform: scale(1.05); }
+/* Floating Button */
+.floatingBtn{
+  position:fixed; bottom:20px; right:20px; background:#ffcc00; color:#3b1f5f;
+  padding:10px 16px; border-radius:25px; font-weight:bold; cursor:pointer; z-index:50;
+  display:flex; align-items:center; gap:5px; transition: transform 0.2s;
+}
+.floatingBtn:hover { transform: scale(1.05); }
 
-  .categories{
-    position:fixed; bottom:70px; right:20px; display:none; flex-direction:column; gap:6px; z-index:50;
-  }
-  .categories button{
-    padding:8px 14px; border:none; border-radius:20px; cursor:pointer; font-weight:bold; transition: transform 0.2s;
-  }
-  .categories button:hover { transform: scale(1.05); }
+.categories{
+  position:fixed; bottom:70px; right:20px; display:none; flex-direction:column; gap:6px; z-index:50;
+}
+.categories button{
+  padding:8px 14px; border:none; border-radius:20px; cursor:pointer; font-weight:bold; transition: transform 0.2s;
+}
+.categories button:hover { transform: scale(1.05); }
 
-  .share-btn{
-    display:inline-flex; justify-content:center; align-items:center;
-    width:36px; height:36px; border-radius:50%; margin-right:5px; border:1px solid rgba(255,255,255,0.5);
-    cursor:pointer; transition: transform 0.2s;
-  }
-  .share-btn:hover { transform: scale(1.2); }
+.share-btn{
+  display:inline-flex; justify-content:center; align-items:center;
+  width:36px; height:36px; border-radius:50%; margin-right:5px; border:1px solid rgba(255,255,255,0.5);
+  cursor:pointer; transition: transform 0.2s;
+}
+.share-btn:hover { transform: scale(1.2); }
 
-  /* TikTok scroll effect */
-  .card.tiktok { margin-bottom:20px; }
+/* TikTok scroll effect */
+.card.tiktok { margin-bottom:20px; }
 </style>
 </head>
 
@@ -77,118 +80,110 @@
 
 <input type="text" id="search" placeholder="Busca por palabra, versículo o tema...">
 
-<div class="cards-container" id="cardsContainer">
-  <!-- Cards se generan aquí -->
-</div>
+<div class="cards-container" id="cardsContainer"></div>
 
 <!-- Botón flotante -->
 <div class="floatingBtn" id="toggleCategories"><i class="bi bi-list"></i> Palabra</div>
-<div class="categories" id="categoriesContainer">
-  <!-- Botones de categorías se generan aquí -->
-</div>
+<div class="categories" id="categoriesContainer"></div>
 
 <script>
-  // Datos de ejemplo
-  const cardsData = [
-    { titulo:"Amor Divino", versiculo:"Juan 3:16", cita:"Dios amó tanto al mundo", reflexion:"Reflexiona sobre su amor", categoria:"amor" },
-    { titulo:"Paz Interior", versiculo:"Filipenses 4:7", cita:"La paz de Dios", reflexion:"Vive en tranquilidad", categoria:"paz" },
-    { titulo:"Fe y Confianza", versiculo:"Hebreos 11:1", cita:"La fe es la certeza", reflexion:"Confía en Él", categoria:"fe" },
-    { titulo:"Fortaleza en Cristo", versiculo:"Isaías 40:31", cita:"Los que esperan en Jehová", reflexion:"Renuevan fuerzas", categoria:"fortaleza" },
-    { titulo:"Evangelio del día", versiculo:"Mateo 5:14", cita:"Ustedes son la luz", reflexion:"Ilumina con tu vida", categoria:"evangelio" }
-  ];
+const cardsData = [
+  { titulo:"Amor Divino", versiculo:"Juan 3:16", cita:"Dios amó tanto al mundo", reflexion:"Reflexiona sobre su amor", categoria:"amor" },
+  { titulo:"Paz Interior", versiculo:"Filipenses 4:7", cita:"La paz de Dios", reflexion:"Vive en tranquilidad", categoria:"paz" },
+  { titulo:"Fe y Confianza", versiculo:"Hebreos 11:1", cita:"La fe es la certeza", reflexion:"Confía en Él", categoria:"fe" },
+  { titulo:"Fortaleza en Cristo", versiculo:"Isaías 40:31", cita:"Los que esperan en Jehová", reflexion:"Renuevan fuerzas", categoria:"fortaleza" },
+  { titulo:"Evangelio del día", versiculo:"Mateo 5:14", cita:"Ustedes son la luz", reflexion:"Ilumina con tu vida", categoria:"evangelio" }
+];
 
-  const categoryStyles = {
-    todas: { bg: '#6b5b95', text: '#fff' },
-    paz: { bg: '#4a90e2', text: '#fff' },
-    fortaleza: { bg: '#e94e77', text: '#fff' },
-    inspiracion: { bg: '#50e3c2', text: '#000' },
-    amor: { bg: '#f8e71c', text: '#000' },
-    fe: { bg: '#9013fe', text: '#fff' },
-    devocion: { bg: '#ff6f61', text: '#fff' },
-    evangelio: { bg: '#f5a623', text: '#000' }
-  };
+const categoryStyles = {
+  todas: { bg: '#6b5b95', text: '#fff' },
+  paz: { bg: '#4a90e2', text: '#fff' },
+  fortaleza: { bg: '#e94e77', text: '#fff' },
+  inspiracion: { bg: '#50e3c2', text: '#000' },
+  amor: { bg: '#f8e71c', text: '#000' },
+  fe: { bg: '#9013fe', text: '#fff' },
+  devocion: { bg: '#ff6f61', text: '#fff' },
+  evangelio: { bg: '#f5a623', text: '#000' }
+};
 
-  const categories = Object.keys(categoryStyles);
+const categories = Object.keys(categoryStyles);
+const cardsContainer = document.getElementById('cardsContainer');
+const categoriesContainer = document.getElementById('categoriesContainer');
+const searchInput = document.getElementById('search');
+let currentCategory = "todas";
 
-  const cardsContainer = document.getElementById('cardsContainer');
-  const categoriesContainer = document.getElementById('categoriesContainer');
-  const searchInput = document.getElementById('search');
-
-  let currentCategory = "todas";
-
-  function highlightText(text, search){
-    if(!search) return text;
-    const words = search.toLowerCase().split(' ').filter(Boolean);
-    let escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    words.forEach(word=>{
-      const re = new RegExp(`(${word})`,'gi');
-      escaped = escaped.replace(re, '<span class="highlight">$1</span>');
-    });
-    return escaped;
-  }
-
-  function filterCards(){
-    const search = searchInput.value.toLowerCase();
-    let filtered = cardsData.filter(c=>{
-      if(currentCategory !== "todas" && c.categoria !== currentCategory) return false;
-      if(!search) return true;
-      const content = `${c.titulo} ${c.cita} ${c.versiculo} ${c.reflexion}`.toLowerCase();
-      return search.split(' ').every(word=>content.includes(word));
-    });
-    renderCards(filtered);
-  }
-
-  function renderCards(data){
-    cardsContainer.innerHTML = "";
-    data.forEach(c=>{
-      const card = document.createElement('div');
-      card.className = "card tiktok";
-      card.style.backgroundColor = categoryStyles[c.categoria].bg;
-      card.style.color = categoryStyles[c.categoria].text;
-      card.innerHTML = `
-        <h3>${highlightText(c.titulo, searchInput.value)}</h3>
-        <p>${highlightText(c.versiculo, searchInput.value)}</p>
-        <p>${highlightText(c.cita, searchInput.value)}</p>
-        <p>${highlightText(c.reflexion, searchInput.value)}</p>
-        <div style="margin-top:5px; display:flex;">
-          <div class="share-btn" onclick="shareCard('whatsapp','${c.cita} - ${c.versiculo}')"><i class="bi bi-whatsapp text-green-500"></i></div>
-          <div class="share-btn" onclick="shareCard('facebook','${c.cita} - ${c.versiculo}')"><i class="bi bi-facebook text-blue-500"></i></div>
-        </div>
-      `;
-      cardsContainer.appendChild(card);
-    });
-  }
-
-  function renderCategories(){
-    categoriesContainer.innerHTML="";
-    categories.forEach(cat=>{
-      const btn = document.createElement('button');
-      btn.textContent = cat;
-      btn.style.backgroundColor = categoryStyles[cat].bg;
-      btn.style.color = categoryStyles[cat].text;
-      btn.onclick = ()=>{
-        currentCategory = cat;
-        categoriesContainer.style.display="none";
-        filterCards();
-      };
-      categoriesContainer.appendChild(btn);
-    });
-  }
-
-  searchInput.addEventListener('input', filterCards);
-
-  document.getElementById('toggleCategories').addEventListener('click', ()=>{
-    categoriesContainer.style.display = categoriesContainer.style.display==="flex"?"none":"flex";
+function highlightText(text, search){
+  if(!search) return text;
+  const words = search.toLowerCase().split(' ').filter(Boolean);
+  let escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  words.forEach(word=>{
+    const re = new RegExp(`(${word})`,'gi');
+    escaped = escaped.replace(re, '<span class="highlight">$1</span>');
   });
+  return escaped;
+}
 
-  function shareCard(platform,text){
-    if(platform==='whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
-    if(platform==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent(text)}`,'_blank');
-  }
+function filterCards(){
+  const search = searchInput.value.toLowerCase();
+  let filtered = cardsData.filter(c=>{
+    if(currentCategory !== "todas" && c.categoria !== currentCategory) return false;
+    if(!search) return true;
+    const content = `${c.titulo} ${c.cita} ${c.versiculo} ${c.reflexion}`.toLowerCase();
+    return search.split(' ').every(word=>content.includes(word));
+  });
+  renderCards(filtered);
+}
 
-  // Inicial
-  renderCategories();
-  filterCards();
+function renderCards(data){
+  cardsContainer.innerHTML = "";
+  data.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = "card tiktok";
+    card.style.backgroundColor = categoryStyles[c.categoria].bg;
+    card.style.color = categoryStyles[c.categoria].text;
+    card.innerHTML = `
+      <h3>${highlightText(c.titulo, searchInput.value)}</h3>
+      <p>${highlightText(c.versiculo, searchInput.value)}</p>
+      <p>${highlightText(c.cita, searchInput.value)}</p>
+      <p>${highlightText(c.reflexion, searchInput.value)}</p>
+      <div style="margin-top:5px; display:flex;">
+        <div class="share-btn" onclick="shareCard('whatsapp','${c.cita} - ${c.versiculo}')"><i class="bi bi-whatsapp text-green-500"></i></div>
+        <div class="share-btn" onclick="shareCard('facebook','${c.cita} - ${c.versiculo}')"><i class="bi bi-facebook text-blue-500"></i></div>
+      </div>
+    `;
+    cardsContainer.appendChild(card);
+  });
+}
+
+function renderCategories(){
+  categoriesContainer.innerHTML="";
+  categories.forEach(cat=>{
+    const btn = document.createElement('button');
+    btn.textContent = cat;
+    btn.style.backgroundColor = categoryStyles[cat].bg;
+    btn.style.color = categoryStyles[cat].text;
+    btn.onclick = ()=>{
+      currentCategory = cat;
+      categoriesContainer.style.display="none";
+      filterCards();
+    };
+    categoriesContainer.appendChild(btn);
+  });
+}
+
+searchInput.addEventListener('input', filterCards);
+document.getElementById('toggleCategories').addEventListener('click', ()=>{
+  categoriesContainer.style.display = categoriesContainer.style.display==="flex"?"none":"flex";
+});
+
+function shareCard(platform,text){
+  if(platform==='whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
+  if(platform==='facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}&quote=${encodeURIComponent(text)}`,'_blank');
+}
+
+// Inicial
+renderCategories();
+filterCards();
 </script>
 </body>
 </html>
