@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Diario</title>
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+    color: white;
+    scroll-behavior: smooth;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #3b1f5f;
+    gap: 0.5rem;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header i {
+    font-size: 1.8rem;
+  }
+  header h1 {
+    font-size: 1.6rem;
+    margin: 0;
+    font-weight: bold;
+  }
+
+  .date {
+    text-align: center;
+    margin: 1rem 0;
+    font-size: 1.2rem;
+  }
+
+  .search-container {
+    text-align: center;
+    margin: 1rem;
+  }
+  .search-container input {
+    width: 90%;
+    max-width: 400px;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .cards-circle {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+  }
+  .cards-circle a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffcc00, #f59e0b);
+    color: #3b1f5f;
+    text-decoration: none;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .cards-circle a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+  }
+
+  .info-container {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    animation: fadeIn 0.6s ease-out;
+  }
+  .info-container textarea {
+    width: 100%;
+    height: 120px;
+    border-radius: 0.75rem;
+    border: none;
+    padding: 0.75rem;
+    font-size: 1rem;
+    resize: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    outline: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .info-container textarea:focus {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+  }
+  .info-container button {
+    width: 160px;
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    border: none;
+    background: #10b981;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    align-self: flex-end;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .info-container button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+  }
+
+  .cards-saved {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .card-saved {
+    background: rgba(255,255,255,0.15);
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    overflow: hidden;
+    transition: max-height 0.5s ease, background 0.3s, transform 0.3s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    max-height: 50px;
+  }
+  .card-saved.open {
+    max-height: 500px;
+    transform: scale(1.02);
+  }
+  .card-saved h3 {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .card-saved p {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.95rem;
+  }
+
+  .floating-evangelizar {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, #ffcc00, #f59e0b);
+    color: #3b1f5f;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 50;
+    animation: slideIn 0.6s ease-out;
+  }
+  .floating-evangelizar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.5);
+  }
+
+  .evangelizar-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+  }
+  .evangelizar-modal div {
+    background: #ffcc00;
+    color: #3b1f5f;
+    padding: 1rem;
+    border-radius: 1rem;
+    max-width: 400px;
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .evangelizar-modal a {
+    text-decoration: none;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: bold;
+    transition: transform 0.2s;
+  }
+  .evangelizar-modal a:nth-child(2) { background: #3b82f6; }
+  .evangelizar-modal a:nth-child(3) { background: #10b981; }
+  .evangelizar-modal a:nth-child(4) { background: #f59e0b; }
+  .evangelizar-modal a:nth-child(5) { background: #ef4444; }
+  .evangelizar-modal a:hover { transform: scale(1.05); }
+  .evangelizar-modal button {
+    background: none;
+    border: none;
+    align-self: flex-end;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .info-note {
+    font-size: 0.8rem;
+    color: #ccc;
+    margin-bottom: 0.5rem;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideIn {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+
+<header>
+  <i class="bi bi-journal-text"></i>
+  <h1>Mi Diario</h1>
+</header>
+
+<div class="date" id="currentDate"></div>
+
+<div class="search-container">
+  <input type="text" id="searchInput" placeholder="Buscar en tu diario...">
+</div>
+
+<div class="cards-circle">
+  <a href="#">A</a>
+  <a href="#">B</a>
+  <a href="#">C</a>
+  <a href="#">D</a>
+</div>
+
+<div class="info-container">
+  <div class="info-note">
+    Los datos se guardan de forma **local en tu dispositivo**. Si borras el historial, se perderán. Nada se sube a Internet.
+  </div>
+  <textarea id="diaryInput" placeholder="Escribe aquí tus reflexiones, preguntas o meditaciones..."></textarea>
+  <button id="saveBtn">Guardar</button>
+</div>
+
+<div class="cards-saved" id="savedCards"></div>
+
+<button class="floating-evangelizar" id="evangelizarBtn">
+  <i class="bi bi-book-half"></i> Evangelizar
+</button>
+
+<script>
+  // Fecha actual
+  const dateElem = document.getElementById('currentDate');
+  const today = new Date();
+  dateElem.textContent = today.toLocaleDateString('es-ES', { weekday: 'long', year:'numeric', month:'long', day:'numeric' });
+
+  // Guardar en localStorage
+  const saveBtn = document.getElementById('saveBtn');
+  const diaryInput = document.getElementById('diaryInput');
+  const savedCards = document.getElementById('savedCards');
+
+  function renderCards(filter="") {
+    savedCards.innerHTML = "";
+    const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]')
+      .filter(e => e.text.toLowerCase().includes(filter.toLowerCase()));
+    entries.forEach((entry, index) => {
+      const card = document.createElement('div');
+      card.className = 'card-saved';
+      const date = new Date(entry.date);
+      card.innerHTML = `<h3>${date.toLocaleDateString()} ${date.toLocaleTimeString()}</h3>
+                        <p>${entry.text}</p>`;
+      card.addEventListener('click', () => card.classList.toggle('open'));
+      savedCards.appendChild(card);
+    });
+  }
+
+  saveBtn.addEventListener('click', () => {
+    const text = diaryInput.value.trim();
+    if(!text) return alert('Escribe algo antes de guardar.');
+    const entries = JSON.parse(localStorage.getItem('diaryEntries') || '[]');
+    entries.push({ text, date: new Date() });
+    localStorage.setItem('diaryEntries', JSON.stringify(entries));
+    diaryInput.value = '';
+    renderCards();
+  });
+
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => renderCards(searchInput.value));
+
+  renderCards();
+
+  // Botón evangelizar
+  const evangelizarBtn = document.getElementById('evangelizarBtn');
+  evangelizarBtn.addEventListener('click', () => {
+    const overlay = document.createElement('div');
+    overlay.className = 'evangelizar-modal';
+    overlay.innerHTML = `
+      <div>
+        <button onclick="this.parentElement.parentElement.remove()">✕</button>
+        <a href="https://m.me/tucanal?ref=${encodeURIComponent('Hola, quiero sugerir una nueva card bíblica.')}" target="_blank">Sugerir reflexión</a>
+        <a href="https://m.me/tucanal?ref=${encodeURIComponent('Hola, quiero apoyar la app')}" target="_blank">Apoyar desarrollo</a>
+        <a href="https://paypal.me/tucuenta" target="_blank">Colaborar con donación</a>
+        <a href="https://youtube.com/tuvideo" target="_blank">Oración 🙏</a>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+  });
+</script>
+
+</body>
+</html>
