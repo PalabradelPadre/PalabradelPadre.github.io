@@ -326,6 +326,26 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
     observer.observe(document.getElementById('root'), { childList: true, subtree: true });
   });
 </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  function setCardTransparency() {
+    // Ajusta la transparencia de todas las cards
+    const cards = document.querySelectorAll('.card-glass');
+    cards.forEach(card => {
+      card.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'; // 35% opaco
+    });
+  }
+
+  // Ejecuta al cargar
+  setCardTransparency();
+
+  // Observa cambios en el DOM para capturar nuevas cards dinámicas
+  const observer = new MutationObserver(() => setCardTransparency());
+  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+});
+</script>
+
   
 </body>
 </html>
