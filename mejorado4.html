@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Palabra del Padre PRO</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+  /* BODY */
+  body {
+    margin:0; font-family:sans-serif; background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+    color:white; overflow-x:hidden;
+  }
+
+  /* HEADER */
+  header { display:flex; justify-content:space-between; align-items:center; padding:1rem; background:rgba(0,0,0,0.4);}
+  header h1 { display:flex; align-items:center; gap:0.5rem; font-size:1.8rem; }
+
+  /* INPUT BUSQUEDA */
+  #search { width:90%; margin:0 auto 1rem auto; display:block; padding:0.7rem 1rem; border-radius:1rem; border:none; font-size:1rem; }
+
+  /* CARDS */
+  .card { backdrop-filter: blur(10px); background-color: rgba(255,255,255,0.15); border-radius:1rem; padding:1rem; margin:1rem; transition: all 0.3s; cursor:pointer; opacity:0.95; box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+  .card.expanded { background-color: rgba(255,255,255,0.25); }
+  .card h2 { margin:0; font-size:1.2rem; }
+  .card h3 { margin:0.2rem 0 0.5rem 0; font-size:1rem; opacity:0.8; }
+  .card p { margin:0.3rem 0; font-size:0.95rem; }
+
+  /* ANIMACIONES */
+  .card { transform: translateY(0); transition: transform 0.3s, opacity 0.3s; }
+  .card.hide { opacity:0; transform: translateY(20px); pointer-events:none; }
+
+  /* BOTONES FLOTANTES */
+  .floating { position:fixed; bottom:5rem; right:1rem; display:flex; flex-direction:column; gap:0.5rem; z-index:50; }
+  .floating button { padding:0.5rem 1rem; border:none; border-radius:999px; background:rgba(0,123,255,0.9); color:white; cursor:pointer; font-weight:bold; display:flex; align-items:center; gap:0.5rem; }
+  .floating button:hover { background:rgba(0,123,255,1); transform:scale(1.05); }
+
+  /* INSTALAR */
+  #installBtn { position:fixed; bottom:1rem; right:1rem; background:#4CAF50; padding:0.75rem 1.25rem; border-radius:999px; font-weight:bold; cursor:pointer; z-index:50; }
+  #installBtn:hover { background:#45a049; }
+
+  /* SHARE BUTTONS */
+  .share-btn { width:32px; height:32px; border-radius:50%; display:flex; justify-content:center; align-items:center; margin-left:0.5rem; border:1px solid rgba(255,255,255,0.5); cursor:pointer; transition:transform 0.2s; }
+  .share-btn:hover { transform:scale(1.2); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h1><i class="bi bi-book-fill"></i> Palabra del Padre</h1>
+</header>
+
+<input id="search" placeholder="Busca por palabra, versículo o tema...">
+
+<div id="cardsContainer"></div>
+
+<div class="floating" id="categoryButtons"></div>
+
+<button id="installBtn" style="display:none;">Instalar App 📲</button>
+
+<script>
+let cardsData = [];
+let deferredPrompt = null;
+
+// Cargar JSON
+fetch('cards.json')
+  .then(r=>r.json())
+  .then(data=>{ cardsData=data; renderCards(); renderCategories(); });
+
+// INSTALL PWA
+window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt = e; document.getElementById('installBtn').style.display='block'; });
+document.getElementById('installBtn').addEventListener('click', async ()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  document.getElementById('installBtn').style.display='none';
+});
+
+// RENDER CARDS
+function renderCards(filterCategory='todas', searchText=''){
+  const container = document.getElementById('cardsContainer');
+  container.innerHTML='';
+  const normalizedSearch = searchText.toLowerCase();
+  cardsData.forEach(c=>{
+    const content = (c.titulo+c.cita+c.reflexion+c.versiculo).toLowerCase();
+    if(filterCategory!=='todas' && c.categoria!==filterCategory) return;
+    if(searchText && !content.includes(normalizedSearch)) return;
+
+    const card = document.createElement('div');
+    card.className='card';
+    card.innerHTML=`<h2>${c.titulo}</h2><h3>${c.versiculo}</h3><p>${c.cita}</p><p>${c.reflexion}</p>`;
+    card.addEventListener('click', ()=>card.classList.toggle('expanded'));
+
+    // Share buttons
+    const shareDiv = document.createElement('div'); shareDiv.style.display='flex'; shareDiv.style.marginTop='0.5rem';
+    const wa = document.createElement('div'); wa.className='share-btn bi bi-whatsapp text-green-500';
+    wa.onclick=()=>window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(c.cita+'\n'+c.versiculo)}`,'_blank');
+    const fb = document.createElement('div'); fb.className='share-btn bi bi-facebook text-blue-500';
+    fb.onclick=()=>window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(c.cita+'\n'+c.versiculo)}`,'_blank');
+    shareDiv.appendChild(wa); shareDiv.appendChild(fb);
+    card.appendChild(shareDiv);
+
+    container.appendChild(card);
+  });
+}
+
+// CATEGORIES
+function renderCategories(){
+  const catDiv = document.getElementById('categoryButtons');
+  const cats = [...new Set(cardsData.map(c=>c.categoria))];
+  cats.unshift('todas');
+  cats.forEach(cat=>{
+    const btn = document.createElement('button');
+    btn.innerText = cat.charAt(0).toUpperCase()+cat.slice(1);
+    btn.onclick=()=>{ renderCards(cat, document.getElementById('search').value); };
+    catDiv.appendChild(btn);
+  });
+}
+
+// BUSQUEDA
+document.getElementById('search').addEventListener('input',(e)=>{
+  renderCards('todas', e.target.value);
+});
+</script>
+</body>
+</html>
