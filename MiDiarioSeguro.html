@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diario Espiritual</title>
+
+<style>
+body {
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background:linear-gradient(#1e1b2e,#3b1f5f);
+  color:white;
+}
+
+/* LOGIN */
+#login {
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(#1e1b2e,#3b1f5f);
+}
+
+.login-box {
+  background:white;
+  color:black;
+  padding:25px;
+  border-radius:15px;
+  max-width:320px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  animation:fadeIn 0.4s;
+}
+
+.login-box h2 {
+  margin-bottom:10px;
+}
+
+.login-box input {
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+.login-box button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#3b82f6;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.login-info {
+  font-size:13px;
+  margin-top:10px;
+  color:#555;
+}
+
+/* HEADER */
+header {
+  text-align:center;
+  padding:15px;
+}
+
+.lock-btn {
+  background:#ef4444;
+  padding:8px 15px;
+  border-radius:20px;
+  border:none;
+  color:white;
+  cursor:pointer;
+}
+
+/* VERSE */
+.verse {
+  margin:15px;
+  padding:15px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.1);
+  font-style:italic;
+  text-align:center;
+}
+
+/* FORM */
+.container {
+  padding:15px;
+}
+
+textarea, input {
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  margin:5px 0;
+  font-size:16px;
+}
+
+button.save {
+  width:100%;
+  background:#10b981;
+  color:white;
+  font-size:16px;
+}
+
+/* GUIDE */
+.guide {
+  text-align:center;
+  margin:10px;
+  opacity:0.8;
+}
+
+/* CARDS */
+.card {
+  background:rgba(255,255,255,0.1);
+  margin:15px;
+  border-radius:15px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.card:hover {
+  transform:scale(1.02);
+}
+
+.card img {
+  width:100%;
+  height:140px;
+  object-fit:cover;
+}
+
+.card-content {
+  padding:10px;
+}
+
+.card p {
+  display:none;
+  white-space:pre-line;
+}
+
+.card.open p {
+  display:block;
+}
+
+.delete-btn {
+  background:#ef4444;
+  margin-top:10px;
+  width:100%;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {opacity:0; transform:scale(0.9);}
+  to {opacity:1; transform:scale(1);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h2>🙏 Diario Espiritual</h2>
+
+    <div id="createBox">
+      <input type="password" id="newPass" placeholder="Crea una contraseña">
+      <button onclick="createPassword()">Crear contraseña</button>
+    </div>
+
+    <div id="loginBox" style="display:none">
+      <input type="password" id="password" placeholder="Escribe tu contraseña">
+      <button onclick="unlock()">Entrar</button>
+    </div>
+
+    <div class="login-info">
+      🔒 Este diario es privado y se guarda solo en tu dispositivo.<br>
+      ⚠️ Si olvidas tu contraseña, no se puede recuperar.
+    </div>
+  </div>
+</div>
+
+<header>
+  <h2>🙏 Mi Diario con Dios</h2>
+  <button class="lock-btn" onclick="lock()">🔒 Bloquear</button>
+</header>
+
+<div class="verse" id="verse"></div>
+
+<div class="guide">
+🙏 Tómate un momento en silencio antes de escribir
+</div>
+
+<div class="container">
+
+<textarea id="reflexion" placeholder="📖 ¿Qué aprendiste hoy de Dios?"></textarea>
+<input id="accion" placeholder="❤️ ¿Qué obra buena hiciste hoy?">
+<input id="relacion" placeholder="🙏 ¿Cómo estuvo tu relación con Dios?">
+<input id="progreso" placeholder="📈 ¿En qué creciste hoy?">
+<input id="proposito" placeholder="🌱 Propósito para mañana">
+
+<button class="save" onclick="save()">Guardar</button>
+
+<p style="font-size:12px;opacity:0.7">
+🔐 No guardes información sensible como contraseñas o datos bancarios.
+</p>
+
+</div>
+
+<div id="entries"></div>
+
+<script>
+let key;
+let salt;
+let timer;
+const TIMEOUT = 5*60*1000;
+
+// Versículos
+const verses = [
+"Dios es amor (1 Jn 4,8)",
+"El Señor es mi pastor (Sal 23)",
+"Todo lo puedo en Él (Flp 4,13)",
+"Confía en el Señor (Prov 3,5)"
+];
+verse.textContent = verses[Math.floor(Math.random()*verses.length)];
+
+// AUTO LOCK
+function resetTimer(){
+  clearTimeout(timer);
+  timer=setTimeout(lock, TIMEOUT);
+}
+document.onclick=resetTimer;
+document.onkeypress=resetTimer;
+
+// BLOQUEAR
+function lock(){
+  location.reload();
+}
+
+// CLAVE
+async function getKey(password, saltBytes){
+  const enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
+
+  return crypto.subtle.deriveKey({
+    name:"PBKDF2",
+    salt:saltBytes,
+    iterations:150000,
+    hash:"SHA-256"
+  },base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+
+// CREAR
+async function createPassword(){
+  const pass=newPass.value;
+  if(pass.length<6) return alert("Usa mínimo 6 caracteres");
+
+  salt = crypto.getRandomValues(new Uint8Array(16));
+  key = await getKey(pass, salt);
+
+  const check = await encrypt("ok");
+
+  localStorage.setItem("salt", JSON.stringify(Array.from(salt)));
+  localStorage.setItem("check", JSON.stringify(check));
+
+  createBox.style.display="none";
+  loginBox.style.display="block";
+}
+
+// LOGIN
+async function unlock(){
+  const pass=password.value;
+
+  const saltStored = new Uint8Array(JSON.parse(localStorage.getItem("salt")));
+  key = await getKey(pass, saltStored);
+
+  try{
+    const check=JSON.parse(localStorage.getItem("check"));
+    await decrypt(check);
+
+    login.style.display="none";
+    load();
+    resetTimer();
+  }catch{
+    alert("Contraseña incorrecta");
+  }
+}
+
+// CIFRAR
+async function encrypt(data){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const enc=new TextEncoder();
+
+  const cipher=await crypto.subtle.encrypt(
+    {name:"AES-GCM",iv},
+    key,
+    enc.encode(JSON.stringify(data))
+  );
+
+  return {iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))};
+}
+
+// DESCIFRAR
+async function decrypt(obj){
+  const dec=new TextDecoder();
+
+  const plain=await crypto.subtle.decrypt(
+    {name:"AES-GCM",iv:new Uint8Array(obj.iv)},
+    key,
+    new Uint8Array(obj.data)
+  );
+
+  return JSON.parse(dec.decode(plain));
+}
+
+// GUARDAR
+async function save(){
+  const entry={
+    date:new Date().toLocaleString(),
+    reflexion:reflexion.value,
+    accion:accion.value,
+    relacion:relacion.value,
+    progreso:progreso.value,
+    proposito:proposito.value
+  };
+
+  const enc=await encrypt(entry);
+
+  const arr=JSON.parse(localStorage.getItem("data")||"[]");
+  arr.push(enc);
+  localStorage.setItem("data",JSON.stringify(arr));
+
+  load();
+}
+
+// CARGAR
+async function load(){
+  entries.innerHTML="";
+  const arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
+
+  for(let i=0;i<arr.length;i++){
+    const d=await decrypt(arr[i]);
+
+    const card=document.createElement("div");
+    card.className="card";
+
+    const img=document.createElement("img");
+    img.src="https://picsum.photos/400/200?random="+i;
+
+    const content=document.createElement("div");
+    content.className="card-content";
+
+    const title=document.createElement("h4");
+    title.textContent=d.date;
+
+    const p=document.createElement("p");
+    p.textContent =
+      "📖 "+d.reflexion+"\n\n"+
+      "❤️ "+d.accion+"\n"+
+      "🙏 "+d.relacion+"\n"+
+      "📈 "+d.progreso+"\n"+
+      "🌱 "+d.proposito;
+
+    const del=document.createElement("button");
+    del.textContent="Eliminar";
+    del.className="delete-btn";
+
+    del.onclick=(e)=>{
+      e.stopPropagation();
+      const data=JSON.parse(localStorage.getItem("data"));
+      data.splice(data.length-1-i,1);
+      localStorage.setItem("data",JSON.stringify(data));
+      load();
+    };
+
+    content.appendChild(title);
+    content.appendChild(p);
+    content.appendChild(del);
+
+    card.appendChild(img);
+    card.appendChild(content);
+
+    card.onclick=()=>card.classList.toggle("open");
+
+    entries.appendChild(card);
+  }
+}
+
+// INIT
+if(localStorage.getItem("salt")){
+  createBox.style.display="none";
+  loginBox.style.display="block";
+}
+
+// INIT TIMER
+resetTimer();
+</script>
+
+</body>
+</html>
