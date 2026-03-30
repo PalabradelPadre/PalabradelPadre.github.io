@@ -28,7 +28,7 @@ body {
 
 .swiper {
   width: 100%;
-  max-width: 420px; /* Centrado y margen lateral */
+  max-width: 420px;
   height: 90vh;
   padding: 1rem;
   box-sizing: border-box;
@@ -43,7 +43,7 @@ body {
 
 .card {
   width: 100%;
-  max-width: 380px; /* No toca el borde del móvil */
+  max-width: 380px;
   background: #ffffff;
   border: 2px solid #fbbf24;
   border-radius: 2rem;
@@ -80,6 +80,14 @@ body {
   font-size: 1rem;
   color: #5c4033;
   margin-bottom: 1rem;
+}
+
+.share {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
 }
 
 .share a {
@@ -129,6 +137,7 @@ body {
   font-weight: 600;
   text-decoration: none;
   animation: pulse 2s infinite;
+  margin-top: 1rem;
 }
 
 .pulse-button:hover { background-color: #d97706; }
@@ -139,10 +148,7 @@ body {
 }
 
 @media (max-width: 380px) {
-  .card {
-    max-width: 95%;
-    padding: 1.5rem 1rem 1rem 1rem;
-  }
+  .card { max-width: 95%; padding: 1.5rem 1rem 1rem 1rem; }
   .card h2 { font-size: 1.5rem; }
   .card p { font-size: 0.95rem; }
 }
@@ -159,7 +165,7 @@ body {
         <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
         <h2>Yo soy el pan de vida</h2>
         <p>Jesús dijo: «Yo soy el pan de vida; el que venga a mí no tendrá hambre, y el que cree en mí no tendrá sed jamás.» - Juan 6,35</p>
-        <div class="share flex gap-3 w-full justify-center">
+        <div class="share">
           <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20pan%20de%20vida%20-%20Juan%206:35" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
           <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
         </div>
@@ -172,8 +178,73 @@ body {
         <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
         <h2>Yo soy la luz del mundo</h2>
         <p>Jesús dijo: «Yo soy la luz del mundo; el que me sigue no caminará en tinieblas, sino que tendrá la luz de la vida.» - Juan 8,12</p>
-        <div class="share flex gap-3 w-full justify-center">
+        <div class="share">
           <a href="https://api.whatsapp.com/send?text=Yo%20soy%20la%20luz%20del%20mundo%20-%20Juan%208:12" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="swiper-slide">
+      <div class="card">
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy el buen pastor</h2>
+        <p>Jesús dijo: «El buen pastor da su vida por las ovejas.» - Juan 10,11</p>
+        <div class="share">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20buen%20pastor%20-%20Juan%2010:11" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="swiper-slide">
+      <div class="card">
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy la resurrección y la vida</h2>
+        <p>Jesús dijo: «El que cree en mí, aunque esté muerto, vivirá.» - Juan 11,25</p>
+        <div class="share">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20la%20resurreccion%20y%20la%20vida%20-%20Juan%2011:25" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="swiper-slide">
+      <div class="card">
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy el camino, la verdad y la vida</h2>
+        <p>Jesús dijo: «Yo soy el camino, la verdad y la vida; nadie viene al Padre sino por mí.» - Juan 14,6</p>
+        <div class="share">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20camino,%20la%20verdad%20y%20la%20vida%20-%20Juan%2014:6" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="swiper-slide">
+      <div class="card">
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy la puerta</h2>
+        <p>Jesús dijo: «Yo soy la puerta; el que entra por mí será salvo.» - Juan 10,9</p>
+        <div class="share">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20la%20puerta%20-%20Juan%2010:9" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="swiper-slide">
+      <div class="card">
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy el alfa y la omega</h2>
+        <p>Jesús dijo: «Yo soy el alfa y la omega, el principio y el fin.» - Apocalipsis 22,13</p>
+        <div class="share">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20alfa%20y%20la%20omega%20-%20Apocalipsis%2022:13" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
           <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
         </div>
       </div>
