@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📓 Libreta Espiritual Premium</title>
+
+<!-- Tipografía -->
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(160deg,#fdf6e3,#e0dcd3);
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.app {
+  width:100%;
+  max-width:480px;
+  height:95vh;
+  display:flex;
+  flex-direction:column;
+  background: rgba(255,255,255,0.95);
+  border-radius:20px;
+  box-shadow:0 10px 35px rgba(0,0,0,0.18);
+  overflow:hidden;
+  position:relative;
+}
+
+.header {
+  background:#ffe5b4;
+  color:#5a2b7f;
+  font-weight:700;
+  font-size:1.5rem;
+  text-align:center;
+  padding:1rem;
+  font-family:'Patrick Hand', cursive;
+}
+
+.search {
+  padding:0.8rem 1rem;
+  border:none;
+  border-bottom:1px solid #ddd;
+  font-size:1rem;
+  outline:none;
+}
+
+.status {
+  font-size:0.85rem;
+  text-align:right;
+  padding:0.3rem 1rem;
+  color:#555;
+  font-style:italic;
+}
+
+.page {
+  flex:1;
+  padding:1.2rem;
+  background: repeating-linear-gradient(
+    to bottom,
+    #fff,
+    #fff 30px,
+    #f0f0f0 31px
+  );
+  font-family:'Patrick Hand', cursive;
+  overflow:hidden;
+  position:relative;
+  transform-origin:left center;
+  transition: transform 0.6s ease, box-shadow 0.3s ease;
+  border-radius:0 0 20px 20px;
+}
+
+.page.flip {
+  transform: rotateY(-160deg);
+}
+
+.page.saving {
+  animation: glow 0.6s ease;
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 0px #ffd54f; }
+  50% { box-shadow: 0 0 20px #ffd54f; }
+  100% { box-shadow: 0 0 0px #ffd54f; }
+}
+
+textarea {
+  width:100%;
+  height:100%;
+  border:none;
+  outline:none;
+  resize:none;
+  background:transparent;
+  font-size:18px;
+  line-height:32px;
+  padding-right:0.2rem;
+}
+
+.notes {
+  max-height:30%;
+  overflow-y:auto;
+  padding:5px;
+}
+
+.note {
+  padding:12px;
+  margin:4px 10px;
+  border-radius:14px;
+  background: rgba(255,255,255,0.85);
+  box-shadow:0 2px 8px rgba(0,0,0,0.12);
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  cursor:pointer;
+  transition:transform 0.2s, background 0.2s;
+}
+
+.note strong { display:block; font-size:0.8rem; margin-bottom:2px; color:#5a2b7f; }
+
+.note button {
+  border:none;
+  background:none;
+  color:#ff5252;
+  font-size:1.3rem;
+  cursor:pointer;
+}
+
+.fab, .verse-btn {
+  position: fixed;
+  bottom: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 28px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  box-shadow:0 5px 18px rgba(0,0,0,0.25);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.fab { right:20px; background:#ffd54f; color:#5a2b7f; }
+.fab:hover { transform:scale(1.1); }
+
+.verse-btn { left:20px; background:#7e57c2; color:white; }
+.verse-btn:hover { transform:scale(1.1); }
+
+.footer {
+  font-size:0.7rem;
+  text-align:center;
+  color:#555;
+  padding:6px 10px;
+  background:#f4f2ee;
+  border-top:1px solid #ddd;
+}
+
+/* Confeti efecto */
+.confetti-piece {
+  position: absolute;
+  width: 8px; height: 8px;
+  background: hsl(0,0%,0%);
+  opacity:0.9;
+  transform: rotate(0deg);
+  animation: fall 1s forwards;
+  pointer-events:none;
+  border-radius:50%;
+}
+
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); opacity:1; }
+  100% { transform: translateY(120px) rotate(360deg); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">📓 Libreta Espiritual</div>
+  <input id="search" class="search" placeholder="Buscar por texto o fecha...">
+  <div class="status" id="status">Listo</div>
+  <div id="page" class="page">
+    <textarea id="editor" placeholder="Escribe tu reflexión..."></textarea>
+  </div>
+  <div id="notes" class="notes"></div>
+  <div class="footer">
+    Tus datos no se guardan en Internet.<br>
+    Se almacenan de forma cifrada solo en este navegador.*
+  </div>
+</div>
+
+<button class="fab" title="Nueva hoja"><i class="bi bi-file-earmark-plus"></i></button>
+<button class="verse-btn" title="Versículo / Plantilla espiritual">🙏</button>
+
+<script>
+/* ===== CIFRADO AES ===== */
+const keyMaterial = window.crypto.subtle.importKey(
+  "raw",
+  new TextEncoder().encode("clave-secreta-espiritual-32"),
+  "PBKDF2",
+  false,
+  ["deriveKey"]
+);
+async function getKey() {
+  const baseKey = await keyMaterial;
+  return crypto.subtle.deriveKey(
+    {name:"PBKDF2", salt:new TextEncoder().encode("libreta"), iterations:100000, hash:"SHA-256"},
+    baseKey,
+    {name:"AES-GCM", length:256},
+    false,
+    ["encrypt","decrypt"]
+  );
+}
+async function encryptData(data) {
+  const key = await getKey();
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder();
+  const encrypted = await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, enc.encode(JSON.stringify(data)));
+  const arr = new Uint8Array(encrypted);
+  const combined = new Uint8Array(iv.length + arr.length);
+  combined.set(iv,0); combined.set(arr,iv.length);
+  return btoa(String.fromCharCode(...combined));
+}
+async function decryptData(data) {
+  const key = await getKey();
+  const combined = Uint8Array.from(atob(data), c=>c.charCodeAt(0));
+  const iv = combined.slice(0,12);
+  const encrypted = combined.slice(12);
+  return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:"AES-GCM", iv}, key, encrypted)));
+}
+
+/* ===== LOGICA NOTAS ===== */
+let notes = [];
+let currentIndex = null;
+const editor = document.getElementById('editor');
+const notesContainer = document.getElementById('notes');
+const page = document.getElementById('page');
+const search = document.getElementById('search');
+const status = document.getElementById('status');
+
+const verses = [
+  "📖 Juan 3:16 - Porque de tal manera amó Dios al mundo... 🙏💖",
+  "🌿 Salmos 23:1 - El Señor es mi pastor, nada me faltará. 🕊️✨",
+  "❤️ 1 Corintios 13:4 - El amor es paciente, es bondadoso. 🤝🌸",
+  "💡 Mateo 5:16 - Brilla delante de los hombres... 🌟🙏",
+  "💪 Filipenses 4:13 - Todo lo puedo en Cristo que me fortalece. ✝️💫"
+];
+
+const templates = [
+  "1️⃣ ¿Cómo acercarme a Dios hoy? 🙏\n2️⃣ Acto de caridad 💖\n3️⃣ Reflexión diaria 🌸\n",
+  "1️⃣ Oración corta: Gracias Dios 🙏\n2️⃣ Servicio a los demás ✨\n3️⃣ Reflexión sobre amistad con Dios 💕\n",
+  "1️⃣ Virtud a cultivar 🌿\n2️⃣ Cómo ayudar a otros 🤝\n3️⃣ Enseñanza bíblica 📖\n"
+];
+
+async function loadNotes() {
+  try {
+    const stored = localStorage.getItem('libretaSegura');
+    if(stored) notes = await decryptData(stored);
+  } catch(e){ notes=[]; console.warn('Error descifrando notas',e);}
+  renderNotes();
+}
+
+async function saveNotes() {
+  page.classList.add('saving');
+  setTimeout(()=>page.classList.remove('saving'),600);
+  status.textContent = 'Guardado ✅';
+  const encrypted = await encryptData(notes);
+  localStorage.setItem('libretaSegura', encrypted);
+  renderNotes(); // REFLEJAR INMEDIATAMENTE
+}
+
+let timeout;
+editor.addEventListener('input', ()=>{
+  status.textContent = 'Escribiendo...';
+  clearTimeout(timeout);
+  timeout=setTimeout(async ()=>{
+    saveCurrent();
+    await saveNotes();
+  },500);
+});
+
+function saveCurrent(){
+  const text = editor.value.trim();
+  if(!text && currentIndex===null) return;
+  const date = new Date().toLocaleString();
+  if(currentIndex!==null){ notes[currentIndex]={text,date}; }
+  else { notes.unshift({text,date}); currentIndex=0; }
+}
+
+document.querySelector('.fab').addEventListener('click', async ()=>{
+  page.classList.add('flip');
+  setTimeout(()=>{
+    editor.value='';
+    currentIndex=null;
+    page.classList.remove('flip');
+    status.textContent='Listo';
+    saveCurrent();
+    saveNotes();
+  },400);
+});
+
+document.querySelector('.verse-btn').addEventListener('click', async ()=>{
+  const verse = verses[Math.floor(Math.random()*verses.length)];
+  const template = templates[Math.floor(Math.random()*templates.length)];
+  editor.value = verse + "\n\n" + template + "\n" + editor.value;
+  saveCurrent();
+  await saveNotes();
+  showConfetti();
+});
+
+function renderNotes(filter=''){
+  notesContainer.innerHTML='';
+  notes.filter(n => n.text.toLowerCase().includes(filter.toLowerCase()) || n.date.includes(filter))
+    .forEach((n,i)=>{
+      const div=document.createElement('div');
+      div.className='note';
+      div.innerHTML=`<div>
+        <strong>${n.date}</strong>${n.text.slice(0,50)}...
+      </div>
+      <button title="Eliminar"><i class="bi bi-trash3-fill"></i></button>`;
+
+      const btn = div.querySelector('button');
+      btn.addEventListener('click', async (e)=>{
+        e.stopPropagation();
+        notes.splice(i,1);
+        currentIndex=null;
+        editor.value='';
+        await saveNotes();
+      });
+
+      div.onclick=()=>{currentIndex=i; editor.value=n.text; status.textContent='Listo';};
+      notesContainer.appendChild(div);
+    });
+}
+
+/* Búsqueda */
+search.addEventListener('input', e=> renderNotes(e.target.value));
+
+/* Confetti efecto */
+function showConfetti(){
+  for(let i=0;i<15;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    c.style.backgroundColor=`hsl(${Math.random()*360},80%,60%)`;
+    c.style.left=`${Math.random()*page.clientWidth}px`;
+    c.style.top='0px';
+    c.style.width='6px';
+    c.style.height='6px';
+    page.appendChild(c);
+    setTimeout(()=>c.remove(),1000);
+  }
+}
+
+loadNotes();
+</script>
+</body>
+</html>
