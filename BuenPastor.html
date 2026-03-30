@@ -3,184 +3,174 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buen Pastor - Fiesta de la Resurrección</title>
+  <title>Mensajes Espirituales</title>
 
   <!-- CDN de TailwindCSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></script>
+
+  <!-- CDN de SwiperJS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 
   <style>
-    body {
-      background-color: #ffffff;
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-
+    /* Estilos de las cards */
     .card {
-      background-color: rgba(255, 255, 255, 0.9);
-      border-radius: 15px;
-      padding: 30px;
+      background-color: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      margin-bottom: 20px;
+      padding: 20px;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 350px;
-      margin: 20px auto;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+      height: 90vh; /* Ajuste de altura */
     }
 
     .card img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
+      width: 140px;
+      height: 140px;
       object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
       margin-bottom: 20px;
     }
 
-    .card h3 {
-      font-size: 1.5rem;
-      color: #2d3748;
+    .card h2 {
+      font-size: 2rem;
       font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
     }
 
     .card p {
-      font-size: 1rem;
-      color: #4a5568;
-      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #555;
+      margin-bottom: 20px;
     }
 
-    .share-buttons a {
-      color: #fff;
-      font-size: 1.25rem;
-      margin-right: 12px;
+    .share a {
+      font-weight: bold;
+      padding: 10px 16px;
+      border-radius: 12px;
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .share-buttons a:hover {
-      color: #ffcc00;
+    .whatsapp {
+      background-color: #25D366;
     }
 
-    /* Color scheme */
-    .card-yellow {
-      background-color: #f6e05e;
+    .facebook {
+      background-color: #1877F2;
     }
 
-    .card-light-blue {
-      background-color: #63b3ed;
-    }
-
-    .card-green {
-      background-color: #68d391;
-    }
-
-    .card-orange {
-      background-color: #fbd38d;
-    }
-
-    .carousel-controls button {
-      background-color: transparent;
-      border: none;
-      font-size: 2rem;
+    /* Logo en esquina */
+    .logo {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 100;
+      font-size: 2.5rem;
       color: #333;
-      opacity: 0.7;
-      transition: opacity 0.3s ease;
     }
-
-    .carousel-controls button:hover {
-      opacity: 1;
-    }
-
   </style>
 </head>
-<body>
 
-  <!-- Carousel Container -->
-  <div class="relative h-screen overflow-hidden flex items-center justify-center flex-col">
+<body class="bg-white flex justify-center items-center min-h-screen">
 
-    <!-- Primer Cita - "Yo soy el pan de vida" -->
-    <div class="card card-yellow">
-      <img src="https://images.pexels.com/photos/4575735/pexels-photo-4575735.jpeg" alt="Logo Resurrección">
-      <h3>“Yo soy el pan de vida” – Juan 6:35</h3>
-      <p class="mt-3">Jesús nos invita a alimentarnos de su presencia para obtener vida eterna. Él es el sustento para nuestra alma.</p>
-      <div class="share-buttons mt-6 flex justify-center gap-4">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank">
-          <i class="fab fa-facebook"></i> Compartir en Facebook
-        </a>
-        <a href="https://api.whatsapp.com/send?text=Yo soy el pan de vida - Juan 6:35 https://tu-sitio.com" target="_blank">
-          <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
-        </a>
+  <!-- Logo en la esquina superior izquierda -->
+  <div class="logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Jesus_Christ_logo.svg/1200px-Jesus_Christ_logo.svg.png" alt="Logo" class="w-16 h-16 rounded-full">
+  </div>
+
+  <!-- Carrusel de tarjetas -->
+  <div class="swiper-container w-full max-w-2xl h-[90vh] overflow-hidden">
+    <div class="swiper-wrapper">
+
+      <!-- Card 1 -->
+      <div class="swiper-slide">
+        <div class="card bg-yellow-100">
+          <img src="https://images.pexels.com/photos/1447179/pexels-photo-1447179.jpeg" alt="Jesús Buen Pastor" class="mx-auto">
+          <h2 class="text-2xl text-gray-800">Yo soy el pan de vida</h2>
+          <p class="text-lg text-gray-600">"El que viene a mí no tendrá hambre, y el que cree en mí no tendrá sed jamás." - Juan 6:35</p>
+          <div class="share flex justify-center gap-4">
+            <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20pan%20de%20vida%20-%20Juan%206:35%20https://example.com" target="_blank" class="whatsapp text-center">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook text-center">
+              <i class="bi bi-facebook"></i> Facebook
+            </a>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Segunda Cita - "Yo soy la luz del mundo" -->
-    <div class="card card-light-blue">
-      <img src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg" alt="Logo Resurrección">
-      <h3>“Yo soy la luz del mundo” – Juan 8:12</h3>
-      <p class="mt-3">Con Jesús, vivimos en la luz y podemos encontrar la verdad que ilumina nuestro camino.</p>
-      <div class="share-buttons mt-6 flex justify-center gap-4">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank">
-          <i class="fab fa-facebook"></i> Compartir en Facebook
-        </a>
-        <a href="https://api.whatsapp.com/send?text=Yo soy la luz del mundo - Juan 8:12 https://tu-sitio.com" target="_blank">
-          <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
-        </a>
+      <!-- Card 2 -->
+      <div class="swiper-slide">
+        <div class="card bg-blue-100">
+          <img src="https://images.pexels.com/photos/2475994/pexels-photo-2475994.jpeg" alt="Luz del Mundo" class="mx-auto">
+          <h2 class="text-2xl text-gray-800">Yo soy la luz del mundo</h2>
+          <p class="text-lg text-gray-600">"El que me sigue no andará en tinieblas, sino que tendrá la luz de la vida." - Juan 8:12</p>
+          <div class="share flex justify-center gap-4">
+            <a href="https://api.whatsapp.com/send?text=Yo%20soy%20la%20luz%20del%20mundo%20-%20Juan%208:12%20https://example.com" target="_blank" class="whatsapp text-center">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook text-center">
+              <i class="bi bi-facebook"></i> Facebook
+            </a>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Tercer Cita - "Yo soy el buen pastor" -->
-    <div class="card card-green">
-      <img src="https://images.pexels.com/photos/1287157/pexels-photo-1287157.jpeg" alt="Logo Resurrección">
-      <h3>“Yo soy el buen pastor” – Juan 10:11</h3>
-      <p class="mt-3">Jesús cuida de nosotros como un buen pastor, guiándonos por caminos de paz y esperanza.</p>
-      <div class="share-buttons mt-6 flex justify-center gap-4">
-        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank">
-          <i class="fab fa-facebook"></i> Compartir en Facebook
-        </a>
-        <a href="https://api.whatsapp.com/send?text=Yo soy el buen pastor - Juan 10:11 https://tu-sitio.com" target="_blank">
-          <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
-        </a>
+      <!-- Card 3 -->
+      <div class="swiper-slide">
+        <div class="card bg-green-100">
+          <img src="https://images.pexels.com/photos/691525/pexels-photo-691525.jpeg" alt="Buen Pastor" class="mx-auto">
+          <h2 class="text-2xl text-gray-800">Yo soy el buen pastor</h2>
+          <p class="text-lg text-gray-600">"El buen pastor da su vida por las ovejas." - Juan 10:11</p>
+          <div class="share flex justify-center gap-4">
+            <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20buen%20pastor%20-%20Juan%2010:11%20https://example.com" target="_blank" class="whatsapp text-center">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook text-center">
+              <i class="bi bi-facebook"></i> Facebook
+            </a>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Más Cards (Agrega tantas como desees) -->
+      <!-- Card 4 -->
+      <div class="swiper-slide">
+        <div class="card bg-pink-100">
+          <img src="https://images.pexels.com/photos/2825618/pexels-photo-2825618.jpeg" alt="Resurrección" class="mx-auto">
+          <h2 class="text-2xl text-gray-800">Yo soy la resurrección y la vida</h2>
+          <p class="text-lg text-gray-600">"El que cree en mí, aunque esté muerto, vivirá." - Juan 11:25</p>
+          <div class="share flex justify-center gap-4">
+            <a href="https://api.whatsapp.com/send?text=Yo%20soy%20la%20resurrección%20y%20la%20vida%20-%20Juan%2011:25%20https://example.com" target="_blank" class="whatsapp text-center">
+              <i class="bi bi-whatsapp"></i> WhatsApp
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook text-center">
+              <i class="bi bi-facebook"></i> Facebook
+            </a>
+          </div>
+        </div>
+      </div>
 
-    <!-- Carousel Controls -->
-    <div class="carousel-controls absolute inset-0 flex justify-between items-center px-6 py-3 z-10">
-      <button id="prevBtn" class="text-3xl">&#10094;</button>
-      <button id="nextBtn" class="text-3xl">&#10095;</button>
     </div>
   </div>
 
   <script>
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    let currentIndex = 0;
-    const cards = document.querySelectorAll('.card');
-    const totalCards = cards.length;
-
-    // Función para mostrar el siguiente item
-    const showNext = () => {
-      cards[currentIndex].classList.remove('active');
-      currentIndex = (currentIndex + 1) % totalCards;
-      cards[currentIndex].classList.add('active');
-    };
-
-    // Función para mostrar el item anterior
-    const showPrev = () => {
-      cards[currentIndex].classList.remove('active');
-      currentIndex = (currentIndex - 1 + totalCards) % totalCards;
-      cards[currentIndex].classList.add('active');
-    };
-
-    // Eventos para los botones
-    nextBtn.addEventListener('click', showNext);
-    prevBtn.addEventListener('click', showPrev);
+    const swiper = new Swiper('.swiper-container', {
+      direction: 'vertical', // Desplazamiento vertical
+      loop: true, // Hacerlo infinito
+      mousewheel: true, // Permitir el desplazamiento con el mouse
+      grabCursor: true, // Permitir el deslizamiento manual con el cursor
+      slidesPerView: 'auto', // Para que todas las slides se muestren una a una
+    });
   </script>
-
+  
 </body>
 </html>
