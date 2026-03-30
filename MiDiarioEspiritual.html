@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diario Espiritual - App Móvil</title>
+<title>Mi Diario Espiritual</title>
 <style>
 /* ===== GENERAL ===== */
 body {
@@ -44,6 +44,7 @@ body {
   margin-bottom:20px;
   color:#1e1b2e;
   font-size:22px;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
 }
 .login-box input {
   width:100%;
@@ -72,6 +73,11 @@ body {
   color:#555;
   text-align:center;
   line-height:1.3;
+}
+.login-info .technical {
+  font-size:11px;
+  opacity:0.7;
+  margin-top:4px;
 }
 
 /* ===== HEADER ===== */
@@ -222,7 +228,7 @@ button.save:hover {background:#059669;}
 <!-- LOGIN -->
 <div id="login">
   <div class="login-box">
-    <h2>🙏 Diario Espiritual</h2>
+    <h2>🙏 Mi Diario Espiritual</h2>
 
     <div id="createBox">
       <input type="password" id="newPass" placeholder="Crea tu contraseña">
@@ -236,14 +242,15 @@ button.save:hover {background:#059669;}
     </div>
 
     <div class="login-info">
-      🔒 Tus datos se guardan solo en este navegador.<br>
-      ⚠️ Si borras historial o datos del sitio, se perderá todo.
+      🔒 Este diario es privado y no se sube a Internet.<br>
+      ⚠️ Si olvidas tu contraseña, no se podrá recuperar.
+      <div class="technical">*Tus datos se guardan únicamente en este navegador y se perderán si borras historial o datos del sitio.</div>
     </div>
   </div>
 </div>
 
 <header>
-  <h2>🙏 Mi Diario con Dios</h2>
+  <h2>🙏 Mi Diario Espiritual</h2>
   <button class="lock-btn" onclick="lock()">🔒 Bloquear</button>
 </header>
 
@@ -271,7 +278,12 @@ button.save:hover {background:#059669;}
 <script>
 let key,salt,timer;
 const TIMEOUT=5*60*1000;
-const verses=["Dios es amor (1 Jn 4,8)","El Señor es mi pastor (Sal 23)","Todo lo puedo en Él (Fil 4,13)","Confía en el Señor (Prov 3,5)"];
+const verses=[
+  "Dios es amor (1 Jn 4,8)",
+  "El Señor es mi pastor (Sal 23)",
+  "Todo lo puedo en Él (Fil 4,13)",
+  "Confía en el Señor (Prov 3,5)"
+];
 document.getElementById("verse").textContent=verses[Math.floor(Math.random()*verses.length)];
 
 // AUTO LOCK
@@ -285,52 +297,58 @@ function lock(){
   ["reflexion","accion","relacion","proposito"].forEach(id=>document.getElementById(id).value="");
 }
 
-// CIFRADO
+// CIFRADO AES-GCM + PBKDF2
 async function getKey(password,saltBytes){
-  const enc=new TextEncoder();
-  const base=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
-  return crypto.subtle.deriveKey({name:"PBKDF2",salt:saltBytes,iterations:150000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+  const enc = new TextEncoder();
+  const base = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2", salt:saltBytes, iterations:150000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
 }
+
 async function encrypt(data){
-  const iv=crypto.getRandomValues(new Uint8Array(12));
-  const enc=new TextEncoder();
-  const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(data)));
-  return {iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))};
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const enc = new TextEncoder();
+  const cipher = await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, enc.encode(JSON.stringify(data)));
+  return {iv:Array.from(iv), data:Array.from(new Uint8Array(cipher))};
 }
+
 async function decrypt(obj){
-  const dec=new TextDecoder();
-  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(obj.iv)},key,new Uint8Array(obj.data));
+  const dec = new TextDecoder();
+  const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv:new Uint8Array(obj.iv)}, key, new Uint8Array(obj.data));
   return JSON.parse(dec.decode(plain));
 }
 
 // CREAR CONTRASEÑA
 async function createPassword(){
-  const pass=document.getElementById("newPass").value;
-  const conf=document.getElementById("confirmPass").value;
-  if(pass.length<6)return alert("Usa mínimo 6 caracteres");
-  if(pass!==conf)return alert("Las contraseñas no coinciden");
-  salt=crypto.getRandomValues(new Uint8Array(16));
-  key=await getKey(pass,salt);
-  const check=await encrypt("ok");
-  localStorage.setItem("salt",JSON.stringify(Array.from(salt)));
-  localStorage.setItem("check",JSON.stringify(check));
-  document.getElementById("newPass").value=document.getElementById("confirmPass").value="";
-  document.getElementById("createBox").style.display="none";
-  document.getElementById("loginBox").style.display="block";
+  const pass = document.getElementById("newPass").value;
+  const conf = document.getElementById("confirmPass").value;
+  if(pass.length < 6) return alert("Usa mínimo 6 caracteres");
+  if(pass !== conf) return alert("Las contraseñas no coinciden");
+
+  salt = crypto.getRandomValues(new Uint8Array(16));
+  key = await getKey(pass, salt);
+
+  const check = await encrypt("ok");
+  localStorage.setItem("salt", JSON.stringify(Array.from(salt)));
+  localStorage.setItem("check", JSON.stringify(check));
+
+  document.getElementById("newPass").value = document.getElementById("confirmPass").value = "";
+  document.getElementById("createBox").style.display = "none";
+  document.getElementById("loginBox").style.display = "block";
 }
 
 // LOGIN
 async function unlock(){
-  const pass=document.getElementById("password").value;
-  const saltStored=new Uint8Array(JSON.parse(localStorage.getItem("salt")));
-  key=await getKey(pass,saltStored);
-  try{
-    const check=JSON.parse(localStorage.getItem("check"));
+  const pass = document.getElementById("password").value;
+  const saltStored = new Uint8Array(JSON.parse(localStorage.getItem("salt")));
+  key = await getKey(pass, saltStored);
+  try {
+    const check = JSON.parse(localStorage.getItem("check"));
     await decrypt(check);
-    document.getElementById("login").style.display="none";
-    document.getElementById("password").value="";
-    load(); resetTimer();
-  }catch{alert("Contraseña incorrecta");}
+    document.getElementById("login").style.display = "none";
+    document.getElementById("password").value = "";
+  } catch {
+    alert("Contraseña incorrecta");
+  }
 }
 
 // GUARDAR ENTRADA
@@ -342,42 +360,45 @@ async function save(){
     relacion:document.getElementById("relacion").value,
     proposito:document.getElementById("proposito").value
   };
-  const enc=await encrypt(entry);
-  const arr=JSON.parse(localStorage.getItem("data")||"[]"); arr.push(enc);
+  const enc = await encrypt(entry);
+  const arr = JSON.parse(localStorage.getItem("data")||"[]");
+  arr.push(enc);
   localStorage.setItem("data",JSON.stringify(arr));
   ["reflexion","accion","relacion","proposito"].forEach(id=>document.getElementById(id).value="");
-  showToast(); load();
+  showToast();
+  load();
 }
 
 // CARGAR ENTRADAS
 async function load(){
-  const entriesDiv=document.getElementById("entries");
-  entriesDiv.innerHTML="";
-  const arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
+  const entriesDiv = document.getElementById("entries");
+  entriesDiv.innerHTML = "";
+  const arr = JSON.parse(localStorage.getItem("data")||"[]").reverse();
   for(let i=0;i<arr.length;i++){
-    const d=await decrypt(arr[i]);
-    const card=document.createElement("div"); card.className="card";
+    const d = await decrypt(arr[i]);
+    const card = document.createElement("div"); card.className="card";
 
-    const header=document.createElement("div"); header.className="card-header";
-    const title=document.createElement("h4"); title.textContent=d.date;
-    const toggleBtn=document.createElement("button"); toggleBtn.textContent="Ver/Ocultar";
-    toggleBtn.onclick=(e)=>{e.stopPropagation(); card.classList.toggle("open");};
+    const header = document.createElement("div"); header.className="card-header";
+    const title = document.createElement("h4"); title.textContent=d.date;
+    const toggleBtn = document.createElement("button"); toggleBtn.textContent="Ver/Ocultar";
+    toggleBtn.onclick = (e)=>{ e.stopPropagation(); card.classList.toggle("open"); };
     header.appendChild(title); header.appendChild(toggleBtn);
 
-    const content=document.createElement("div"); content.className="card-content";
+    const content = document.createElement("div"); content.className="card-content";
     content.textContent="📖 "+d.reflexion+"\n\n❤️ "+d.accion+"\n🙏 "+d.relacion+"\n🌱 "+d.proposito;
 
-    const del=document.createElement("button"); del.textContent="Eliminar"; del.className="delete-btn";
-    del.onclick=(e)=>{e.stopPropagation(); const data=JSON.parse(localStorage.getItem("data")); data.splice(data.length-1-i,1); localStorage.setItem("data",JSON.stringify(data)); load();};
+    const del = document.createElement("button"); del.textContent="Eliminar"; del.className="delete-btn";
+    del.onclick = (e)=>{ e.stopPropagation(); const data=JSON.parse(localStorage.getItem("data")); data.splice(data.length-1-i,1); localStorage.setItem("data",JSON.stringify(data)); load(); };
 
-    card.appendChild(header); card.appendChild(content); card.appendChild(del); entriesDiv.appendChild(card);
+    card.appendChild(header); card.appendChild(content); card.appendChild(del);
+    entriesDiv.appendChild(card);
   }
 }
 
 // FILTRAR ENTRADAS
 function filterEntries(){
-  const input=document.getElementById("searchInput").value.toLowerCase();
-  const cards=document.querySelectorAll(".card");
+  const input = document.getElementById("searchInput").value.toLowerCase();
+  const cards = document.querySelectorAll(".card");
   cards.forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(input)?"":"none";});
 }
 
@@ -393,6 +414,8 @@ if(localStorage.getItem("salt")){
   document.getElementById("createBox").style.display="none";
   document.getElementById("loginBox").style.display="block";
 }
+
+// INIT TIMER
 resetTimer();
 </script>
 </body>
