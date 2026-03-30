@@ -23,28 +23,29 @@ body {
   align-items:center;
   background:rgba(30,27,46,0.95);
   z-index:9999;
+  padding:15px;
+  box-sizing:border-box;
 }
 
 .login-box {
   background:white;
   color:black;
-  padding:35px 25px;
-  border-radius:25px;
-  max-width:320px;
-  width:90%;
+  padding:30px 25px;
+  border-radius:20px;
+  max-width:360px;
+  width:100%;
   text-align:center;
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
-  animation:fadeIn 0.4s;
   display:flex;
   flex-direction:column;
   gap:12px;
-  box-sizing:border-box;
+  animation:fadeIn 0.4s;
 }
 .login-box h2 {
   margin-bottom:20px;
   color:#1e1b2e;
-  font-size:22px;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  font-size:24px;
+  text-shadow:1px 1px 3px rgba(0,0,0,0.2);
 }
 .login-box input {
   width:100%;
@@ -103,9 +104,10 @@ header {
   margin:15px;
   padding:15px;
   border-radius:12px;
-  background:rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.15);
   font-style:italic;
   text-align:center;
+  word-break:break-word;
 }
 
 /* ===== GUIDE ===== */
@@ -128,6 +130,7 @@ textarea,input {
   border-radius:14px;
   border:none;
   font-size:16px;
+  box-sizing:border-box;
 }
 button.save {
   background:#10b981;
@@ -148,7 +151,8 @@ button.save:hover {background:#059669;}
   margin:15px;
 }
 #searchInput {
-  width:90%;
+  width:95%;
+  max-width:500px;
   padding:12px;
   border-radius:14px;
   border:none;
@@ -168,26 +172,29 @@ button.save:hover {background:#059669;}
   opacity:0;
   pointer-events:none;
   transition:0.5s;
+  font-weight:bold;
 }
 
 /* ===== CARDS ===== */
 .card {
-  background: linear-gradient(145deg,#3b1f5f,#1e1b2e);
+  background: rgba(255,255,255,0.15);
   margin:12px 15px;
-  border-radius:22px;
+  border-radius:20px;
   padding:18px;
   cursor:pointer;
   transition:0.3s;
   overflow:hidden;
-  box-shadow:0 6px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px);
 }
-.card:hover {transform:scale(1.03);}
+.card:hover {transform:scale(1.02);}
 .card-header {
   display:flex;
   justify-content:space-between;
   align-items:center;
+  flex-wrap:wrap;
 }
-.card-header h4 {margin:0; font-size:16px;}
+.card-header h4 {margin:0; font-size:16px; word-break:break-word;}
 .card-header button {
   background:#3b82f6;
   border:none;
@@ -196,6 +203,7 @@ button.save:hover {background:#059669;}
   border-radius:12px;
   cursor:pointer;
   font-size:14px;
+  margin-top:5px;
 }
 .card-content {
   margin-top:10px;
@@ -216,7 +224,12 @@ button.save:hover {background:#059669;}
   font-size:14px;
 }
 
-/* ===== ANIMACIÓN ===== */
+/* ===== RESPONSIVE ===== */
+@media(max-width:480px){
+  .card-header {flex-direction:column; align-items:flex-start;}
+  .card-header button {align-self:flex-end;}
+  .login-box {padding:25px 20px;}
+}
 @keyframes fadeIn {
   from {opacity:0; transform:scale(0.9);}
   to {opacity:1; transform:scale(1);}
@@ -276,82 +289,72 @@ button.save:hover {background:#059669;}
 <div class="toast" id="toast">✅ Guardado con éxito</div>
 
 <script>
+// ===== VARIABLES Y SEGURIDAD =====
 let key,salt,timer;
 const TIMEOUT=5*60*1000;
-const verses=[
-  "Dios es amor (1 Jn 4,8)",
-  "El Señor es mi pastor (Sal 23)",
-  "Todo lo puedo en Él (Fil 4,13)",
-  "Confía en el Señor (Prov 3,5)"
-];
+const verses=["Dios es amor (1 Jn 4,8)","El Señor es mi pastor (Sal 23)","Todo lo puedo en Él (Fil 4,13)","Confía en el Señor (Prov 3,5)"];
 document.getElementById("verse").textContent=verses[Math.floor(Math.random()*verses.length)];
 
-// AUTO LOCK
+// ===== AUTO LOCK =====
 function resetTimer(){clearTimeout(timer);timer=setTimeout(lock,TIMEOUT);}
 document.onclick=resetTimer; document.onkeypress=resetTimer;
-
-// BLOQUEAR
 function lock(){
   document.getElementById("login").style.display="flex";
   document.getElementById("entries").innerHTML="";
   ["reflexion","accion","relacion","proposito"].forEach(id=>document.getElementById(id).value="");
 }
 
-// CIFRADO AES-GCM + PBKDF2
+// ===== CIFRADO AES-GCM + PBKDF2 =====
 async function getKey(password,saltBytes){
   const enc = new TextEncoder();
   const base = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
   return crypto.subtle.deriveKey({name:"PBKDF2", salt:saltBytes, iterations:150000, hash:"SHA-256"}, base, {name:"AES-GCM", length:256}, false, ["encrypt","decrypt"]);
 }
-
 async function encrypt(data){
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const enc = new TextEncoder();
   const cipher = await crypto.subtle.encrypt({name:"AES-GCM", iv}, key, enc.encode(JSON.stringify(data)));
   return {iv:Array.from(iv), data:Array.from(new Uint8Array(cipher))};
 }
-
 async function decrypt(obj){
   const dec = new TextDecoder();
   const plain = await crypto.subtle.decrypt({name:"AES-GCM", iv:new Uint8Array(obj.iv)}, key, new Uint8Array(obj.data));
   return JSON.parse(dec.decode(plain));
 }
 
-// CREAR CONTRASEÑA
+// ===== CREAR CONTRASEÑA =====
 async function createPassword(){
-  const pass = document.getElementById("newPass").value;
-  const conf = document.getElementById("confirmPass").value;
-  if(pass.length < 6) return alert("Usa mínimo 6 caracteres");
-  if(pass !== conf) return alert("Las contraseñas no coinciden");
-
-  salt = crypto.getRandomValues(new Uint8Array(16));
-  key = await getKey(pass, salt);
-
-  const check = await encrypt("ok");
-  localStorage.setItem("salt", JSON.stringify(Array.from(salt)));
-  localStorage.setItem("check", JSON.stringify(check));
-
-  document.getElementById("newPass").value = document.getElementById("confirmPass").value = "";
-  document.getElementById("createBox").style.display = "none";
-  document.getElementById("loginBox").style.display = "block";
+  const pass=document.getElementById("newPass").value;
+  const conf=document.getElementById("confirmPass").value;
+  if(pass.length<6) return alert("Usa mínimo 6 caracteres");
+  if(pass!==conf) return alert("Las contraseñas no coinciden");
+  salt=crypto.getRandomValues(new Uint8Array(16));
+  key=await getKey(pass,salt);
+  const check=await encrypt("ok");
+  localStorage.setItem("salt",JSON.stringify(Array.from(salt)));
+  localStorage.setItem("check",JSON.stringify(check));
+  document.getElementById("newPass").value=document.getElementById("confirmPass").value="";
+  document.getElementById("createBox").style.display="none";
+  document.getElementById("loginBox").style.display="block";
 }
 
-// LOGIN
+// ===== LOGIN =====
 async function unlock(){
-  const pass = document.getElementById("password").value;
-  const saltStored = new Uint8Array(JSON.parse(localStorage.getItem("salt")));
-  key = await getKey(pass, saltStored);
-  try {
-    const check = JSON.parse(localStorage.getItem("check"));
+  const pass=document.getElementById("password").value;
+  const saltStored=new Uint8Array(JSON.parse(localStorage.getItem("salt")));
+  key=await getKey(pass,saltStored);
+  try{
+    const check=JSON.parse(localStorage.getItem("check"));
     await decrypt(check);
-    document.getElementById("login").style.display = "none";
-    document.getElementById("password").value = "";
-  } catch {
+    document.getElementById("login").style.display="none";
+    document.getElementById("password").value="";
+    load();
+  }catch{
     alert("Contraseña incorrecta");
   }
 }
 
-// GUARDAR ENTRADA
+// ===== GUARDAR ENTRADA =====
 async function save(){
   const entry={
     date:new Date().toLocaleDateString()+" "+new Date().toLocaleTimeString(),
@@ -360,8 +363,8 @@ async function save(){
     relacion:document.getElementById("relacion").value,
     proposito:document.getElementById("proposito").value
   };
-  const enc = await encrypt(entry);
-  const arr = JSON.parse(localStorage.getItem("data")||"[]");
+  const enc=await encrypt(entry);
+  const arr=JSON.parse(localStorage.getItem("data")||"[]");
   arr.push(enc);
   localStorage.setItem("data",JSON.stringify(arr));
   ["reflexion","accion","relacion","proposito"].forEach(id=>document.getElementById(id).value="");
@@ -369,53 +372,46 @@ async function save(){
   load();
 }
 
-// CARGAR ENTRADAS
+// ===== CARGAR ENTRADAS =====
 async function load(){
-  const entriesDiv = document.getElementById("entries");
-  entriesDiv.innerHTML = "";
-  const arr = JSON.parse(localStorage.getItem("data")||"[]").reverse();
+  const entriesDiv=document.getElementById("entries");
+  entriesDiv.innerHTML="";
+  const arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
   for(let i=0;i<arr.length;i++){
-    const d = await decrypt(arr[i]);
-    const card = document.createElement("div"); card.className="card";
-
-    const header = document.createElement("div"); header.className="card-header";
-    const title = document.createElement("h4"); title.textContent=d.date;
-    const toggleBtn = document.createElement("button"); toggleBtn.textContent="Ver/Ocultar";
-    toggleBtn.onclick = (e)=>{ e.stopPropagation(); card.classList.toggle("open"); };
+    const d=await decrypt(arr[i]);
+    const card=document.createElement("div"); card.className="card";
+    const header=document.createElement("div"); header.className="card-header";
+    const title=document.createElement("h4"); title.textContent=d.date;
+    const toggleBtn=document.createElement("button"); toggleBtn.textContent="Ver/Ocultar";
+    toggleBtn.onclick=(e)=>{ e.stopPropagation(); card.classList.toggle("open"); };
     header.appendChild(title); header.appendChild(toggleBtn);
-
-    const content = document.createElement("div"); content.className="card-content";
+    const content=document.createElement("div"); content.className="card-content";
     content.textContent="📖 "+d.reflexion+"\n\n❤️ "+d.accion+"\n🙏 "+d.relacion+"\n🌱 "+d.proposito;
-
-    const del = document.createElement("button"); del.textContent="Eliminar"; del.className="delete-btn";
-    del.onclick = (e)=>{ e.stopPropagation(); const data=JSON.parse(localStorage.getItem("data")); data.splice(data.length-1-i,1); localStorage.setItem("data",JSON.stringify(data)); load(); };
-
+    const del=document.createElement("button"); del.textContent="Eliminar"; del.className="delete-btn";
+    del.onclick=(e)=>{ e.stopPropagation(); const data=JSON.parse(localStorage.getItem("data")); data.splice(data.length-1-i,1); localStorage.setItem("data",JSON.stringify(data)); load(); };
     card.appendChild(header); card.appendChild(content); card.appendChild(del);
     entriesDiv.appendChild(card);
   }
 }
 
-// FILTRAR ENTRADAS
+// ===== FILTRAR ENTRADAS =====
 function filterEntries(){
-  const input = document.getElementById("searchInput").value.toLowerCase();
-  const cards = document.querySelectorAll(".card");
-  cards.forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(input)?"":"none";});
+  const input=document.getElementById("searchInput").value.toLowerCase();
+  document.querySelectorAll(".card").forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(input)?"":"none";});
 }
 
-// TOAST
+// ===== TOAST =====
 function showToast(){
   const t=document.getElementById("toast");
   t.style.opacity=1;
   setTimeout(()=>t.style.opacity=0,2000);
 }
 
-// INIT
+// ===== INIT =====
 if(localStorage.getItem("salt")){
   document.getElementById("createBox").style.display="none";
   document.getElementById("loginBox").style.display="block";
 }
-
-// INIT TIMER
 resetTimer();
 </script>
 </body>
