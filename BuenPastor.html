@@ -310,7 +310,7 @@ document.querySelectorAll('.share a').forEach(btn=>{
     const imgData = canvas.toDataURL('image/png');
     const title = card.querySelector('h2') ? card.querySelector('h2').innerText : '';
     const text = card.querySelector('p') ? card.querySelector('p').innerText : '';
-    const message = encodeURIComponent(`${title}\n${text}\n\nwww.buenpastorejemplo.es`);
+    const message = encodeURIComponent(`${title}\n${text}\n\nhttps://palabradelpadre.github.io`);
 
     if(btn.classList.contains('whatsapp')){
       window.open(`https://api.whatsapp.com/send?text=${message}`);
