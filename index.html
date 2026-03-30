@@ -19,14 +19,15 @@
 
 
     .card-glass {
-      backdrop-filter: blur(12px);
-      background-color: rgba(255, 255, 255, 0.18);
-      border-radius: 1rem;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      padding: 1.5rem;
-      transition: all 0.3s;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-    }
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.07); /* 🔥 ajusta aquí la transparencia */
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
     .card-glass:hover { transform: scale(1.03); }
     .share-btn { 
       width: 36px; height: 36px; 
@@ -259,7 +260,7 @@
         installPrompt.prompt();
         installPrompt.userChoice.then(choice => console.log('Resultado instalación:', choice.outcome));
       } else {
-        alert('El evento de instalación aún no está disponible.');
+        alert('Instalación aún no disponible.');
       }
     }, 
     className: 'install-btn' 
