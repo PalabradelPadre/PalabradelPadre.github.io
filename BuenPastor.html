@@ -8,69 +8,78 @@
 <!-- TailwindCSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 
-<!-- SwiperJS -->
+<!-- SwiperJS clásico -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
 <style>
   body {
-    background: linear-gradient(135deg, #fef3c7, #d9f99d);
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #fff7ed, #fef3c7);
     min-height: 100vh;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Inter', sans-serif;
+  }
+
+  .swiper {
+    width: 100%;
+    max-width: 420px;
+    height: 90vh;
+    padding: 1rem 0;
+  }
+
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .card {
+    background: #fff8e7;
     border-radius: 2rem;
-    overflow: hidden;
-    position: relative;
-    text-align: center;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    text-align: left;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.25);
     transition: transform 0.5s ease, box-shadow 0.5s ease;
-    perspective: 1000px;
-  }
-
-  .card-inner {
-    border-radius: 2rem;
-    background: white;
-    padding: 1.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    transform-style: preserve-3d;
+    position: relative;
   }
 
-  .card:hover .card-inner {
-    transform: rotateX(5deg) rotateY(5deg) scale(1.03);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  .card:hover {
+    transform: rotateX(5deg) rotateY(5deg) scale(1.05);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.3);
   }
 
-  .card img {
-    width: 150px;
-    height: 150px;
+  .card-logo {
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
 
   .card h2 {
-    font-size: 1.6rem;
+    font-size: 1.7rem;
     font-weight: 700;
-    color: #111827;
-    margin-bottom: 0.5rem;
+    color: #b45309;
+    margin-top: 3rem;
+    margin-bottom: 0.7rem;
+    text-align: center;
   }
 
   .card p {
     font-size: 1rem;
-    color: #374151;
+    color: #5c4033;
     margin-bottom: 1rem;
+    text-align: center;
   }
 
   .share a {
@@ -84,6 +93,7 @@
     color: white;
     text-decoration: none;
     transition: background 0.3s;
+    font-size: 0.9rem;
   }
 
   .whatsapp { background-color: #25D366; }
@@ -92,88 +102,94 @@
   .facebook { background-color: #1877F2; }
   .facebook:hover { background-color: #145dbf; }
 
-  /* Logo fijo */
-  .logo {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    z-index: 50;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  /* Card final especial */
+  .card-final {
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    color: #92400e;
+    text-align: center;
+    padding: 2rem;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.2);
   }
+
+  .card-final h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .card-final p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-final a {
+    background-color: #f59e0b;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.3s;
+  }
+
+  .card-final a:hover {
+    background-color: #d97706;
+  }
+
 </style>
 </head>
 <body>
 
-<!-- Logo -->
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Jesus_Christ_logo.svg/1200px-Jesus_Christ_logo.svg.png" class="logo" alt="Logo">
+<div class="swiper">
+  <div class="swiper-wrapper">
 
-<!-- Carrusel -->
-<main class="w-full max-w-sm h-[90vh] p-4">
-  <swiper-container direction="vertical" loop="true" mousewheel="true" grab-cursor="true" slides-per-view="auto" class="h-full">
-    <template class="swiper-slide">
+    <!-- Card 1 -->
+    <div class="swiper-slide">
       <div class="card">
-        <div class="card-inner">
-          <img src="" alt="">
-          <h2></h2>
-          <p></p>
-          <div class="share flex gap-3 w-full justify-center">
-            <a href="#" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-            <a href="#" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
-          </div>
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy el pan de vida</h2>
+        <p>Jesús dijo: «Yo soy el pan de vida; el que venga a mí no tendrá hambre, y el que cree en mí no tendrá sed jamás.» - Juan 6,35</p>
+        <div class="share flex gap-3 w-full justify-center">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20el%20pan%20de%20vida%20-%20Juan%206:35" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
         </div>
       </div>
-    </template>
-  </swiper-container>
-</main>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="swiper-slide">
+      <div class="card">
+        <img src="https://images.pexels.com/photos/1068536/pexels-photo-1068536.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=60" class="card-logo" alt="Logo Jesús">
+        <h2>Yo soy la luz del mundo</h2>
+        <p>Jesús dijo: «Yo soy la luz del mundo; el que me sigue no caminará en tinieblas, sino que tendrá la luz de la vida.» - Juan 8,12</p>
+        <div class="share flex gap-3 w-full justify-center">
+          <a href="https://api.whatsapp.com/send?text=Yo%20soy%20la%20luz%20del%20mundo%20-%20Juan%208:12" target="_blank" class="whatsapp"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=https://example.com" target="_blank" class="facebook"><i class="bi bi-facebook"></i> Facebook</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card final de colaboración -->
+    <div class="swiper-slide">
+      <div class="card card-final">
+        <h2>Próximamente</h2>
+        <p>Estamos preparando más contenido espiritual y queremos que formes parte. Ayúdanos a crear esta sección apoyando nuestro proyecto.</p>
+        <a href="https://www.paypal.com/donate?hosted_button_id=XXXXXX" target="_blank">Colabora Aquí</a>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script>
-  const messages = [
-    {
-      title: "Yo soy el pan de vida",
-      text: "Jesús les dijo: «Yo soy el pan de vida; el que venga a mí no tendrá hambre, y el que cree en mí no tendrá sed jamás.» - Juan 6,35",
-      img: "https://images.pexels.com/photos/1447179/pexels-photo-1447179.jpeg",
-      whatsapp: "https://api.whatsapp.com/send?text=Yo%20soy%20el%20pan%20de%20vida%20-%20Juan%206:35",
-      facebook: "https://www.facebook.com/sharer/sharer.php?u=https://example.com"
-    },
-    {
-      title: "Yo soy la luz del mundo",
-      text: "Jesús dijo: «Yo soy la luz del mundo; el que me sigue no caminará en tinieblas, sino que tendrá la luz de la vida.» - Juan 8,12",
-      img: "https://images.pexels.com/photos/2475994/pexels-photo-2475994.jpeg",
-      whatsapp: "https://api.whatsapp.com/send?text=Yo%20soy%20la%20luz%20del%20mundo%20-%20Juan%208:12",
-      facebook: "https://www.facebook.com/sharer/sharer.php?u=https://example.com"
-    },
-    {
-      title: "Yo soy el buen pastor",
-      text: "Jesús dijo: «Yo soy el buen pastor. El buen pastor da la vida por sus ovejas.» - Juan 10,11",
-      img: "https://images.pexels.com/photos/691525/pexels-photo-691525.jpeg",
-      whatsapp: "https://api.whatsapp.com/send?text=Yo%20soy%20el%20buen%20pastor%20-%20Juan%2010:11",
-      facebook: "https://www.facebook.com/sharer/sharer.php?u=https://example.com"
-    },
-    {
-      title: "Yo soy la resurrección y la vida",
-      text: "Jesús dijo: «Yo soy la resurrección y la vida; el que cree en mí, aunque muera, vivirá.» - Juan 11,25",
-      img: "https://images.pexels.com/photos/2825618/pexels-photo-2825618.jpeg",
-      whatsapp: "https://api.whatsapp.com/send?text=Yo%20soy%20la%20resurrección%20y%20la%20vida%20-%20Juan%2011:25",
-      facebook: "https://www.facebook.com/sharer/sharer.php?u=https://example.com"
-    }
-  ];
-
-  const swiperContainer = document.querySelector("swiper-container");
-  const template = document.querySelector("template");
-
-  messages.forEach(msg => {
-    const clone = template.content.cloneNode(true);
-    const card = clone.querySelector(".card");
-    card.querySelector("img").src = msg.img;
-    card.querySelector("img").alt = msg.title;
-    card.querySelector("h2").textContent = msg.title;
-    card.querySelector("p").textContent = msg.text;
-    card.querySelectorAll("a")[0].href = msg.whatsapp;
-    card.querySelectorAll("a")[1].href = msg.facebook;
-    swiperContainer.appendChild(clone);
+  const swiper = new Swiper('.swiper', {
+    direction: 'vertical',
+    loop: false,
+    mousewheel: true,
+    grabCursor: true,
+    slidesPerView: 'auto',
+    spaceBetween: 25
   });
 </script>
 
