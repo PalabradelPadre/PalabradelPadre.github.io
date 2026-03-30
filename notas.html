@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Diario Espiritual</title>
+<style>
+/* --- General --- */
+body {
+  margin:0;
+  font-family:'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1e1b2e, #3b1f5f);
+  color:white;
+}
+header {
+  text-align:center;
+  padding:15px;
+  background: rgba(0,0,0,0.2);
+  position: sticky;
+  top:0;
+  z-index:100;
+}
+header h1 {
+  margin:0;
+  font-size:1.8em;
+}
+.lock-btn, .collab-btn {
+  padding:8px 15px;
+  border:none;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:0.9em;
+  margin:5px;
+}
+.lock-btn { background:#ef4444; color:white; }
+.collab-btn { background:#f59e0b; color:white; }
+
+/* --- Login --- */
+#login {
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: linear-gradient(#1e1b2e,#3b1f5f);
+  z-index:200;
+}
+.login-box {
+  background:white;
+  color:black;
+  padding:25px;
+  border-radius:15px;
+  max-width:320px;
+  width:90%;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+.login-box h2 { margin-bottom:15px; }
+.login-box input {
+  width:90%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+.login-box button {
+  width:95%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#3b82f6;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+.login-info {
+  font-size:13px;
+  margin-top:10px;
+  color:#555;
+  text-align:left;
+}
+
+/* --- Sections --- */
+.section {
+  margin:15px;
+  background: rgba(255,255,255,0.05);
+  border-radius:15px;
+  padding:15px;
+}
+.section h3 { margin-top:0; }
+
+/* --- Devocional --- */
+#devocional {
+  text-align:center;
+  font-style:italic;
+  padding:10px;
+}
+
+/* --- Formulario homilía --- */
+#formHomilia input, #formHomilia textarea {
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:10px;
+  border:none;
+  font-size:16px;
+}
+#formHomilia button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#10b981;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* --- Buscador --- */
+#search {
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+}
+
+/* --- Cards --- */
+.cards {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.card {
+  background: rgba(255,255,255,0.1);
+  margin:10px;
+  border-radius:15px;
+  width:280px;
+  transition:0.3s;
+  cursor:pointer;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.card h4 {
+  margin:10px;
+  font-size:1em;
+}
+.card p {
+  margin:10px;
+  font-size:0.95em;
+  display:none;
+  white-space:pre-line;
+}
+.card.open p { display:block; }
+.delete-btn {
+  background:#ef4444;
+  margin:10px;
+  border:none;
+  padding:8px;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+}
+
+/* --- Colaboración modal --- */
+#collabModal {
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.7);
+  z-index:300;
+}
+.modal-content {
+  background:white;
+  color:black;
+  padding:25px;
+  border-radius:15px;
+  max-width:350px;
+  width:90%;
+  text-align:center;
+}
+.modal-content button {
+  margin-top:15px;
+  padding:10px 15px;
+  border:none;
+  border-radius:12px;
+  background:#3b82f6;
+  color:white;
+  cursor:pointer;
+}
+
+/* --- Responsive --- */
+@media(max-width:600px){
+  .cards { flex-direction:column; align-items:center; }
+  .card { width:90%; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h2>🙏 Mi Diario Espiritual</h2>
+    <div id="createBox">
+      <input type="password" id="newPass" placeholder="Crea una contraseña">
+      <button onclick="createPassword()">Crear contraseña</button>
+    </div>
+    <div id="loginBox" style="display:none">
+      <input type="password" id="password" placeholder="Ingresa tu contraseña">
+      <button onclick="unlock()">Entrar</button>
+    </div>
+    <div class="login-info">
+      🔒 Este diario es privado y se guarda solo en tu dispositivo.<br>
+      ⚠️ Si olvidas tu contraseña, no se puede recuperar.<br>
+      *Los datos se almacenan en el navegador y se perderán si borras historial o cookies.
+    </div>
+  </div>
+</div>
+
+<header>
+  <h1>🙏 Mi Diario Espiritual</h1>
+  <button class="lock-btn" onclick="lock()">Cerrar sesión</button>
+  <button class="collab-btn" onclick="openCollab()">Colabora</button>
+</header>
+
+<!-- Devocional -->
+<div class="section" id="devocionalSection">
+  <h3>📖 Devocional del día</h3>
+  <div id="devocional"></div>
+</div>
+
+<!-- Formulario homilía -->
+<div class="section">
+  <h3>📝 Guardar Homilía</h3>
+  <form id="formHomilia" onsubmit="save();return false;">
+    <input id="titulo" placeholder="Título de la homilía">
+    <textarea id="texto" placeholder="Escribe tu nota o reflexión. Ej: 'Ama a tu prójimo como a ti mismo' (Mt 22,39)"></textarea>
+    <button type="submit">Guardar</button>
+  </form>
+</div>
+
+<!-- Buscador -->
+<div class="section">
+  <input type="text" id="search" placeholder="🔍 Buscar homilías por palabra clave o fecha">
+</div>
+
+<!-- Cards -->
+<div class="cards" id="entries"></div>
+
+<!-- Modal Colaboración -->
+<div id="collabModal">
+  <div class="modal-content">
+    <h3>🙏 Apoya este proyecto</h3>
+    <p>Si quieres ayudar a mantener y mejorar Mi Diario Espiritual, puedes colaborar económicamente. ¡Gracias por tu generosidad!</p>
+    <button onclick="closeCollab()">Cerrar</button>
+  </div>
+</div>
+
+<script>
+// Seguridad y cifrado
+let key, salt;
+const TIMEOUT=5*60*1000;
+let timer;
+
+// Devocionales
+const devocionales=[
+"Dios es amor (1 Jn 4,8)",
+"El Señor es mi pastor (Sal 23, Cat.)",
+"Todo lo puedo en Él (Flp 4,13, Cat.)",
+"Confía en el Señor (Prov 3,5, Cat.)"
+];
+document.getElementById('devocional').textContent = devocionales[Math.floor(Math.random()*devocionales.length)];
+
+// Auto lock
+function resetTimer(){
+  clearTimeout(timer);
+  timer=setTimeout(lock,TIMEOUT);
+}
+document.onclick=resetTimer;
+document.onkeypress=resetTimer;
+
+// Bloquear
+function lock(){
+  location.reload();
+}
+
+// Key derivation
+async function getKey(password,saltBytes){
+  const enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({
+    name:"PBKDF2",
+    salt:saltBytes,
+    iterations:150000,
+    hash:"SHA-256"
+  },base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+
+// Crear contraseña
+async function createPassword(){
+  const pass=document.getElementById('newPass').value;
+  if(pass.length<6){ alert("Usa mínimo 6 caracteres"); return;}
+  salt = crypto.getRandomValues(new Uint8Array(16));
+  key = await getKey(pass,salt);
+  const check = await encrypt("ok");
+  localStorage.setItem("salt",JSON.stringify(Array.from(salt)));
+  localStorage.setItem("check",JSON.stringify(check));
+  document.getElementById('createBox').style.display="none";
+  document.getElementById('loginBox').style.display="block";
+}
+
+// Login
+async function unlock(){
+  const pass=document.getElementById('password').value;
+  const saltStored=new Uint8Array(JSON.parse(localStorage.getItem("salt")));
+  key=await getKey(pass,saltStored);
+  try{
+    const check=JSON.parse(localStorage.getItem("check"));
+    await decrypt(check);
+    document.getElementById('login').style.display="none";
+    load();
+    resetTimer();
+  }catch{
+    alert("Contraseña incorrecta");
+  }
+}
+
+// Encrypt / Decrypt
+async function encrypt(data){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const enc=new TextEncoder();
+  const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(data)));
+  return {iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))};
+}
+async function decrypt(obj){
+  const dec=new TextDecoder();
+  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(obj.iv)},key,new Uint8Array(obj.data));
+  return JSON.parse(dec.decode(plain));
+}
+
+// Guardar homilía
+async function save(){
+  const entry={
+    date:new Date().toLocaleString(),
+    titulo:document.getElementById('titulo').value,
+    texto:document.getElementById('texto').value
+  };
+  const enc=await encrypt(entry);
+  const arr=JSON.parse(localStorage.getItem("data")||"[]");
+  arr.push(enc);
+  localStorage.setItem("data",JSON.stringify(arr));
+  document.getElementById('titulo').value='';
+  document.getElementById('texto').value='';
+  load();
+}
+
+// Cargar homilías
+async function load(){
+  const entriesDiv=document.getElementById('entries');
+  entriesDiv.innerHTML='';
+  let arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
+  const filtro=document.getElementById('search').value.toLowerCase();
+  for(let i=0;i<arr.length;i++){
+    const d=await decrypt(arr[i]);
+    if(filtro && !(d.texto.toLowerCase().includes(filtro) || d.titulo.toLowerCase().includes(filtro))) continue;
+    const card=document.createElement('div');
+    card.className='card';
+    const title=document.createElement('h4');
+    title.textContent=d.date + " - " + d.titulo;
+    const p=document.createElement('p');
+    p.textContent=d.texto;
+    const del=document.createElement('button');
+    del.className='delete-btn';
+    del.textContent='Eliminar';
+    del.onclick=(e)=>{
+      e.stopPropagation();
+      const data=JSON.parse(localStorage.getItem("data"));
+      data.splice(data.length-1-i,1);
+      localStorage.setItem("data",JSON.stringify(data));
+      load();
+    };
+    card.onclick=()=>card.classList.toggle('open');
+    card.appendChild(title);
+    card.appendChild(p);
+    card.appendChild(del);
+    entriesDiv.appendChild(card);
+  }
+}
+
+// Buscador
+document.getElementById('search').addEventListener('input',load);
+
+// Modal colaboración
+function openCollab(){ document.getElementById('collabModal').style.display='flex'; }
+function closeCollab(){ document.getElementById('collabModal').style.display='none'; }
+
+// Init
+if(localStorage.getItem("salt")){
+  document.getElementById('createBox').style.display='none';
+  document.getElementById('loginBox').style.display='block';
+}
+resetTimer();
+</script>
+</body>
+</html>
