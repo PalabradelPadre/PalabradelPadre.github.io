@@ -306,7 +306,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
         e('h3', { className: 'text-sm' }, highlightText(versiculo, search)),
         expanded && e('div', { className: 'mt-2' },
           e('p', null, highlightText(cita, search)),
-          e('p', null, highlightText(reflexion, search))
+          e('h2', null, highlightText(reflexion, search))
         ),
         e('div', { className: 'flex justify-between mt-2 items-center' },
           e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
