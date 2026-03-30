@@ -309,14 +309,7 @@ document.querySelector('.fab').addEventListener('click', async ()=>{
   },400);
 });
 
-document.querySelector('.verse-btn').addEventListener('click', async ()=>{
-  const verse = verses[Math.floor(Math.random()*verses.length)];
-  const template = templates[Math.floor(Math.random()*templates.length)];
-  editor.value = verse + "\n\n" + template + "\n" + editor.value;
-  saveCurrent();
-  await saveNotes();
-  showConfetti();
-});
+
 
 function renderNotes(filter=''){
   notesContainer.innerHTML='';
