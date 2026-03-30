@@ -311,7 +311,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
         e('div', { className: 'flex justify-between mt-2 items-center' },
           e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
           e('button', { onClick: () => shareCard('facebook'), className: 'share-btn' }, e('i', { className: 'bi bi-facebook text-blue-500' })),
-          e('button', { className: 'floating-btn diario-btn' }, e('i', { className: 'bi bi-journal-text' }), 'Mi Diario')
+          e('button', { className: 'floating-btn diario-btn' }, e('i', { className: 'bi bi-journal-text' }), '')
         )
       );
     }
@@ -426,7 +426,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
         // Evita duplicar el evento si ya se añadió
         if (!btn.dataset.miDiarioInit) {
           btn.addEventListener('click', () => {
-            window.location.href = '/MiDiarioEspiritual.html';
+            window.location.href = '/libreta.html';
           });
           btn.dataset.miDiarioInit = 'true';
         }
