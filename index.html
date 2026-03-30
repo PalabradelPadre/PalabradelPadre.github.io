@@ -345,7 +345,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
           categories.map((cat, i) => e('button', {
             key: i,
             onClick: () => { setCategory(cat.id); setOpen(false); },
-            className: `px-4 py-2 rounded flex items-center gap-2 ${cat.color}`
+            className: `px-4 py-2 rounded flex items-center gap-2 backdrop-blur-md ${cat.color} border border-white/30 shadow-md ${cat.color}`
           }, e('i', { className: `bi ${cat.icon}` }), cat.label))
         )
       );
