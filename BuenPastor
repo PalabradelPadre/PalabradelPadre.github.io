@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buen Pastor</title>
+<style>
+/* --- RESET --- */
+* {box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI', sans-serif;}
+
+/* --- BODY --- */
+body {
+  background: linear-gradient(#1e1b2e, #3b1f5f);
+  color: white;
+  min-height:100vh;
+}
+
+/* --- LOGIN --- */
+#login {
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(rgba(30,27,46,0.95), rgba(59,31,95,0.95));
+  z-index:100;
+}
+
+.login-box {
+  background:white;
+  color:black;
+  padding:30px 25px;
+  border-radius:15px;
+  max-width:360px;
+  width:90%;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.3);
+}
+
+.login-box h2 {
+  margin-bottom:15px;
+}
+
+.login-box input {
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+  text-align:center;
+}
+
+.login-box button {
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#3b82f6;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:5px;
+}
+
+.login-info {
+  font-size:13px;
+  margin-top:12px;
+  color:#555;
+  text-align:center;
+}
+
+/* --- HEADER --- */
+header {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  background:rgba(0,0,0,0.4);
+  backdrop-filter: blur(5px);
+}
+
+header h1 {
+  font-size:1.5rem;
+}
+
+.lock-btn {
+  background:#ef4444;
+  padding:8px 15px;
+  border-radius:20px;
+  border:none;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* --- VERSE --- */
+.verse {
+  margin:15px;
+  padding:15px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.1);
+  font-style:italic;
+  text-align:center;
+  font-size:1rem;
+}
+
+/* --- FORM --- */
+.container {
+  padding:15px;
+}
+
+textarea, input {
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  margin:5px 0;
+  font-size:16px;
+}
+
+button.save {
+  width:100%;
+  background:#10b981;
+  color:white;
+  font-size:16px;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  margin-top:5px;
+  cursor:pointer;
+}
+
+/* --- GUIDE --- */
+.guide {
+  text-align:center;
+  margin:10px;
+  opacity:0.8;
+}
+
+/* --- SEARCH --- */
+#searchBox {
+  margin:10px 15px;
+}
+
+#searchBox input {
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  font-size:16px;
+}
+
+/* --- CARDS --- */
+.cards-container {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+  padding:15px;
+}
+
+.card {
+  background:rgba(255,255,255,0.1);
+  padding:15px;
+  border-radius:15px;
+  transition:0.3s;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+}
+
+.card h4 {
+  margin-bottom:5px;
+}
+
+.card p {
+  display:none;
+  white-space:pre-line;
+  margin-top:5px;
+  font-size:0.95rem;
+}
+
+.card.open p {
+  display:block;
+}
+
+.card button {
+  background:#ef4444;
+  margin-top:10px;
+  padding:8px;
+  border:none;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+}
+
+/* --- MODAL --- */
+.modal {
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,0.7);
+  z-index:200;
+}
+
+.modal-content {
+  background:white;
+  color:black;
+  padding:25px;
+  border-radius:15px;
+  max-width:400px;
+  width:90%;
+  text-align:center;
+  position:relative;
+}
+
+.modal-content button.close {
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:#ef4444;
+  color:white;
+  border:none;
+  padding:5px 10px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+/* --- RESPONSIVE --- */
+@media(max-width:480px){
+  header h1 { font-size:1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-box">
+    <h2>🙏 Buen Pastor</h2>
+
+    <div id="createBox">
+      <input type="password" id="newPass" placeholder="Crea una contraseña (opcional)">
+      <button onclick="createPassword()">Crear contraseña</button>
+    </div>
+
+    <div id="loginBox" style="display:none">
+      <input type="password" id="password" placeholder="Ingresa tu contraseña">
+      <button onclick="unlock()">Entrar</button>
+    </div>
+
+    <div class="login-info">
+      🔒 Los datos se guardan solo en tu dispositivo.*<br>
+      ⚠️ Si olvidas la contraseña, no se puede recuperar.
+    </div>
+    <div style="font-size:11px; opacity:0.7; margin-top:5px;">*Si borras el historial del navegador, se perderán los datos.</div>
+  </div>
+</div>
+
+<header>
+  <h1>🙏 Buen Pastor</h1>
+  <button class="lock-btn" onclick="lock()">🔒 Cerrar sesión</button>
+</header>
+
+<div class="verse" id="verse"></div>
+
+<div class="guide">
+🙏 Antes de escribir, tómate un momento de silencio y oración.
+</div>
+
+<div class="container">
+<textarea id="reflexion" placeholder="📖 Reflexión: ¿Qué aprendiste de Dios hoy? Ej: “Amarás al Señor tu Dios con todo tu corazón” (Mt 22,37)"></textarea>
+<input id="accion" placeholder="❤️ Obra buena del día">
+<input id="relacion" placeholder="🙏 ¿Cómo fue tu relación con Dios hoy?">
+<input id="proposito" placeholder="🌱 Propósito para mañana">
+
+<button class="save" onclick="save()">Guardar</button>
+
+<p style="font-size:12px;opacity:0.7">
+🔐 No guardes información sensible como contraseñas o datos bancarios.
+</p>
+</div>
+
+<div id="searchBox">
+  <input type="text" id="searchInput" placeholder="Buscar reflexiones...">
+</div>
+
+<div class="cards-container" id="entries"></div>
+
+<!-- MODAL DE COLABORACION -->
+<div class="modal" id="collabModal">
+  <div class="modal-content">
+    <button class="close" onclick="closeModal()">X</button>
+    <h3>Compartir Amor</h3>
+    <p>“Dad, y se os dará; medida buena, apretada, remecida y rebosando darán en vuestro regazo.” (Lc 6,38)</p>
+    <p>Tu apoyo permite que este proyecto crezca y ayude a acercar más personas a Dios.</p>
+    <button onclick="window.open('https://www.paypal.com/donate','_blank')">Colaborar</button>
+  </div>
+</div>
+
+<script>
+// --- VARIABLES ---
+let key, salt, timer;
+const TIMEOUT = 5*60*1000;
+
+// --- VERSICULOS ---
+const verses = [
+"Dios es amor (1 Jn 4,8)",
+"El Señor es mi pastor (Sal 23,1-2)",
+"Todo lo puedo en Él (Flp 4,13)",
+"Confía en el Señor (Prov 3,5-6)"
+];
+const verse=document.getElementById("verse");
+verse.textContent = verses[Math.floor(Math.random()*verses.length)];
+
+// --- AUTO LOCK ---
+function resetTimer(){
+  clearTimeout(timer);
+  timer=setTimeout(lock, TIMEOUT);
+}
+document.onclick=resetTimer;
+document.onkeypress=resetTimer;
+
+// --- BLOQUEAR ---
+function lock(){
+  location.reload();
+}
+
+// --- CIFRADO ---
+async function getKey(password, saltBytes){
+  const enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({
+    name:"PBKDF2",
+    salt:saltBytes,
+    iterations:150000,
+    hash:"SHA-256"
+  },base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+
+async function encrypt(data){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const enc=new TextEncoder();
+  const cipher=await crypto.subtle.encrypt(
+    {name:"AES-GCM",iv},
+    key,
+    enc.encode(JSON.stringify(data))
+  );
+  return {iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))};
+}
+
+async function decrypt(obj){
+  const dec=new TextDecoder();
+  const plain=await crypto.subtle.decrypt(
+    {name:"AES-GCM",iv:new Uint8Array(obj.iv)},
+    key,
+    new Uint8Array(obj.data)
+  );
+  return JSON.parse(dec.decode(plain));
+}
+
+// --- CREAR CONTRASEÑA ---
+async function createPassword(){
+  const pass=newPass.value;
+  if(pass && pass.length<6) return alert("Usa mínimo 6 caracteres");
+
+  salt = crypto.getRandomValues(new Uint8Array(16));
+  key = pass ? await getKey(pass, salt) : null;
+
+  if(pass){
+    const check = await encrypt("ok");
+    localStorage.setItem("salt", JSON.stringify(Array.from(salt)));
+    localStorage.setItem("check", JSON.stringify(check));
+  }
+
+  createBox.style.display="none";
+  loginBox.style.display=pass?"block":"none";
+  login.style.display=pass?"block":"none";
+}
+
+// --- LOGIN ---
+async function unlock(){
+  const pass=password.value;
+  const saltStored = new Uint8Array(JSON.parse(localStorage.getItem("salt")));
+  key = await getKey(pass, saltStored);
+  try{
+    const check=JSON.parse(localStorage.getItem("check"));
+    await decrypt(check);
+    login.style.display="none";
+    load();
+    resetTimer();
+  }catch{
+    alert("Contraseña incorrecta");
+  }
+}
+
+// --- GUARDAR ---
+async function save(){
+  const entry={
+    date:new Date().toLocaleString(),
+    reflexion:reflexion.value,
+    accion:accion.value,
+    relacion:relacion.value,
+    proposito:proposito.value
+  };
+
+  if(!entry.reflexion && !entry.accion && !entry.relacion) return;
+
+  const enc=key ? await encrypt(entry) : entry;
+  const arr=JSON.parse(localStorage.getItem("data")||"[]");
+  arr.push(enc);
+  localStorage.setItem("data",JSON.stringify(arr));
+
+  reflexion.value=''; accion.value=''; relacion.value=''; proposito.value='';
+  load();
+}
+
+// --- CARGAR ---
+async function load(){
+  const container=document.getElementById("entries");
+  container.innerHTML="";
+  const arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
+  for(let i=0;i<arr.length;i++){
+    let d = arr[i];
+    if(key && d.iv) d = await decrypt(d);
+    const card=document.createElement("div");
+    card.className="card";
+
+    const title=document.createElement("h4");
+    title.textContent=d.date;
+
+    const p=document.createElement("p");
+    p.textContent = 
+      "📖 "+d.reflexion+"\n\n"+
+      "❤️ "+d.accion+"\n"+
+      "🙏 "+d.relacion+"\n"+
+      "🌱 "+d.proposito;
+
+    const del=document.createElement("button");
+    del.textContent="Eliminar";
+    del.onclick=(e)=>{
+      e.stopPropagation();
+      const data=JSON.parse(localStorage.getItem("data"));
+      data.splice(data.length-1-i,1);
+      localStorage.setItem("data",JSON.stringify(data));
+      load();
+    };
+
+    card.appendChild(title);
+    card.appendChild(p);
+    card.appendChild(del);
+    card.onclick=()=>card.classList.toggle("open");
+    container.appendChild(card);
+  }
+}
+
+// --- INIT ---
+if(localStorage.getItem("salt")){
+  createBox.style.display="none";
+  loginBox.style.display="block";
+}
+
+// --- INIT TIMER ---
+resetTimer();
+
+// --- SEARCH ---
+const searchInput=document.getElementById("searchInput");
+searchInput.oninput=function(){
+  const term=this.value.toLowerCase();
+  document.querySelectorAll(".card").forEach(c=>{
+    const text=c.textContent.toLowerCase();
+    c.style.display=text.includes(term)?"flex":"none";
+  });
+};
+
+// --- COLABORACION ---
+function openModal(){ document.getElementById("collabModal").style.display="flex"; }
+function closeModal(){ document.getElementById("collabModal").style.display="none"; }
+
+</script>
+
+</body>
+</html>
