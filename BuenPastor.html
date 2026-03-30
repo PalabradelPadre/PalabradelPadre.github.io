@@ -1,103 +1,92 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buen Pastor - Guía Espiritual</title>
-  <!-- Bootstrap CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <title>Buen Pastor - Fiesta de la Resurrección</title>
+
+  <!-- CDN de TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"></script>
+
   <style>
     body {
-      background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
-      font-family: Arial, sans-serif;
+      background-color: #ffffff;
+      font-family: 'Arial', sans-serif;
       margin: 0;
       padding: 0;
-    }
-
-    .carousel-container {
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-    }
-
-    .carousel-item {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.5s ease;
-      opacity: 0;
-      visibility: hidden;
-      padding: 20px;
-    }
-
-    .carousel-item.active {
-      opacity: 1;
-      visibility: visible;
+      color: #333;
     }
 
     .card {
-      background-color: rgba(255, 255, 255, 0.8);
+      background-color: rgba(255, 255, 255, 0.9);
       border-radius: 15px;
-      padding: 20px;
+      padding: 30px;
       text-align: center;
-      box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
-      width: 80%;
-      max-width: 600px;
-      margin: auto;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 350px;
+      margin: 20px auto;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
     .card:hover {
       transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
     }
 
     .card img {
-      width: 100%;
-      border-radius: 10px;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
       object-fit: cover;
-      max-height: 200px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
-    .share-buttons {
-      margin-top: 20px;
+    .card h3 {
+      font-size: 1.5rem;
+      color: #2d3748;
+      font-weight: bold;
+    }
+
+    .card p {
+      font-size: 1rem;
+      color: #4a5568;
+      margin-top: 10px;
     }
 
     .share-buttons a {
-      margin-right: 10px;
       color: #fff;
-      text-decoration: none;
-      font-size: 1.2rem;
+      font-size: 1.25rem;
+      margin-right: 12px;
     }
 
     .share-buttons a:hover {
       color: #ffcc00;
     }
 
-    .carousel-controls {
-      position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 20px;
-      z-index: 10;
+    /* Color scheme */
+    .card-yellow {
+      background-color: #f6e05e;
+    }
+
+    .card-light-blue {
+      background-color: #63b3ed;
+    }
+
+    .card-green {
+      background-color: #68d391;
+    }
+
+    .card-orange {
+      background-color: #fbd38d;
     }
 
     .carousel-controls button {
       background-color: transparent;
       border: none;
       font-size: 2rem;
-      color: white;
-      cursor: pointer;
+      color: #333;
       opacity: 0.7;
       transition: opacity 0.3s ease;
     }
@@ -105,43 +94,65 @@
     .carousel-controls button:hover {
       opacity: 1;
     }
+
   </style>
 </head>
-
 <body>
+
   <!-- Carousel Container -->
-  <div class="carousel-container">
-    <div id="carousel" class="carousel-item active">
-      <div class="card">
-        <img src="https://via.placeholder.com/600x300?text=Imagen+de+Ejemplo" alt="Cita Inspiradora">
-        <h3>“Yo soy el pan de vida” – Juan 6:35</h3>
-        <p>Jesús nos invita a alimentarnos de su presencia para obtener vida eterna. Él es el sustento para nuestra alma.</p>
-        <div class="share-buttons">
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank" class="share-facebook"><i class="fab fa-facebook"></i> Compartir en Facebook</a>
-          <a href="https://api.whatsapp.com/send?text=Yo soy el pan de vida - Juan 6:35 https://tu-sitio.com" target="_blank" class="share-whatsapp"><i class="fab fa-whatsapp"></i> Compartir en WhatsApp</a>
-        </div>
+  <div class="relative h-screen overflow-hidden flex items-center justify-center flex-col">
+
+    <!-- Primer Cita - "Yo soy el pan de vida" -->
+    <div class="card card-yellow">
+      <img src="https://images.pexels.com/photos/4575735/pexels-photo-4575735.jpeg" alt="Logo Resurrección">
+      <h3>“Yo soy el pan de vida” – Juan 6:35</h3>
+      <p class="mt-3">Jesús nos invita a alimentarnos de su presencia para obtener vida eterna. Él es el sustento para nuestra alma.</p>
+      <div class="share-buttons mt-6 flex justify-center gap-4">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank">
+          <i class="fab fa-facebook"></i> Compartir en Facebook
+        </a>
+        <a href="https://api.whatsapp.com/send?text=Yo soy el pan de vida - Juan 6:35 https://tu-sitio.com" target="_blank">
+          <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
+        </a>
       </div>
     </div>
 
-    <!-- Puedes agregar más items de "carousel" con las citas bíblicas de los "Yo Soy" de Jesús -->
-    <div id="carousel" class="carousel-item">
-      <div class="card">
-        <img src="https://via.placeholder.com/600x300?text=Imagen+de+Ejemplo" alt="Cita Inspiradora">
-        <h3>“Yo soy la luz del mundo” – Juan 8:12</h3>
-        <p>Con Jesús, vivimos en la luz y podemos encontrar la verdad que ilumina nuestro camino.</p>
-        <div class="share-buttons">
-          <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank" class="share-facebook"><i class="fab fa-facebook"></i> Compartir en Facebook</a>
-          <a href="https://api.whatsapp.com/send?text=Yo soy la luz del mundo - Juan 8:12 https://tu-sitio.com" target="_blank" class="share-whatsapp"><i class="fab fa-whatsapp"></i> Compartir en WhatsApp</a>
-        </div>
+    <!-- Segunda Cita - "Yo soy la luz del mundo" -->
+    <div class="card card-light-blue">
+      <img src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg" alt="Logo Resurrección">
+      <h3>“Yo soy la luz del mundo” – Juan 8:12</h3>
+      <p class="mt-3">Con Jesús, vivimos en la luz y podemos encontrar la verdad que ilumina nuestro camino.</p>
+      <div class="share-buttons mt-6 flex justify-center gap-4">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank">
+          <i class="fab fa-facebook"></i> Compartir en Facebook
+        </a>
+        <a href="https://api.whatsapp.com/send?text=Yo soy la luz del mundo - Juan 8:12 https://tu-sitio.com" target="_blank">
+          <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
+        </a>
       </div>
     </div>
 
-    <!-- Add more cards as needed -->
+    <!-- Tercer Cita - "Yo soy el buen pastor" -->
+    <div class="card card-green">
+      <img src="https://images.pexels.com/photos/1287157/pexels-photo-1287157.jpeg" alt="Logo Resurrección">
+      <h3>“Yo soy el buen pastor” – Juan 10:11</h3>
+      <p class="mt-3">Jesús cuida de nosotros como un buen pastor, guiándonos por caminos de paz y esperanza.</p>
+      <div class="share-buttons mt-6 flex justify-center gap-4">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tu-sitio.com" target="_blank">
+          <i class="fab fa-facebook"></i> Compartir en Facebook
+        </a>
+        <a href="https://api.whatsapp.com/send?text=Yo soy el buen pastor - Juan 10:11 https://tu-sitio.com" target="_blank">
+          <i class="fab fa-whatsapp"></i> Compartir en WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <!-- Más Cards (Agrega tantas como desees) -->
 
     <!-- Carousel Controls -->
-    <div class="carousel-controls">
-      <button id="prevBtn">&lt;</button>
-      <button id="nextBtn">&gt;</button>
+    <div class="carousel-controls absolute inset-0 flex justify-between items-center px-6 py-3 z-10">
+      <button id="prevBtn" class="text-3xl">&#10094;</button>
+      <button id="nextBtn" class="text-3xl">&#10095;</button>
     </div>
   </div>
 
@@ -149,29 +160,27 @@
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
     let currentIndex = 0;
-    const carouselItems = document.querySelectorAll('.carousel-item');
-    const totalItems = carouselItems.length;
+    const cards = document.querySelectorAll('.card');
+    const totalCards = cards.length;
 
-    // Function to show the next carousel item
+    // Función para mostrar el siguiente item
     const showNext = () => {
-      carouselItems[currentIndex].classList.remove('active');
-      currentIndex = (currentIndex + 1) % totalItems;
-      carouselItems[currentIndex].classList.add('active');
+      cards[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex + 1) % totalCards;
+      cards[currentIndex].classList.add('active');
     };
 
-    // Function to show the previous carousel item
+    // Función para mostrar el item anterior
     const showPrev = () => {
-      carouselItems[currentIndex].classList.remove('active');
-      currentIndex = (currentIndex - 1 + totalItems) % totalItems;
-      carouselItems[currentIndex].classList.add('active');
+      cards[currentIndex].classList.remove('active');
+      currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+      cards[currentIndex].classList.add('active');
     };
 
-    // Event listeners for buttons
+    // Eventos para los botones
     nextBtn.addEventListener('click', showNext);
     prevBtn.addEventListener('click', showPrev);
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
