@@ -496,7 +496,39 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 </script>
-  
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  if (document.getElementById('mi-boton-flotante')) return;
+
+  const btn = document.createElement('button');
+  btn.id = 'mi-boton-flotante';
+  btn.innerHTML = '💬 Ayuda';
+
+  Object.assign(btn.style, {
+    position: 'fixed',
+    bottom: '80px',
+    right: '20px',
+    padding: '12px 16px',
+    borderRadius: '999px',
+    background: '#25D366',
+    color: '#fff',
+    border: 'none',
+    fontWeight: 'bold',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+    cursor: 'pointer',
+    zIndex: '9999'
+  });
+
+  btn.onclick = () => {
+    window.open('https://wa.me/5210000000000', '_blank');
+  };
+
+  document.body.appendChild(btn);
+
+});
+</script>
   
 </body>
 </html>
