@@ -3,53 +3,62 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Diario Espiritual</title>
+<title>Diario Espiritual - App Móvil</title>
 <style>
-/* GENERAL */
+/* ===== GENERAL ===== */
 body {
   margin:0;
   font-family:'Segoe UI', sans-serif;
-  background:linear-gradient(135deg,#1e1b2e,#3b1f5f);
+  background: linear-gradient(135deg,#1e1b2e,#3b1f5f);
   color:white;
   overflow-x:hidden;
 }
 
-/* LOGIN */
+/* ===== LOGIN ===== */
 #login {
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:rgba(30,27,46,0.98);
+  background:rgba(30,27,46,0.95);
   z-index:9999;
 }
 
 .login-box {
   background:white;
   color:black;
-  padding:25px;
-  border-radius:15px;
+  padding:35px 25px;
+  border-radius:25px;
   max-width:320px;
+  width:90%;
   text-align:center;
   box-shadow:0 10px 30px rgba(0,0,0,0.3);
   animation:fadeIn 0.4s;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  box-sizing:border-box;
 }
-
-.login-box h2 {margin-bottom:15px; color:#1e1b2e;}
+.login-box h2 {
+  margin-bottom:20px;
+  color:#1e1b2e;
+  font-size:22px;
+}
 .login-box input {
   width:100%;
-  padding:12px;
-  margin:10px 0;
-  border-radius:10px;
+  padding:14px;
+  border-radius:12px;
   border:1px solid #ccc;
   font-size:16px;
+  text-align:center;
+  box-sizing:border-box;
 }
 .login-box button {
   width:100%;
-  padding:12px;
+  padding:14px;
   border:none;
-  border-radius:10px;
+  border-radius:14px;
   background:#3b82f6;
   color:white;
   font-size:16px;
@@ -57,9 +66,15 @@ body {
   transition:0.3s;
 }
 .login-box button:hover {background:#2563eb;}
-.login-info {font-size:13px; margin-top:10px; color:#555;}
+.login-info {
+  font-size:13px;
+  margin-top:10px;
+  color:#555;
+  text-align:center;
+  line-height:1.3;
+}
 
-/* HEADER */
+/* ===== HEADER ===== */
 header {
   text-align:center;
   padding:15px;
@@ -77,63 +92,64 @@ header {
   top:15px;
 }
 
-/* VERSE */
+/* ===== VERSE ===== */
 .verse {
   margin:15px;
   padding:15px;
   border-radius:12px;
-  background:rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.12);
   font-style:italic;
   text-align:center;
 }
 
-/* GUIDE */
+/* ===== GUIDE ===== */
 .guide {
   text-align:center;
   margin:10px;
   opacity:0.8;
 }
 
-/* FORM */
+/* ===== FORM ===== */
 .container {
   padding:15px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
 }
 textarea,input {
   width:100%;
-  padding:12px;
-  border-radius:12px;
+  padding:14px;
+  border-radius:14px;
   border:none;
-  margin:5px 0;
   font-size:16px;
 }
 button.save {
-  width:100%;
   background:#10b981;
   color:white;
   font-size:16px;
-  padding:12px;
+  padding:14px;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   cursor:pointer;
   margin-top:5px;
   transition:0.3s;
 }
 button.save:hover {background:#059669;}
 
-/* BUSCADOR */
+/* ===== BUSCADOR ===== */
 #searchContainer {
   text-align:center;
-  margin:10px 15px;
+  margin:15px;
 }
 #searchInput {
-  width:80%;
-  padding:10px;
-  border-radius:12px;
+  width:90%;
+  padding:12px;
+  border-radius:14px;
   border:none;
   font-size:16px;
 }
 
-/* TOAST */
+/* ===== TOAST ===== */
 .toast {
   position:fixed;
   bottom:20px;
@@ -141,25 +157,25 @@ button.save:hover {background:#059669;}
   transform:translateX(-50%);
   background:#10b981;
   color:white;
-  padding:12px 20px;
-  border-radius:12px;
+  padding:14px 22px;
+  border-radius:16px;
   opacity:0;
   pointer-events:none;
   transition:0.5s;
 }
 
-/* CARDS */
+/* ===== CARDS ===== */
 .card {
-  background:rgba(255,255,255,0.12);
-  margin:10px 15px;
-  border-radius:15px;
-  padding:15px;
+  background: linear-gradient(145deg,#3b1f5f,#1e1b2e);
+  margin:12px 15px;
+  border-radius:22px;
+  padding:18px;
   cursor:pointer;
   transition:0.3s;
   overflow:hidden;
-  box-shadow:0 5px 15px rgba(0,0,0,0.2);
+  box-shadow:0 6px 20px rgba(0,0,0,0.3);
 }
-.card:hover {transform:scale(1.02);}
+.card:hover {transform:scale(1.03);}
 .card-header {
   display:flex;
   justify-content:space-between;
@@ -170,8 +186,8 @@ button.save:hover {background:#059669;}
   background:#3b82f6;
   border:none;
   color:white;
-  padding:5px 10px;
-  border-radius:8px;
+  padding:6px 12px;
+  border-radius:12px;
   cursor:pointer;
   font-size:14px;
 }
@@ -182,8 +198,19 @@ button.save:hover {background:#059669;}
   opacity:0.9;
 }
 .card.open .card-content {display:block;}
+.delete-btn {
+  background:#ef4444;
+  border:none;
+  color:white;
+  padding:10px;
+  border-radius:14px;
+  cursor:pointer;
+  margin-top:12px;
+  width:100%;
+  font-size:14px;
+}
 
-/* ANIMACIÓN */
+/* ===== ANIMACIÓN ===== */
 @keyframes fadeIn {
   from {opacity:0; transform:scale(0.9);}
   to {opacity:1; transform:scale(1);}
@@ -209,8 +236,8 @@ button.save:hover {background:#059669;}
     </div>
 
     <div class="login-info">
-      🔒 Este diario es privado y se guarda solo en tu dispositivo.<br>
-      ⚠️ Si olvidas tu contraseña, no se puede recuperar.
+      🔒 Tus datos se guardan solo en este navegador.<br>
+      ⚠️ Si borras historial o datos del sitio, se perderá todo.
     </div>
   </div>
 </div>
@@ -226,8 +253,8 @@ button.save:hover {background:#059669;}
 <!-- FORMULARIO -->
 <div class="container">
   <textarea id="reflexion" placeholder="📖 ¿Qué aprendiste hoy de Dios? (Fil 4,13: Todo lo puedo en Cristo que me fortalece)"></textarea>
-  <input id="accion" placeholder="❤️ ¿Qué obra buena hiciste hoy? (Col 3,23: Todo lo que hagáis, hacedlo de corazón, como para el Señor)">
-  <input id="relacion" placeholder="🙏 ¿Cómo estuvo tu relación con Dios? (1 Jn 4,7: Queridos hijos, amémonos los unos a los otros, porque el amor es de Dios)">
+  <input id="accion" placeholder="❤️ ¿Qué obra buena hiciste hoy? (Col 3,23: Hazlo de corazón como para el Señor)">
+  <input id="relacion" placeholder="🙏 ¿Cómo estuvo tu relación con Dios? (1 Jn 4,7: Amémonos los unos a los otros)">
   <input id="proposito" placeholder="🌱 Propósito para mañana">
   <button class="save" onclick="save()">Guardar</button>
 </div>
@@ -237,75 +264,57 @@ button.save:hover {background:#059669;}
   <input type="text" id="searchInput" placeholder="🔍 Busca tus entradas..." onkeyup="filterEntries()">
 </div>
 
+<!-- ENTRIES -->
 <div id="entries"></div>
 <div class="toast" id="toast">✅ Guardado con éxito</div>
 
 <script>
-let key, salt, timer;
-const TIMEOUT = 5*60*1000;
-
-// Versículos
-const verses = [
-  "Dios es amor (1 Jn 4,8)",
-  "El Señor es mi pastor (Sal 23)",
-  "Todo lo puedo en Él (Fil 4,13)",
-  "Confía en el Señor (Prov 3,5)"
-];
-document.getElementById("verse").textContent = verses[Math.floor(Math.random()*verses.length)];
+let key,salt,timer;
+const TIMEOUT=5*60*1000;
+const verses=["Dios es amor (1 Jn 4,8)","El Señor es mi pastor (Sal 23)","Todo lo puedo en Él (Fil 4,13)","Confía en el Señor (Prov 3,5)"];
+document.getElementById("verse").textContent=verses[Math.floor(Math.random()*verses.length)];
 
 // AUTO LOCK
-function resetTimer(){
-  clearTimeout(timer);
-  timer=setTimeout(lock, TIMEOUT);
-}
-document.onclick=resetTimer;
-document.onkeypress=resetTimer;
+function resetTimer(){clearTimeout(timer);timer=setTimeout(lock,TIMEOUT);}
+document.onclick=resetTimer; document.onkeypress=resetTimer;
 
 // BLOQUEAR
 function lock(){
   document.getElementById("login").style.display="flex";
   document.getElementById("entries").innerHTML="";
-  document.getElementById("reflexion").value="";
-  document.getElementById("accion").value="";
-  document.getElementById("relacion").value="";
-  document.getElementById("proposito").value="";
+  ["reflexion","accion","relacion","proposito"].forEach(id=>document.getElementById(id).value="");
 }
 
 // CIFRADO
-async function getKey(password, saltBytes){
+async function getKey(password,saltBytes){
   const enc=new TextEncoder();
   const base=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
-  return crypto.subtle.deriveKey({
-    name:"PBKDF2",
-    salt:saltBytes,
-    iterations:150000,
-    hash:"SHA-256"
-  },base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt:saltBytes,iterations:150000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
 }
 async function encrypt(data){
   const iv=crypto.getRandomValues(new Uint8Array(12));
   const enc=new TextEncoder();
-  const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv}, key, enc.encode(JSON.stringify(data)));
-  return {iv:Array.from(iv), data:Array.from(new Uint8Array(cipher))};
+  const cipher=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,enc.encode(JSON.stringify(data)));
+  return {iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))};
 }
 async function decrypt(obj){
   const dec=new TextDecoder();
-  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(obj.iv)}, key, new Uint8Array(obj.data));
+  const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(obj.iv)},key,new Uint8Array(obj.data));
   return JSON.parse(dec.decode(plain));
 }
 
 // CREAR CONTRASEÑA
 async function createPassword(){
-  const pass = document.getElementById("newPass").value;
-  const conf = document.getElementById("confirmPass").value;
-  if(pass.length < 6) return alert("Usa mínimo 6 caracteres");
-  if(pass !== conf) return alert("Las contraseñas no coinciden");
-  salt = crypto.getRandomValues(new Uint8Array(16));
-  key = await getKey(pass, salt);
-  const check = await encrypt("ok");
-  localStorage.setItem("salt", JSON.stringify(Array.from(salt)));
-  localStorage.setItem("check", JSON.stringify(check));
-  document.getElementById("newPass").value = document.getElementById("confirmPass").value = "";
+  const pass=document.getElementById("newPass").value;
+  const conf=document.getElementById("confirmPass").value;
+  if(pass.length<6)return alert("Usa mínimo 6 caracteres");
+  if(pass!==conf)return alert("Las contraseñas no coinciden");
+  salt=crypto.getRandomValues(new Uint8Array(16));
+  key=await getKey(pass,salt);
+  const check=await encrypt("ok");
+  localStorage.setItem("salt",JSON.stringify(Array.from(salt)));
+  localStorage.setItem("check",JSON.stringify(check));
+  document.getElementById("newPass").value=document.getElementById("confirmPass").value="";
   document.getElementById("createBox").style.display="none";
   document.getElementById("loginBox").style.display="block";
 }
@@ -314,17 +323,14 @@ async function createPassword(){
 async function unlock(){
   const pass=document.getElementById("password").value;
   const saltStored=new Uint8Array(JSON.parse(localStorage.getItem("salt")));
-  key=await getKey(pass, saltStored);
+  key=await getKey(pass,saltStored);
   try{
     const check=JSON.parse(localStorage.getItem("check"));
     await decrypt(check);
     document.getElementById("login").style.display="none";
     document.getElementById("password").value="";
-    load();
-    resetTimer();
-  }catch{
-    alert("Contraseña incorrecta");
-  }
+    load(); resetTimer();
+  }catch{alert("Contraseña incorrecta");}
 }
 
 // GUARDAR ENTRADA
@@ -337,15 +343,10 @@ async function save(){
     proposito:document.getElementById("proposito").value
   };
   const enc=await encrypt(entry);
-  const arr=JSON.parse(localStorage.getItem("data")||"[]");
-  arr.push(enc);
+  const arr=JSON.parse(localStorage.getItem("data")||"[]"); arr.push(enc);
   localStorage.setItem("data",JSON.stringify(arr));
-  document.getElementById("reflexion").value="";
-  document.getElementById("accion").value="";
-  document.getElementById("relacion").value="";
-  document.getElementById("proposito").value="";
-  showToast();
-  load();
+  ["reflexion","accion","relacion","proposito"].forEach(id=>document.getElementById(id).value="");
+  showToast(); load();
 }
 
 // CARGAR ENTRADAS
@@ -355,45 +356,21 @@ async function load(){
   const arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
   for(let i=0;i<arr.length;i++){
     const d=await decrypt(arr[i]);
-    const card=document.createElement("div");
-    card.className="card";
+    const card=document.createElement("div"); card.className="card";
 
-    const header=document.createElement("div");
-    header.className="card-header";
-    const title=document.createElement("h4");
-    title.textContent=d.date;
-    const toggleBtn=document.createElement("button");
-    toggleBtn.textContent="Ver/ocultar";
-    toggleBtn.onclick=(e)=>{
-      e.stopPropagation();
-      card.classList.toggle("open");
-    };
-    header.appendChild(title);
-    header.appendChild(toggleBtn);
+    const header=document.createElement("div"); header.className="card-header";
+    const title=document.createElement("h4"); title.textContent=d.date;
+    const toggleBtn=document.createElement("button"); toggleBtn.textContent="Ver/Ocultar";
+    toggleBtn.onclick=(e)=>{e.stopPropagation(); card.classList.toggle("open");};
+    header.appendChild(title); header.appendChild(toggleBtn);
 
-    const content=document.createElement("div");
-    content.className="card-content";
-    content.textContent =
-      "📖 "+d.reflexion+"\n\n"+
-      "❤️ "+d.accion+"\n"+
-      "🙏 "+d.relacion+"\n"+
-      "🌱 "+d.proposito;
+    const content=document.createElement("div"); content.className="card-content";
+    content.textContent="📖 "+d.reflexion+"\n\n❤️ "+d.accion+"\n🙏 "+d.relacion+"\n🌱 "+d.proposito;
 
-    const del=document.createElement("button");
-    del.textContent="Eliminar";
-    del.className="delete-btn";
-    del.onclick=(e)=>{
-      e.stopPropagation();
-      const data=JSON.parse(localStorage.getItem("data"));
-      data.splice(data.length-1-i,1);
-      localStorage.setItem("data",JSON.stringify(data));
-      load();
-    };
+    const del=document.createElement("button"); del.textContent="Eliminar"; del.className="delete-btn";
+    del.onclick=(e)=>{e.stopPropagation(); const data=JSON.parse(localStorage.getItem("data")); data.splice(data.length-1-i,1); localStorage.setItem("data",JSON.stringify(data)); load();};
 
-    card.appendChild(header);
-    card.appendChild(content);
-    card.appendChild(del);
-    entriesDiv.appendChild(card);
+    card.appendChild(header); card.appendChild(content); card.appendChild(del); entriesDiv.appendChild(card);
   }
 }
 
@@ -401,9 +378,7 @@ async function load(){
 function filterEntries(){
   const input=document.getElementById("searchInput").value.toLowerCase();
   const cards=document.querySelectorAll(".card");
-  cards.forEach(c=>{
-    c.style.display = c.textContent.toLowerCase().includes(input) ? "" : "none";
-  });
+  cards.forEach(c=>{c.style.display=c.textContent.toLowerCase().includes(input)?"":"none";});
 }
 
 // TOAST
