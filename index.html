@@ -282,7 +282,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
   filteredCards.map((card, i) => e(Card, { key: i, ...card, search }))
 ),
         e('button', { className: 'evangelizar-btn', onClick: () => setShowModal(true) },
-          e('i', { className: 'bi bi-book-half' }), ' Únete'
+          e('i', { className: 'bi bi-person-fill-add' }), ' Únete'
         ),
         showModal && e(Modal, { onClose: () => setShowModal(false) }),
         e('footer', { className: `footer ${showFooter ? 'show' : ''}` },
