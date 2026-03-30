@@ -86,18 +86,31 @@ header {
   text-align:center;
   padding:15px;
   position:relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background: rgba(30,27,46,0.9);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border-bottom-left-radius:20px;
+  border-bottom-right-radius:20px;
+  flex-wrap:wrap;
+}
+header h2 {
+  margin:0;
+  font-size:22px;
+  color:#fff;
 }
 .lock-btn {
   background:#ef4444;
-  padding:8px 15px;
-  border-radius:20px;
+  padding:10px 18px;
+  border-radius:25px;
   border:none;
   color:white;
   cursor:pointer;
-  position:absolute;
-  right:15px;
-  top:15px;
+  font-size:16px;
+  transition:0.3s;
 }
+.lock-btn:hover {background:#dc2626;}
 
 /* ===== VERSE ===== */
 .verse {
@@ -224,16 +237,29 @@ button.save:hover {background:#059669;}
   font-size:14px;
 }
 
+/* ===== TUTORIAL CARD ===== */
+#tutorial {
+  background: rgba(59,31,95,0.9);
+  margin:15px;
+  padding:18px;
+  border-radius:20px;
+  box-shadow:0 8px 25px rgba(0,0,0,0.4);
+  animation:fadeInUp 0.8s ease forwards;
+  opacity:0;
+  transform:translateY(30px);
+}
+#tutorial.show {opacity:1; transform:translateY(0);}
+#tutorial h3 {margin-top:0; font-size:18px;}
+#tutorial p {margin:10px 0 0 0; line-height:1.4;}
+
 /* ===== RESPONSIVE ===== */
 @media(max-width:480px){
   .card-header {flex-direction:column; align-items:flex-start;}
   .card-header button {align-self:flex-end;}
   .login-box {padding:25px 20px;}
 }
-@keyframes fadeIn {
-  from {opacity:0; transform:scale(0.9);}
-  to {opacity:1; transform:scale(1);}
-}
+@keyframes fadeIn {from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);}}
+@keyframes fadeInUp {from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:translateY(0);}}
 </style>
 </head>
 <body>
@@ -244,7 +270,7 @@ button.save:hover {background:#059669;}
     <h2>🙏 Mi Diario Espiritual</h2>
 
     <div id="createBox">
-      <input type="password" id="newPass" placeholder="Crea tu contraseña"><br>
+      <input type="password" id="newPass" placeholder="Crea tu contraseña">
       <input type="password" id="confirmPass" placeholder="Confirma tu contraseña">
       <button onclick="createPassword()">Crear contraseña</button>
     </div>
@@ -263,8 +289,8 @@ button.save:hover {background:#059669;}
 </div>
 
 <header>
-  <h2> 📙 Mi Diario Espiritual</h2> <br>
-  <button class="lock-btn" onclick="lock()">🔒 Bloquear</button>
+  <h2>🙏 Mi Diario Espiritual</h2>
+  <button class="lock-btn" onclick="lock()">🔒 Cerrar sesión</button>
 </header>
 
 <div class="verse" id="verse"></div>
@@ -273,15 +299,22 @@ button.save:hover {background:#059669;}
 <!-- FORMULARIO -->
 <div class="container">
   <textarea id="reflexion" placeholder="📖 ¿Qué aprendiste hoy de Dios? (Fil 4,13: Todo lo puedo en Cristo que me fortalece)"></textarea>
-  <input id="accion" placeholder="❤️ ¿Qué obra buena hiciste hoy? (Col 3,23)">
-  <input id="relacion" placeholder="🙏 ¿Cómo estuvo tu relación con Dios? (1 Jn 4,7)">
-  <input id="proposito" placeholder="Propósito">
+  <input id="accion" placeholder="❤️ ¿Qué obra buena hiciste hoy? (Col 3,23: Hazlo de corazón como para el Señor)">
+  <input id="relacion" placeholder="🙏 ¿Cómo estuvo tu relación con Dios? (1 Jn 4,7: Amémonos los unos a los otros)">
+  <input id="proposito" placeholder="🌱 Propósito para mañana">
   <button class="save" onclick="save()">Guardar</button>
 </div>
 
 <!-- BUSCADOR -->
 <div id="searchContainer">
   <input type="text" id="searchInput" placeholder="🔍 Busca tus entradas..." onkeyup="filterEntries()">
+</div>
+
+<!-- TUTORIAL CARD -->
+<div id="tutorial">
+  <h3>📖 ¿Para qué sirve este Diario Espiritual?</h3>
+  <p>Este diario te ayuda a reflexionar sobre tu relación con Dios, registrar buenas acciones, y planificar tu crecimiento espiritual diario. Cada entrada se guarda <strong>solo en tu navegador</strong>, asegurando privacidad completa.</p>
+  <p>💡 Usa el buscador para encontrar tus reflexiones rápidamente.</p>
 </div>
 
 <!-- ENTRIES -->
@@ -349,6 +382,7 @@ async function unlock(){
     document.getElementById("login").style.display="none";
     document.getElementById("password").value="";
     load();
+    document.getElementById("tutorial").classList.add("show");
   }catch{
     alert("Contraseña incorrecta");
   }
