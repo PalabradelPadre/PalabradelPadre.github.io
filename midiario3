@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diario Espiritual</title>
+
+<style>
+body {
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(#1e1b2e,#3b1f5f);
+  color:white;
+}
+
+/* LOGIN */
+#login {
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:black;
+}
+.box {
+  background:white;
+  color:black;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+  width:280px;
+}
+input {
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+}
+
+/* HEADER */
+header { text-align:center; padding:10px; }
+
+/* FORM */
+.container { padding:15px; }
+textarea {
+  width:100%;
+  height:100px;
+}
+textarea, input, button {
+  border-radius:10px;
+  border:none;
+  padding:10px;
+}
+button { cursor:pointer; margin-top:5px; }
+
+.save { background:#10b981; color:white; }
+.logout { background:#ef4444; color:white; }
+
+/* CARD */
+.card {
+  background:rgba(255,255,255,0.1);
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.card p { display:none; }
+.card.open p { display:block; }
+
+/* VERSE */
+.verse {
+  margin:10px;
+  padding:10px;
+  background:rgba(255,255,255,0.1);
+  border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="login">
+  <div class="box">
+    <h3>🔒 Diario Espiritual</h3>
+
+    <div id="createBox" style="display:none">
+      <p>Crea tu contraseña</p>
+      <input type="password" id="newPass" placeholder="Nueva contraseña">
+      <button onclick="createPassword()">Guardar</button>
+    </div>
+
+    <div id="loginBox" style="display:none">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button onclick="unlock()">Entrar</button>
+    </div>
+
+    <p style="font-size:12px">
+      ⚠️ Si pierdes tu contraseña, no hay forma de recuperar datos.
+    </p>
+  </div>
+</div>
+
+<header>
+  <h2>🙏 Diario Espiritual</h2>
+  <button class="logout" onclick="logout()">Cerrar sesión</button>
+</header>
+
+<div class="verse" id="verse"></div>
+
+<div class="container">
+
+<textarea id="reflexion" placeholder="📖 Reflexión / aprendizaje del día"></textarea>
+<input id="accion" placeholder="❤️ Acción concreta (fe hecha obra)">
+<input id="relacion" placeholder="🙏 Relación con Dios">
+<input id="progreso" placeholder="📈 Progreso interior">
+<input id="proposito" placeholder="🌱 Propósito">
+
+<button class="save" onclick="save()">Guardar</button>
+
+<p style="font-size:12px;opacity:0.7">
+🔐 No guardes contraseñas, datos personales sensibles o información financiera.
+</p>
+
+</div>
+
+<div id="entries"></div>
+
+<script>
+let key;
+let timer;
+const TIMEOUT = 5 * 60 * 1000;
+
+// versículos
+const verses = [
+"Dios es amor (1 Jn 4,8)",
+"El Señor es mi pastor (Sal 23)",
+"Todo lo puedo en Él (Flp 4,13)",
+"Confía en Dios (Prov 3,5)"
+];
+verse.textContent = verses[Math.floor(Math.random()*verses.length)];
+
+// AUTO LOCK
+function resetTimer(){
+  clearTimeout(timer);
+  timer=setTimeout(()=>location.reload(), TIMEOUT);
+}
+document.onclick=resetTimer;
+document.onkeypress=resetTimer;
+
+// CLAVE
+async function getKey(password){
+  const enc=new TextEncoder();
+  const base=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);
+
+  return crypto.subtle.deriveKey({
+    name:"PBKDF2",
+    salt:enc.encode("diario_salt"),
+    iterations:120000,
+    hash:"SHA-256"
+  },base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);
+}
+
+// CREAR CONTRASEÑA
+async function createPassword(){
+  const pass=newPass.value;
+  key=await getKey(pass);
+
+  const test=await encrypt("ok");
+  localStorage.setItem("check",JSON.stringify(test));
+
+  loginBox.style.display="block";
+  createBox.style.display="none";
+}
+
+// LOGIN
+async function unlock(){
+  const pass=password.value;
+  key=await getKey(pass);
+
+  try{
+    const check=JSON.parse(localStorage.getItem("check"));
+    await decrypt(check);
+
+    login.style.display="none";
+    load();
+    resetTimer();
+  }catch{
+    alert("Contraseña incorrecta");
+  }
+}
+
+// CIFRAR
+async function encrypt(data){
+  const iv=crypto.getRandomValues(new Uint8Array(12));
+  const enc=new TextEncoder();
+
+  const cipher=await crypto.subtle.encrypt(
+    {name:"AES-GCM",iv},
+    key,
+    enc.encode(JSON.stringify(data))
+  );
+
+  return {iv:Array.from(iv),data:Array.from(new Uint8Array(cipher))};
+}
+
+// DESCIFRAR
+async function decrypt(obj){
+  const dec=new TextDecoder();
+
+  const plain=await crypto.subtle.decrypt(
+    {name:"AES-GCM",iv:new Uint8Array(obj.iv)},
+    key,
+    new Uint8Array(obj.data)
+  );
+
+  return JSON.parse(dec.decode(plain));
+}
+
+// SAVE
+async function save(){
+  const entry={
+    date:new Date().toLocaleString(),
+    reflexion:reflexion.value,
+    accion:accion.value,
+    relacion:relacion.value,
+    progreso:progreso.value,
+    proposito:proposito.value
+  };
+
+  const enc=await encrypt(entry);
+
+  const arr=JSON.parse(localStorage.getItem("data")||"[]");
+  arr.push(enc);
+  localStorage.setItem("data",JSON.stringify(arr));
+
+  load();
+}
+
+// LOAD
+async function load(){
+  entries.innerHTML="";
+  const arr=JSON.parse(localStorage.getItem("data")||"[]").reverse();
+
+  for(let i=0;i<arr.length;i++){
+    const d=await decrypt(arr[i]);
+
+    const div=document.createElement("div");
+    div.className="card";
+
+    div.innerHTML=`
+    <h4>${d.date}</h4>
+    <p>
+    📖 ${d.reflexion}<br>
+    ❤️ ${d.accion}<br>
+    🙏 ${d.relacion}<br>
+    📈 ${d.progreso}<br>
+    🌱 ${d.proposito}
+    </p>`;
+
+    div.onclick=()=>div.classList.toggle("open");
+
+    entries.appendChild(div);
+  }
+}
+
+// INIT
+if(localStorage.getItem("check")){
+  loginBox.style.display="block";
+}else{
+  createBox.style.display="block";
+}
+
+// LOGOUT
+function logout(){
+  location.reload();
+}
+</script>
+
+</body>
+</html>
