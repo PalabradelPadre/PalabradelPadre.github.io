@@ -1,7 +1,7 @@
 {
   "id": "./",
   "name": "Palabra del Padre",
-  "short_name": "Palabra Padre",
+  "short_name": "Palabra del Padre",
   "description": "Reflexiones y versículos bíblicos para cultivar tu amistad con Dios.",
   "start_url": "./index.html?source=pwa",
   "scope": "./",
