@@ -1,68 +1,133 @@
-const CACHE_NAME = 'palabra-del-padre-v10';
+// 🔥 Versión (cambiar cada vez que actualices)
+const CACHE_NAME = 'palabra-del-padre-v11';
+
+// 📦 Archivos esenciales para offline total
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './sw.js',
+
+  './cards.json', // 🔥 CRÍTICO (contenido espiritual)
+
   './Palabra192.png',
   './Palabra512.png',
   './Palabra360.png',
+
   './campana.mp3'
 ];
 
-// 🔧 Instalación
+// 🔧 INSTALACIÓN (precache)
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(urlsToCache))
+      .then(cache => {
+        console.log('📦 Cacheando archivos esenciales');
+        return cache.addAll(urlsToCache);
+      })
       .then(() => self.skipWaiting())
   );
 });
 
-// 🔄 Activación
+// 🔄 ACTIVACIÓN (limpieza de versiones viejas)
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys.filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => {
+            console.log('🧹 Eliminando cache viejo:', key);
+            return caches.delete(key);
+          })
       )
     ).then(() => self.clients.claim())
   );
 });
 
-// 🌐 Fetch - Network first
+// 🌐 FETCH (cache-first = verdadero offline)
 self.addEventListener('fetch', event => {
+
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    fetch(event.request)
-      .then(response => {
-        if (event.request.method === 'GET' && response && response.status === 200) {
+
+    caches.match(event.request).then(cachedResponse => {
+
+      // ✅ 1. Respuesta inmediata desde cache
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // 🌐 2. Si no está en cache → intentar red
+      return fetch(event.request)
+        .then(response => {
+
+          // ⚠️ validar respuesta
+          if (!response || response.status !== 200) {
+            return response;
+          }
+
           const resClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
-        }
-        return response;
-      })
-      .catch(() => caches.match(event.request))
+
+          // 💾 guardar en cache dinámico
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, resClone));
+
+          return response;
+        })
+        .catch(() => {
+
+          // 🔴 3. Fallback offline
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+
+        });
+
+    })
+
   );
 });
 
-// 🔔 Mostrar notificación enviada desde el script principal
+// 🔔 NOTIFICACIONES DESDE APP
 self.addEventListener('message', event => {
   const data = event.data;
+
   if (data && data.type === 'SHOW_NOTIFICATION') {
     const { title, body, icon, badge, tag } = data;
-    self.registration.showNotification(title, { body, icon, badge, tag, vibrate: [200,100,200] });
+
+    self.registration.showNotification(title, {
+      body,
+      icon,
+      badge,
+      tag: tag || 'palabra',
+      vibrate: [200, 100, 200],
+      data: {
+        url: './'
+      }
+    });
   }
 });
 
-// 🖱️ Acción al hacer click en la notificación
+// 🖱️ CLICK EN NOTIFICACIÓN
 self.addEventListener('notificationclick', event => {
+
   event.notification.close();
+
   event.waitUntil(
-    clients.matchAll({ type: 'window' }).then(clientsArr => {
-      const ventana = clientsArr.find(c => c.url.includes('./'));
-      if (ventana) return ventana.focus();
-      return clients.openWindow('./');
-    })
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(clientsArr => {
+
+        // 🔍 Buscar si ya hay una ventana abierta
+        for (const client of clientsArr) {
+          if (client.url.includes('./') && 'focus' in client) {
+            return client.focus();
+          }
+        }
+
+        // 🚀 Si no hay, abrir nueva
+        return clients.openWindow('./');
+      })
   );
 });
