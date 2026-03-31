@@ -1,4 +1,4 @@
-const CACHE_NAME = 'palabra-del-padre-v9';
+const CACHE_NAME = 'palabra-del-padre-v10';
 const urlsToCache = [
   './',
   './index.html',
@@ -10,7 +10,7 @@ const urlsToCache = [
   './campana.mp3'
 ];
 
-// Instalación
+// 🔧 Instalación
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,7 +19,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activación
+// 🔄 Activación
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -31,7 +31,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch - Network first
+// 🌐 Fetch - Network first
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request)
@@ -46,7 +46,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Mostrar notificación desde el script
+// 🔔 Mostrar notificación enviada desde el script principal
 self.addEventListener('message', event => {
   const data = event.data;
   if (data && data.type === 'SHOW_NOTIFICATION') {
@@ -55,7 +55,7 @@ self.addEventListener('message', event => {
   }
 });
 
-// Notificación al hacer click
+// 🖱️ Acción al hacer click en la notificación
 self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
