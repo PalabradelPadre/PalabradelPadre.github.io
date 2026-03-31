@@ -640,10 +640,11 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 🔔 Crear botón
+  // ✅ Crear botón de notificaciones
   const btn = document.createElement('button');
   btn.innerHTML = '🔔';
   Object.assign(btn.style, {
@@ -653,146 +654,158 @@ document.addEventListener('DOMContentLoaded', () => {
     width: '36px',
     height: '36px',
     borderRadius: '50%',
-    background: '#22c55e', // verde cuando activado
+    background: '#22c55e',
     color: '#fff',
     border: 'none',
-    fontSize: '16px',
+    fontSize: '18px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
     cursor: 'pointer',
-    zIndex: '9999'
+    zIndex: '9999',
+    transition: 'transform 0.2s'
   });
   document.body.appendChild(btn);
 
-  let cards = [];
-  let usados = JSON.parse(localStorage.getItem('cards_usados')) || [];
-  let contador = parseInt(localStorage.getItem('contador_versiculos')) || 0;
-  let swRegistration = null;
+  // Latido al activar
+  function latido() {
+    btn.style.transform = 'scale(1.3)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 300);
+  }
 
+  let cards = [];
+  let usados = [];
+  let swRegistration = null;
+  let horarios = [];
   const sonido = new Audio('/campana.mp3');
+
   function reproducirSonido() {
     sonido.currentTime = 0;
-    sonido.volume = 1;
     sonido.play().catch(() => {});
   }
 
+  // Cargar versículos
   fetch('cards.json')
     .then(res => res.json())
-    .then(data => cards = data.filter(c => c.categoria !== 'evangelio'));
+    .then(data => cards = data);
 
+  // Registrar Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => swRegistration = reg);
   }
 
+  // Mostrar notificación push
   function mostrarNotificacion(titulo, mensaje) {
     reproducirSonido();
-    const opciones = {
-      body: mensaje,
-      icon: '/Palabra360.png',
-      badge: '/Palabra360.png',
-      tag: 'palabra'
-    };
+    const opciones = { body: mensaje, icon: '/Palabra360.png', badge: '/Palabra360.png', tag: 'palabra' };
     if (swRegistration && swRegistration.active) {
-      swRegistration.active.postMessage({
-        type: 'SHOW_NOTIFICATION',
-        ...opciones,
-        title: titulo
-      });
+      swRegistration.active.postMessage({ type: 'SHOW_NOTIFICATION', ...opciones, title: titulo });
     } else {
       new Notification(titulo, opciones);
     }
   }
 
-  function enviarVersiculo() {
-    if (!cards.length) return;
-
+  // Elegir versículo aleatorio
+  function obtenerVersiculo() {
+    if (!cards.length) return null;
     if (usados.length === cards.length) usados = [];
-
     const disponibles = cards.filter((_, i) => !usados.includes(i));
     const index = Math.floor(Math.random() * disponibles.length);
     const card = disponibles[index];
-
     usados.push(cards.indexOf(card));
-    contador++;
-    localStorage.setItem('cards_usados', JSON.stringify(usados));
-    localStorage.setItem('contador_versiculos', contador);
-
-    mostrarNotificacion(
-      card.titulo || 'Palabra del Padre',
-      `${card.cita || ''}\n${card.versiculo || ''} (${contador}/${cards.length})`
-    );
+    return card;
   }
 
-  // ⏰ Programación horaria
-  const horarios = [
-    { h:7, callback: ()=> mostrarNotificacion('⛪ Ve a Misa','Recuerda participar de la Eucaristía de hoy') },
-    { h:8, callback: enviarVersiculo },
-    { h:9, callback: enviarVersiculo },
-    { h:10, callback: enviarVersiculo },
-    { h:11, callback: enviarVersiculo },
-    { h:12, callback: ()=> mostrarNotificacion('🙏 Ángelus','Detente un momento para orar') },
-    { h:13, callback: enviarVersiculo },
-    { h:14, callback: enviarVersiculo },
-    { h:15, callback: ()=> mostrarNotificacion('🕒 Coronilla','Recuerda rezar la Coronilla a la Divina Misericordia') },
-    { h:16, callback: enviarVersiculo },
-    { h:17, callback: ()=> mostrarNotificacion('📿 Rosario','Hora de rezar el Rosario') },
-    { h:18, callback: ()=> mostrarNotificacion('🕯️ San José','Dedica un momento a la oración a San José') },
-    { h:19, callback: enviarVersiculo },
-    { h:20, callback: enviarVersiculo },
-    { h:21, callback: enviarVersiculo },
-    { h:22, callback: ()=> mostrarNotificacion('🙏 Acción de gracias','Termina el día agradeciendo a Dios') }
-  ];
-
+  // Programar notificaciones
   function programarNotificaciones() {
     const ahora = new Date();
-    horarios.forEach(({h, callback}) => {
-      let notifTime = new Date();
-      notifTime.setHours(h,0,0,0);
-      if (notifTime < ahora) notifTime.setDate(notifTime.getDate() + 1);
+    const eventos = [
+      { hora: 7, titulo: '⛪ Ir a Misa', mensaje: 'Recuerda asistir a la Misa.' },
+      { hora: 8 }, { hora: 9 }, { hora: 10 }, { hora: 11 },
+      { hora: 12, titulo: '🙏 Ángelus', mensaje: 'Detente un momento para orar el Ángelus.' },
+      { hora: 13 }, { hora: 14 },
+      { hora: 15, titulo: '🕒 Coronilla', mensaje: 'Hora de la Coronilla a la Divina Misericordia.' },
+      { hora: 16 }, 
+      { hora: 17, titulo: '📿 Rosario', mensaje: 'Es momento de rezar el Rosario.' },
+      { hora: 18, titulo: '🕊️ San José', mensaje: 'Recuerda hacer una oración a San José.' },
+      { hora: 19 }, { hora: 20 }, { hora: 21 },
+      { hora: 22, titulo: '🙏 Acción de Gracias', mensaje: 'Termina el día con una oración de agradecimiento a Dios.' }
+    ];
 
-      setTimeout(function tick() {
-        callback();
-        setTimeout(tick, 24*60*60*1000); // repetir cada 24h
-      }, notifTime - ahora);
+    eventos.forEach((evento, idx) => {
+      const horaEvento = new Date();
+      horaEvento.setHours(evento.hora, 0, 0, 0);
+      if (ahora > horaEvento) horaEvento.setDate(horaEvento.getDate() + 1);
+
+      setTimeout(() => {
+        let titulo = evento.titulo || '📖 Versículo del Día';
+        let mensaje = evento.mensaje;
+
+        if (!evento.titulo) {
+          const card = obtenerVersiculo();
+          if (card) mensaje = `${card.cita}\n${card.versiculo}`;
+        }
+
+        mostrarNotificacion(titulo, mensaje);
+        actualizarProgreso();
+
+      }, horaEvento - ahora);
     });
+
+    // Guardar la lista de eventos programados para el progreso
+    horarios = eventos;
   }
 
+  // Actualizar progreso de notificaciones restantes
+  function actualizarProgreso() {
+    const ahora = new Date().getHours();
+    const restantes = horarios.filter(h => h.hora > ahora).length;
+    btn.title = `Notificaciones restantes hoy: ${restantes}`;
+  }
+
+  // Iniciar notificaciones
   async function iniciarNotificaciones() {
     let permiso = Notification.permission;
-    if (permiso === 'default') {
-      permiso = await Notification.requestPermission();
-    }
+    if (permiso === 'default') permiso = await Notification.requestPermission();
     if (permiso !== 'granted') return;
 
-    btn.style.background = '#22c55e'; // verde
+    latido();
+    mostrarNotificacion('🔔 Notificaciones activadas', 'Recibirás palabras de Dios durante el día.');
     programarNotificaciones();
-    mostrarNotificacion('🔔 Notificaciones activadas','Recibirás palabras de Dios durante el día');
+    actualizarProgreso();
+    btn.style.background = '#ef4444'; // indicar activado
   }
 
-  function actualizarBoton() {
-    if (Notification.permission === 'granted') {
-      btn.style.background = '#22c55e'; // verde
-    } else {
-      btn.style.background = '#ef4444'; // rojo
-    }
-  }
-
-  btn.onclick = () => {
-    if (Notification.permission === 'granted') {
-      alert('Notificaciones ya activadas. Si deseas desactivarlas, hazlo desde el navegador.');
+  // Botón toggle
+  btn.onclick = async () => {
+    if (Notification.permission !== 'granted') {
+      await iniciarNotificaciones();
       return;
     }
-    iniciarNotificaciones();
+    // Ya activadas → desactivar reload
+    if (btn.dataset.activado) {
+      btn.dataset.activado = '';
+      btn.style.background = '#22c55e';
+      btn.title = 'Haz clic para activar notificaciones';
+      location.reload(); // recarga limpia
+    } else {
+      btn.dataset.activado = '1';
+      await iniciarNotificaciones();
+    }
   };
 
-  // auto actualizar botón al cargar
-  setTimeout(actualizarBoton, 1000);
+  // Auto iniciar si ya aceptó
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      btn.dataset.activado = '1';
+      iniciarNotificaciones();
+    }
+  }, 1000);
+
 });
 </script>
-
   
 </body>
 </html>
