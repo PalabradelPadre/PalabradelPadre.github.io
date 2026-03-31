@@ -534,51 +534,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
  
-  <script>
-document.addEventListener('DOMContentLoaded', () => {
-
-  function intercambiarBotones() {
-    const cards = document.querySelectorAll('.card-glass');
-
-    cards.forEach(card => {
-      const btnDiario = card.querySelector('.diario-btn');
-      const btnUnete = card.querySelector('.btn-unete-card');
-
-      // Validar que ambos existan
-      if (!btnDiario || !btnUnete) return;
-
-      // Evitar hacerlo más de una vez
-      if (card.dataset.swapDone) return;
-
-      // Clonar nodos (mantienen eventos porque no usamos innerHTML)
-      const diarioClone = btnDiario;
-      const uneteClone = btnUnete;
-
-      // Intercambiar posiciones
-      const parent = btnDiario.parentNode;
-
-      parent.insertBefore(uneteClone, diarioClone); // Únete va donde estaba Diario
-      parent.appendChild(diarioClone); // Diario pasa al final
-
-      card.dataset.swapDone = 'true';
-    });
-  }
-
-  // Ejecutar al cargar
-  intercambiarBotones();
-
-  // Observar cambios (React vuelve a renderizar)
-  const observer = new MutationObserver(() => {
-    intercambiarBotones();
-  });
-
-  observer.observe(document.getElementById('root'), {
-    childList: true,
-    subtree: true
-  });
-
-});
-</script>
   
 <script>
 document.addEventListener('DOMContentLoaded', () => {
