@@ -1,12 +1,18 @@
 {
+  "id": "./",
   "name": "Palabra del Padre",
   "short_name": "Palabra Padre",
   "description": "Reflexiones y versículos bíblicos para cultivar tu amistad con Dios.",
-  "start_url": "./index.html",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
   "background_color": "#f5f7fa",
   "theme_color": "#4f46e5",
-  "orientation": "portrait-primary",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": ["lifestyle", "books", "education"],
   "icons": [
     {
       "src": "Palabra192.png",
@@ -22,7 +28,32 @@
       "src": "Palabra.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "maskable any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "📖 Ver Evangelio",
+      "short_name": "Evangelio",
+      "url": "./index.html?evangelio=true",
+      "icons": [
+        {
+          "src": "Palabra192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "🙏 Orar ahora",
+      "short_name": "Orar",
+      "url": "./index.html?orar=true",
+      "icons": [
+        {
+          "src": "Palabra192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "gcm_sender_id": "103953800507"
 }
