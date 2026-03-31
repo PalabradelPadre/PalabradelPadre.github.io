@@ -640,7 +640,195 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
+document.addEventListener('DOMContentLoaded', () => {
 
+  // 🔔 Botón compacto de notificaciones con contador
+  const btn = document.createElement('button');
+  btn.innerHTML = '🔔 0';
+  Object.assign(btn.style, {
+    position: 'fixed',
+    bottom: '1.5rem',
+    left: '1rem',
+    width: '42px',           // más pequeño
+    height: '42px',          // más pequeño
+    borderRadius: '50%',
+    background: '#22c55e',
+    color: '#fff',
+    border: 'none',
+    fontSize: '14px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+    cursor: 'pointer',
+    zIndex: '9999',
+    flexDirection: 'column',
+    textAlign: 'center'
+  });
+  document.body.appendChild(btn);
+
+  let cards = [];
+  let usados = [];
+  let contador = 0;
+  let totalVersiculos = 0;
+
+  let intervaloHora = null;
+  let angelusTimeout = null;
+  let coronillaTimeout = null;
+
+  const sonido = new Audio('/campana.mp3');
+
+  fetch('cards.json')
+    .then(res => res.json())
+    .then(data => {
+      cards = data.filter(c => c.categoria !== 'evangelio');
+      totalVersiculos = cards.length;
+    });
+
+  let swRegistration = null;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => swRegistration = reg);
+  }
+
+  function reproducirSonido() {
+    // ✅ reproducir cada vez que se envía una notificación
+    sonido.currentTime = 0;
+    sonido.volume = 1;
+    sonido.play().catch(() => {});
+  }
+
+  function mostrarNotificacion(titulo, mensaje) {
+    reproducirSonido();
+
+    const opciones = {
+      body: mensaje,
+      icon: '/Palabra360.png',
+      badge: '/Palabra360.png',
+      tag: 'palabra'
+    };
+
+    if (swRegistration && swRegistration.active) {
+      swRegistration.active.postMessage({
+        type: 'SHOW_NOTIFICATION',
+        ...opciones,
+        title: titulo
+      });
+    } else {
+      new Notification(titulo, opciones);
+    }
+  }
+
+  function actualizarContador() {
+    btn.innerHTML = `${contador}/${totalVersiculos}`;
+  }
+
+  function enviarVersiculo() {
+    if (!cards.length) return;
+
+    if (usados.length === cards.length) usados = [];
+
+    const disponibles = cards.filter((_, i) => !usados.includes(i));
+    const index = Math.floor(Math.random() * disponibles.length);
+    const card = disponibles[index];
+
+    usados.push(cards.indexOf(card));
+    contador = usados.length;
+    actualizarContador();
+
+    mostrarNotificacion(
+      card.titulo || 'Palabra del Padre',
+      `${card.cita || ''}\n${card.versiculo || ''}`
+    );
+  }
+
+  function programarCadaHora() {
+    const ahora = new Date();
+    const proximaHora = new Date();
+    proximaHora.setMinutes(0, 0, 0);
+    proximaHora.setHours(ahora.getHours() + 1);
+
+    setTimeout(() => {
+      enviarVersiculo();
+      intervaloHora = setInterval(enviarVersiculo, 3600000);
+    }, proximaHora - ahora);
+  }
+
+  function programarAngelus() {
+    const ahora = new Date();
+    const proximo = new Date();
+    proximo.setHours(12, 0, 0, 0);
+    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
+
+    angelusTimeout = setTimeout(() => {
+      mostrarNotificacion('🙏 Ángelus (Mediodía)', 'Detente un momento para orar.');
+      setInterval(() => {
+        mostrarNotificacion('🙏 Ángelus', 'Recuerda tu oración.');
+      }, 86400000);
+    }, proximo - ahora);
+  }
+
+  function programarCoronilla() {
+    const ahora = new Date();
+    const proximo = new Date();
+    proximo.setHours(15, 0, 0, 0);
+    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
+
+    coronillaTimeout = setTimeout(() => {
+      mostrarNotificacion(
+        '🕒 Hora de la Misericordia',
+        'A las 3:00 p.m., recuerda rezar la Coronilla a la Divina Misericordia.'
+      );
+      setInterval(() => {
+        mostrarNotificacion(
+          '🕒 Hora de la Misericordia',
+          'Es momento de la Coronilla a la Divina Misericordia.'
+        );
+      }, 86400000);
+    }, proximo - ahora);
+  }
+
+  async function iniciarNotificaciones() {
+    let permiso = Notification.permission;
+    if (permiso === 'default') permiso = await Notification.requestPermission();
+    if (permiso !== 'granted') return;
+
+    mostrarNotificacion('🔔 Notificaciones activadas', 'Recibirás palabras de Dios durante el día.');
+    enviarVersiculo();
+    programarCadaHora();
+    programarAngelus();
+    programarCoronilla();
+  }
+
+  btn.onclick = () => {
+    if (intervaloHora) {
+      // Desactivar todo
+      clearInterval(intervaloHora);
+      clearTimeout(angelusTimeout);
+      clearTimeout(coronillaTimeout);
+      intervaloHora = null;
+      btn.style.background = '#22c55e';
+      actualizarContador();
+    } else {
+      // Activar
+      iniciarNotificaciones();
+      btn.style.background = '#ef4444';
+      actualizarContador();
+    }
+  };
+
+  // 🔥 Auto iniciar si ya aceptó
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      iniciarNotificaciones();
+      btn.style.background = '#ef4444';
+      actualizarContador();
+    }
+  }, 3000);
+
+});
+</script>
   
 </body>
 </html>
