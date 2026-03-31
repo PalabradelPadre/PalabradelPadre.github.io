@@ -639,14 +639,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-  
- <script>
-document.addEventListener('DOMContentLoaded', async () => {
 
-  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
 
-  const reg = await navigator.serviceWorker.ready;
+  if (!('Notification' in window)) return;
 
+  let reg = null;
   let cards = [];
   let usados = [];
   let intervaloHora = null;
@@ -656,8 +655,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function reproducirSonido() {
     sonido.currentTime = 0;
-    sonido.volume = 1;
     sonido.play().catch(()=>{});
+  }
+
+  // 🔧 Registrar SW correctamente
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(r => {
+        reg = r;
+      })
+      .catch(err => console.log('SW error', err));
   }
 
   fetch('cards.json')
@@ -669,13 +676,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     reproducirSonido();
 
-    reg.showNotification(titulo, {
-      body: mensaje,
-      icon: '/Palabra360.png',
-      badge: '/Palabra360.png',
-      vibrate: [200,100,200],
-      tag: 'palabra'
-    });
+    if (reg) {
+      reg.showNotification(titulo, {
+        body: mensaje,
+        icon: '/Palabra360.png',
+        badge: '/Palabra360.png',
+        vibrate: [200,100,200],
+        tag: 'palabra'
+      });
+    } else {
+      new Notification(titulo, { body: mensaje });
+    }
   }
 
   function enviarVersiculo() {
@@ -684,83 +695,63 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (usados.length === cards.length) usados = [];
 
     const disponibles = cards.filter((_, i) => !usados.includes(i));
-    const index = Math.floor(Math.random() * disponibles.length);
-    const card = disponibles[index];
-    const realIndex = cards.indexOf(card);
+    const card = disponibles[Math.floor(Math.random() * disponibles.length)];
+    usados.push(cards.indexOf(card));
 
-    usados.push(realIndex);
-
-    const titulo = card.titulo || 'Palabra del Padre';
-    const mensaje = `${card.cita || ''}\n${card.versiculo || ''}`;
-
-    mostrarNotificacion(titulo, mensaje);
+    mostrarNotificacion(
+      card.titulo || 'Palabra del Padre',
+      `${card.cita || ''}\n${card.versiculo || ''}`
+    );
   }
 
   function programarCadaHora() {
     const ahora = new Date();
-
-    const proximaHora = new Date();
-    proximaHora.setMinutes(0, 0, 0);
-    proximaHora.setHours(ahora.getHours() + 1);
-
-    const tiempo = proximaHora - ahora;
+    const proxima = new Date();
+    proxima.setMinutes(0,0,0);
+    proxima.setHours(ahora.getHours() + 1);
 
     setTimeout(() => {
       enviarVersiculo();
-
-      intervaloHora = setInterval(() => {
-        enviarVersiculo();
-      }, 60 * 60 * 1000);
-
-    }, tiempo);
+      intervaloHora = setInterval(enviarVersiculo, 3600000);
+    }, proxima - ahora);
   }
 
   function programarAngelus() {
     const ahora = new Date();
     const proximo = new Date();
+    proximo.setHours(12,0,0,0);
 
-    proximo.setHours(12, 0, 0, 0);
-
-    if (ahora > proximo) {
-      proximo.setDate(proximo.getDate() + 1);
-    }
-
-    const tiempo = proximo - ahora;
+    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
 
     angelusTimeout = setTimeout(() => {
-      notificarAngelus();
-      setInterval(notificarAngelus, 24 * 60 * 60 * 1000);
-    }, tiempo);
+      mostrarNotificacion(
+        '🙏 Ángelus (Mediodía)',
+        'Detente un momento para orar.'
+      );
+      setInterval(() => {
+        mostrarNotificacion(
+          '🙏 Ángelus',
+          'Recuerda tu oración.'
+        );
+      }, 86400000);
+    }, proximo - ahora);
   }
 
-  function notificarAngelus() {
-    mostrarNotificacion(
-      '🙏 Ángelus (Mediodía)',
-      'El Ángel del Señor anunció a María…\nDetente un momento para orar.'
-    );
-  }
+  async function iniciar() {
+    let permiso = Notification.permission;
 
-  async function iniciarNotificaciones(auto = false) {
-    if (Notification.permission === 'default') {
-      const permiso = await Notification.requestPermission();
-      if (permiso !== 'granted') return;
+    if (permiso === 'default') {
+      permiso = await Notification.requestPermission();
     }
 
-    if (Notification.permission !== 'granted') return;
-
-    if (!auto) console.log('Notificaciones activadas manualmente');
+    if (permiso !== 'granted') return;
 
     programarCadaHora();
     programarAngelus();
     enviarVersiculo();
   }
 
-  // 🔥 AUTO-INICIO (clave)
-  if (Notification.permission === 'granted') {
-    iniciarNotificaciones(true);
-  }
-
-  // 🔘 BOTÓN (opcional)
+  // 🔘 BOTÓN SIEMPRE VISIBLE
   const btn = document.createElement('button');
   btn.innerHTML = '🔔';
 
@@ -778,15 +769,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
-    cursor: 'pointer',
-    zIndex: '9999'
+    zIndex: '9999',
+    cursor: 'pointer'
   });
 
   document.body.appendChild(btn);
 
-  btn.onclick = async () => {
-
+  btn.onclick = () => {
     if (intervaloHora) {
       clearInterval(intervaloHora);
       clearTimeout(angelusTimeout);
@@ -795,13 +784,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    await iniciarNotificaciones();
+    iniciar();
     btn.innerHTML = '🔕';
   };
 
+  // 🔥 AUTO INTELIGENTE (NO intrusivo)
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      iniciar();
+      btn.innerHTML = '🔕';
+    }
+  }, 3000);
+
 });
 </script>
-  
   
 </body>
 </html>
