@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palabra del Padre</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+  
+  <style>
+    body {
+      background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+      font-family: sans-serif;
+    }
+
+
+    .card-glass {
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.07); /* 🔥 ajusta aquí la transparencia */
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+    .card-glass:hover { transform: scale(1.03); }
+    .share-btn { 
+      width: 36px; height: 36px; 
+      display: flex; align-items: center; justify-content: center; 
+      border-radius: 50%; 
+      transition: transform 0.2s; 
+      border: 1px solid rgba(255, 255, 255, 0.5); 
+    }
+    .share-btn:hover { transform: scale(1.2); }
+    .highlight { background-color: yellow; color: black; font-weight: bold; }
+    .floating-btn {
+      background-color: rgba(0, 123, 255, 0.85);
+      color: white;
+      font-weight: bold;
+      padding: 0.5rem 1rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .floating-btn:hover { transform: scale(1.05); }
+    .floating-btn.diario-btn {
+      background-color: rgba(255,255,255,0.85);
+      color: #3b1f5f;
+    }
+
+    .evangelizar-btn {
+      position: fixed;
+      bottom: 1rem;
+      left: 1rem;
+      background-color: #ffcc00;
+      color: #3b1f5f;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      font-weight: bold;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      z-index: 50;
+      transition: transform 0.2s;
+    }
+    .evangelizar-btn:hover { transform: scale(1.05); }
+
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: #f3f4f6;
+      font-style: italic;
+      font-size: 0.95rem;
+      position: relative;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .footer.show { opacity: 1; }
+
+.install-btn {
+  background: linear-gradient(145deg, #4CAF50, #45A049);
+  color: #fff;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.8rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  z-index: 50;
+  cursor: pointer;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.rem;
+  overflow: hidden;          /* necesario para el ripple */
+  transition: transform 0.2s, opacity 0.3s, box-shadow 0.2s;
+}
+
+.install-btn i {
+  font-size: 1rem;
+}
+
+.install-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* efecto ripple */
+.install-btn::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: inherit;
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.4s, opacity 0.6s;
+}
+
+.install-btn:active::after {
+  transform: scale(2);
+  opacity: 1;
+  transition: 0s;
+}
+
+.install-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out forwards;
+}
+
+@keyframes scale-up {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.animate-scale-up {
+  animation: scale-up 0.25s ease-out forwards;
+}
+
+    
+  </style>
+</head>
+<body class="text-white">
+  <div id="root"></div>
+
+  <script>
+    const e = React.createElement;
+
+    const categories = [
+      {id:'todas', label:'Todas', icon:'bi-list', color:'bg-indigo-600/70'},
+      {id:'paz', label:'Paz', icon:'bi-dove-fill', color:'bg-blue-400/70'},
+      {id:'fortaleza', label:'Fortaleza', icon:'bi-shield-fill', color:'bg-red-400/70'},
+      {id:'inspiracion', label:'Inspiración', icon:'bi-lightning-fill', color:'bg-green-400/70'},
+      {id:'amor', label:'Amor al prójimo', icon:'bi-heart-fill', color:'bg-yellow-300/70'},
+      {id:'fe', label:'Fe y Confianza', icon:'bi-star-fill', color:'bg-purple-400/70'},
+      {id:'devocion', label:'Devoción', icon:'bi-book-fill', color:'bg-pink-400/70'},
+      {id:'evangelio', label:'Evangelio', icon:'bi-calendar-event-fill', color:'bg-orange-400/70'}
+    ];
+
+    function normalize(str){
+      return (str || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    }
+
+    function highlightText(text, search){
+      if(!search) return text;
+      const words = normalize(search).split(' ').filter(Boolean);
+      let result = text;
+      words.forEach(word => {
+        const re = new RegExp(`(${word})`, 'gi');
+        result = result.replace(re, '<span class="highlight">$1</span>');
+      });
+      return e('span', { dangerouslySetInnerHTML: { __html: result } });
+    }
+
+    function App() {
+      const [cardsData, setCardsData] = React.useState([]);
+      const [category, setCategory] = React.useState('todas');
+      const [search, setSearch] = React.useState('');
+      const [installPrompt, setInstallPrompt] = React.useState(null);
+      const [showModal, setShowModal] = React.useState(false);
+      const [showFooter, setShowFooter] = React.useState(false);
+
+      React.useEffect(() => {
+        fetch('cards.json')
+          .then(res => res.json())
+          .then(data => setCardsData(data))
+          .catch(err => console.error('Error cargando JSON', err));
+      }, []);
+
+      React.useEffect(() => {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          e.preventDefault();
+          setInstallPrompt(e);
+        });
+      }, []);
+
+      React.useEffect(() => {
+        setShowFooter(true);
+        const timer = setTimeout(() => setShowFooter(false), 5000);
+        return () => clearTimeout(timer);
+      }, []);
+
+      const handleInstall = async () => {
+        if (!installPrompt) return;
+        installPrompt.prompt();
+        await installPrompt.userChoice;
+      };
+
+      let filteredCards = category === 'todas'
+        ? cardsData
+        : cardsData.filter(c => normalize(c.categoria) === category);
+
+      if (search) {
+        const words = normalize(search).split(' ').filter(Boolean);
+        filteredCards = filteredCards.filter(c => {
+          const content = normalize(`${c.titulo} ${c.cita} ${c.reflexion} ${c.versiculo}`);
+          return words.every(w => content.includes(w));
+        });
+      }
+
+      const heroCard = cardsData.find(c => c.categoria === 'evangelio');
+
+      return e('div', { className: 'min-h-screen flex flex-col' },
+        e('header', { className: 'flex justify-center items-center p-4 bg-gray-800 shadow relative' },
+          e('h1', { className: 'text-2xl font-bold flex items-center gap-2' },
+            e('i', { className: 'bi bi-book-fill text-yellow-400' }), 'Palabra del Padre', e('i', { className: 'bi bi-dove-fill text-white' })
+          )
+        ),
+        e('div', { className: 'mx-4 my-2' },
+          e('input', {
+            type: 'text',
+            placeholder: 'Busca por palabra, versículo o tema...',
+            value: search,
+            onChange: (e) => setSearch(e.target.value),
+            className: 'w-full p-3 rounded-xl text-gray-900'
+          })
+        ),
+        e('div', { className: 'text-center my-2' },
+  e('button', { 
+    onClick: () => {
+      if (installPrompt) {
+        installPrompt.prompt();
+        installPrompt.userChoice.then(choice => console.log('Resultado instalación:', choice.outcome));
+      } else {
+        alert('Instalación aún no disponible.');
+      }
+    }, 
+    className: 'install-btn' 
+  }, '📲')
+),
+   heroCard && e(HeroCard, { ...heroCard }),
+e('div', { className: 'flex justify-center my-4' },
+  e('a', 
+    { 
+      href: 'https://www.facebook.com/AmoryVerdadCatolica', 
+      target: '_blank', 
+      className: 'bg-blue-600 px-6 py-3 rounded hover:bg-blue-500 text-white font-bold flex items-center gap-2'
+    }, 
+    e('i', { className: 'bi bi-chat-dots' }), // ícono dentro del <a>
+    'Acompañamiento' // texto también dentro del <a>
+  )
+),
+e(FloatingCategories, { categories, setCategory, category }),
+e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4' },
+  filteredCards.map((card, i) => e(Card, { key: i, ...card, search }))
+),
+        e('button', { className: 'evangelizar-btn', onClick: () => setShowModal(true) },
+          e('i', { className: 'bi bi-person-fill-add' }), ' Únete'
+        ),
+        showModal && e(Modal, { onClose: () => setShowModal(false) }),
+        e('footer', { className: `footer ${showFooter ? 'show' : ''}` },
+          '“Porque el que siembra generosamente, también segará generosamente.” — Lucas 6:38'
+        )
+      );
+    }
+
+    function Card({ id, titulo, versiculo, cita, reflexion, categoria, search }) {
+      const [expanded, setExpanded] = React.useState(false);
+      const catObj = categories.find(c => normalize(c.id) === normalize(categoria)) || { color: 'bg-gray-600/30' };
+
+      const shareCard = (platform) => {
+        const text = `${cita}\n${versiculo}\nCompartir: ${"https://palabradelpadre.github.io"}`;
+        if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      return e('div', { className: `card-glass cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
+        e('h2', { className: 'text-lg font-bold' }, highlightText(titulo, search)),
+        e('h3', { className: 'text-sm' }, highlightText(versiculo, search)),
+        expanded && e('div', { className: 'mt-2' },
+          e('p', { className: 'font-bold' }, highlightText(cita, search)),
+          e('p', null, highlightText(reflexion, search))
+        ),
+        e('div', { className: 'flex justify-between mt-2 items-center' },
+          e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
+          e('button', { onClick: () => shareCard('facebook'), className: 'share-btn' }, e('i', { className: 'bi bi-facebook text-blue-500' })),
+          e('button', { className: 'floating-btn diario-btn' }, e('i', { className: 'bi bi-journal-text' }), '')
+        )
+      );
+    }
+
+    function HeroCard({ titulo, versiculo, cita, reflexion }) {
+      const shareCard = (platform) => {
+        const text = `${cita}\n${versiculo}\nFuente: ${window.location.href}`;
+        if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
+      };
+
+      return e('div', { className: 'card-glass mx-4 my-4' },
+        e('h2', { className: 'text-2xl font-bold mb-2' }, titulo),
+        e('h3', { className: 'text-lg mb-2' }, versiculo),
+        e('p', { className: 'mb-2' }, cita),
+        e('p', { className: 'text-sm mb-2' }, reflexion),
+        e('div', { className: 'flex gap-2 mt-2 justify-end' },
+          e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
+          e('button', { onClick: () => shareCard('facebook'), className: 'share-btn' }, e('i', { className: 'bi bi-facebook text-blue-500' }))
+        )
+      );
+    }
+
+    function FloatingCategories({ categories, setCategory, category }) {
+      const [open, setOpen] = React.useState(false);
+      return e('div', { className: 'fixed bottom-6 right-6 z-50 flex flex-col items-end' },
+        e('button', { className: 'floating-btn', onClick: () => setOpen(!open) },
+          e('i', { className: 'bi bi-list' }), 'Palabra'
+        ),
+        open && e('div', { className: 'flex flex-col space-y-2 mt-2' },
+          categories.map((cat, i) => e('button', {
+            key: i,
+            onClick: () => { setCategory(cat.id); setOpen(false); },
+            className: `px-4 py-2 rounded flex items-center gap-2 backdrop-blur-md ${cat.color} border border-white/30 shadow-md ${cat.color}`
+          }, e('i', { className: `bi ${cat.icon}` }), cat.label))
+        )
+      );
+    }
+
+    function Modal({ onClose }) {
+  return e('div', {
+    className: 'fixed inset-0 bg-black/50 flex justify-center items-center z-50 animate-fade-in',
+    onClick: onClose
+  },
+    e('div', {
+      className: 'bg-yellow-300 text-black p-6 rounded-xl shadow-xl max-w-md w-full relative transform transition-transform scale-90 animate-scale-up',
+      onClick: e => e.stopPropagation()
+    },
+      e('button', {
+        onClick: onClose,
+        className: 'absolute top-3 right-3 text-black font-bold text-lg hover:text-gray-800'
+      }, '✕'),
+
+     e('h2', { className: 'text-2xl font-bold mb-4 text-center' }, ['¡Tu apoyo es vital!',
+  e('br'),
+  'Sé parte de esta misión.']),
+
+      e('div', { className: 'flex flex-col gap-4' },
+
+        // 1. Sugerir card con mensaje predefinido
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, '¿Quieres ayudar agregando una nueva cita bíblica?'),
+          e('a', {
+            href: 'https://www.facebook.com/AmoryVerdadCatolica' + encodeURIComponent(''),
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 transition'
+          }, e('i', { className: 'bi bi-chat-dots' }), 'Enviar Mensaje')
+        ),
+
+        // 2. Colaborar versión 2
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, 'Apoya la creación de la versión 2, con más funciones como agregar tus propias citas bíblicas automáticamente.'),
+          e('a', {
+            href: 'https://www.facebook.com/AmoryVerdadCatolica?ref=' + encodeURIComponent(''),
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500 transition'
+          }, e('i', { className: 'bi bi-lightning-fill' }), 'Enviar Mensaje')
+        ),
+
+        // 3. Apoyo económico
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, 'Con tu aporte económico, me donas tiempo para mantener y mejorar la app.'),
+          e('a', {
+            href: 'https://paypal.me/silenciodeSanJose',
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-yellow-500 text-black rounded hover:bg-yellow-400 transition'
+          }, e('i', { className: 'bi bi-heart-fill' }), 'Colaborar')
+        ),
+
+        // 4. Ofrecer oración
+        e('div', { className: 'card-glass p-4 flex flex-col gap-2' },
+          e('p', null, 'Ofrece una oración.'),
+          e('a', {
+            href: 'https://www.youtube.com/shorts/xVKBrgowlvU', // tu video de oración
+            target: '_blank',
+            className: 'flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-500 transition'
+          }, e('span', null, '🙏'), 'Oración')
+        )
+      )
+    )
+  );
+}
+    ReactDOM.createRoot(document.getElementById('root')).render(e(App));
+  </script>
+
+<script>
+  // Esperamos a que el DOM esté cargado
+  document.addEventListener('DOMContentLoaded', () => {
+    // Función para actualizar todos los botones "Mi Diario"
+    function initMiDiarioButton() {
+      // Selecciona todos los botones con la clase 'diario-btn'
+      const diarioButtons = document.querySelectorAll('.diario-btn');
+      diarioButtons.forEach(btn => {
+        // Evita duplicar el evento si ya se añadió
+        if (!btn.dataset.miDiarioInit) {
+          btn.addEventListener('click', () => {
+            window.location.href = '/libretaespiritual.html';
+          });
+          btn.dataset.miDiarioInit = 'true';
+        }
+      });
+    }
+
+    // Ejecuta la función al cargar
+    initMiDiarioButton();
+
+    // Observa cambios en el DOM para detectar nuevos botones (por ejemplo, si se renderiza otra card)
+    const observer = new MutationObserver(() => initMiDiarioButton());
+    observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  });
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/swr.js')
+    .then(() => console.log('Service Worker registrado ✅'))
+    .catch(err => console.error('Error registrando SW', err));
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.querySelector('.install-btn');
+  if (!btn) return;
+
+  let deferredPrompt = null;
+
+  function isAppInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+  }
+
+  // 🔴 OCULTAR SI YA ESTÁ INSTALADA
+  if (isAppInstalled()) {
+    btn.classList.add('hidden');
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    // Solo mostrar si NO está instalada
+    if (!isAppInstalled()) {
+      btn.classList.remove('hidden');
+    }
+  });
+
+  btn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === 'accepted') {
+      btn.classList.add('hidden');
+    }
+
+    deferredPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    btn.classList.add('hidden');
+    deferredPrompt = null;
+  });
+});
+</script>
+
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  if (document.getElementById('mi-boton-flotante')) return;
+
+  const btn = document.createElement('button');
+  btn.id = 'mi-boton-flotante';
+  btn.innerHTML = '🐏 Buen Pastor'; // Aquí cambiamos el ícono y el texto
+
+  Object.assign(btn.style, {
+    position: 'fixed',
+    bottom: '5rem', // Lo movemos a la parte inferior
+    left: '1rem',   // Lo colocamos en la parte izquierda
+    padding: '11px 15px',
+    borderRadius: '999px',
+    background: '#FFFFFF', // Botón de color verde
+    color: '#000',
+    border: 'none',
+    fontWeight: 'bold',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+    cursor: 'pointer',
+    zIndex: '9999'
+  });
+
+  // Evento para redirigir a la página "Buen Pastor"
+  btn.onclick = () => {
+    window.location.href = '/BuenPastor.html'; // Asegúrate de que la ruta sea correcta
+  };
+
+  document.body.appendChild(btn);
+
+});
+</script>
+  
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function agregarBotonUnete() {
+    const cards = document.querySelectorAll('.card-glass');
+
+    cards.forEach(card => {
+      // Evitar duplicar botón
+      if (card.querySelector('.btn-unete-card')) return;
+
+      const btn = document.createElement('button');
+      btn.className = 'btn-unete-card';
+      btn.innerText = '🙌 Únete';
+
+      // Estilos
+      btn.style.marginTop = '10px';
+      btn.style.width = '100%';
+      btn.style.padding = '8px';
+      btn.style.borderRadius = '10px';
+      btn.style.background = '#ffcc00';
+      btn.style.color = '#3b1f5f';
+      btn.style.fontWeight = 'bold';
+      btn.style.border = 'none';
+      btn.style.cursor = 'pointer';
+
+      // Acción del botón
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // evita que se abra/cierre la card
+        const modalBtn = document.querySelector('.evangelizar-btn');
+        if (modalBtn) modalBtn.click(); // reutiliza tu botón existente
+      });
+
+      card.appendChild(btn);
+    });
+  }
+
+  // Ejecutar al cargar
+  agregarBotonUnete();
+
+  // Observar cambios (porque React renderiza dinámicamente)
+  const observer = new MutationObserver(() => {
+    agregarBotonUnete();
+  });
+
+  observer.observe(document.getElementById('root'), {
+    childList: true,
+    subtree: true
+  });
+
+});
+</script>
+  
+</body>
+</html>
