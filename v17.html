@@ -643,8 +643,10 @@ document.addEventListener('DOMContentLoaded', () => {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+  // 🔔 BOTÓN
   const btn = document.createElement('button');
   btn.innerHTML = '🔔';
+
   Object.assign(btn.style, {
     position: 'fixed',
     bottom: '2.1rem',
@@ -663,54 +665,44 @@ document.addEventListener('DOMContentLoaded', () => {
     cursor: 'pointer',
     zIndex: '9999'
   });
+
   document.body.appendChild(btn);
 
+  // 📦 ESTADO
   let cards = [];
-  let usados = [];
-  let intervaloHora = null;
-  let angelusTimeout = null;
-  let coronillaTimeout = null;
-  let minutoTimeout = null;
+  let usados = JSON.parse(localStorage.getItem('usados') || '[]');
+  let intervalo = null;
 
-  const sonido = new Audio('/campana.mp3');
-
-  function reproducirSonido() {
-    sonido.currentTime = 0;
-    sonido.volume = 1;
-    sonido.play().catch(() => {});
-  }
-
+  // 📥 Cargar datos
   fetch('cards.json')
     .then(res => res.json())
-    .then(data => cards = data);
+    .then(data => cards = data)
+    .catch(() => console.warn('No se pudo cargar cards.json'));
 
-  let swRegistration = null;
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => swRegistration = reg);
+  function guardarUsados() {
+    localStorage.setItem('usados', JSON.stringify(usados));
   }
 
+  // 🔔 NOTIFICACIÓN
   function mostrarNotificacion(titulo, mensaje) {
-    reproducirSonido();
-
     const opciones = {
       body: mensaje,
       icon: '/Palabra360.png',
-      badge: '/Palabra360.png',
-      tag: 'palabra'
+      badge: '/Palabra360.png'
     };
 
-    if (swRegistration && swRegistration.active) {
-      swRegistration.active.postMessage({
-        type: 'SHOW_NOTIFICATION',
-        ...opciones,
-        title: titulo
+    if (Notification.permission === 'granted') {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg) {
+          reg.showNotification(titulo, opciones);
+        } else {
+          new Notification(titulo, opciones);
+        }
       });
-    } else {
-      new Notification(titulo, opciones);
     }
   }
 
+  // 📖 VERSÍCULO
   function enviarVersiculo() {
     if (!cards.length) return;
 
@@ -721,6 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const card = disponibles[index];
 
     usados.push(cards.indexOf(card));
+    guardarUsados();
 
     mostrarNotificacion(
       card.titulo || 'Palabra del Padre',
@@ -728,72 +721,68 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   }
 
-  // ⏱️ después de 1 minuto
-  function programarPrimerVersiculo() {
-    minutoTimeout = setTimeout(() => {
+  // 🧠 MOTOR INTELIGENTE
+  function verificarEventos() {
+
+    const ahora = new Date();
+
+    const ultimaHora = localStorage.getItem('ultimaHora');
+    const angelus = localStorage.getItem('angelus');
+    const coronilla = localStorage.getItem('coronilla');
+
+    // ⏰ cada hora
+    if (!ultimaHora || (ahora - new Date(ultimaHora)) > 3600000) {
       enviarVersiculo();
-    }, 60000);
-  }
+      localStorage.setItem('ultimaHora', ahora);
+    }
 
-  // 🔁 cada hora exacta
-  function programarCadaHora() {
-    const ahora = new Date();
-    const proximaHora = new Date();
+    // 🙏 Ángelus (12)
+    if (ahora.getHours() === 12 && !angelus) {
+      mostrarNotificacion('🙏 Ángelus', 'Detente un momento para orar.');
+      localStorage.setItem('angelus', 'true');
+    }
 
-    proximaHora.setMinutes(0, 0, 0);
-    proximaHora.setHours(ahora.getHours() + 1);
+    if (ahora.getHours() !== 12) {
+      localStorage.removeItem('angelus');
+    }
 
-    setTimeout(() => {
-      enviarVersiculo();
-      intervaloHora = setInterval(enviarVersiculo, 3600000);
-    }, proximaHora - ahora);
-  }
-
-  // 🙏 Ángelus (NO TOCAR)
-  function programarAngelus() {
-    const ahora = new Date();
-    const proximo = new Date();
-
-    proximo.setHours(12, 0, 0, 0);
-    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
-
-    angelusTimeout = setTimeout(() => {
-      mostrarNotificacion('🙏 Ángelus (Mediodía)', 'Detente un momento para orar.');
-
-      setInterval(() => {
-        mostrarNotificacion('🙏 Ángelus', 'Recuerda tu oración.');
-      }, 86400000);
-
-    }, proximo - ahora);
-  }
-
-  // 🕒 Coronilla 3:00 p.m.
-  function programarCoronilla() {
-    const ahora = new Date();
-    const proximo = new Date();
-
-    proximo.setHours(15, 0, 0, 0);
-
-    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
-
-    coronillaTimeout = setTimeout(() => {
-
+    // 🕒 Coronilla (15)
+    if (ahora.getHours() === 15 && !coronilla) {
       mostrarNotificacion(
         '🕒 Hora de la Misericordia',
-        'A las 3:00 p.m., recuerda rezar la Coronilla a la Divina Misericordia.'
+        'Reza la Coronilla a la Divina Misericordia.'
       );
+      localStorage.setItem('coronilla', 'true');
+    }
 
-      setInterval(() => {
-        mostrarNotificacion(
-          '🕒 Hora de la Misericordia',
-          'Es momento de la Coronilla a la Divina Misericordia.'
-        );
-      }, 86400000);
-
-    }, proximo - ahora);
+    if (ahora.getHours() !== 15) {
+      localStorage.removeItem('coronilla');
+    }
   }
 
-  async function iniciarNotificaciones() {
+  // 🚀 INICIAR
+  function iniciarSistema() {
+
+    mostrarNotificacion(
+      '🔔 Notificaciones activadas',
+      'Recibirás palabras durante el día.'
+    );
+
+    // ⏱️ versículo a 1 minuto
+    setTimeout(() => {
+      enviarVersiculo();
+    }, 60000);
+
+    verificarEventos();
+
+    intervalo = setInterval(() => {
+      verificarEventos();
+    }, 60000); // cada minuto
+  }
+
+  // 👉 BOTÓN
+  btn.onclick = async () => {
+
     let permiso = Notification.permission;
 
     if (permiso === 'default') {
@@ -802,52 +791,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (permiso !== 'granted') return;
 
-    // ✅ 1. Notificación inmediata
-    mostrarNotificacion(
-      '🔔 Notificaciones activadas',
-      'Recibirás palabras de Dios durante el día.'
-    );
-
-    // ✅ 2. después de 1 minuto
-    programarPrimerVersiculo();
-
-    // ✅ 3. cada hora
-    programarCadaHora();
-
-    // ✅ 4. Ángelus
-    programarAngelus();
-
-    // ✅ 5. Coronilla
-    programarCoronilla();
-  }
-
-  btn.onclick = () => {
-
-    if (intervaloHora) {
-      clearInterval(intervaloHora);
-      clearTimeout(angelusTimeout);
-      clearTimeout(coronillaTimeout);
-      clearTimeout(minutoTimeout);
-
-      intervaloHora = null;
+    if (intervalo) {
+      clearInterval(intervalo);
+      intervalo = null;
       btn.innerHTML = '🔔';
       return;
     }
 
-    iniciarNotificaciones();
+    iniciarSistema();
     btn.innerHTML = '🔕';
   };
 
-  // 🔥 auto iniciar si ya aceptó
+  // 🔥 AUTO REANUDAR
   setTimeout(() => {
     if (Notification.permission === 'granted') {
-      iniciarNotificaciones();
+      iniciarSistema();
       btn.innerHTML = '🔕';
     }
-  }, 3000);
+  }, 2000);
+
+  // 👀 AL VOLVER A LA APP
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) {
+      verificarEventos();
+    }
+  });
 
 });
-</script>
+</script>  
 
   
 </body>
