@@ -1,5 +1,5 @@
 // 🔥 Versión (cambiar cada vez que actualices)
-const CACHE_NAME = 'palabra-del-padre-v11';
+const CACHE_NAME = 'palabra-del-padre-v12';
 
 // 📦 Archivos esenciales para offline total
 const urlsToCache = [
