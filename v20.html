@@ -640,11 +640,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 🔔 Botón compacto con contador y progreso
+  // 🔔 Botón compacto con contador y barra de progreso
   const btn = document.createElement('button');
   btn.innerHTML = '🔔 0';
   Object.assign(btn.style, {
@@ -670,15 +669,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   document.body.appendChild(btn);
 
+  // 📊 barra de progreso
+  const barra = document.createElement('div');
+  Object.assign(barra.style, {
+    position: 'absolute',
+    bottom: '-6px',
+    left: '0',
+    width: '100%',
+    height: '4px',
+    background: '#ddd',
+    borderRadius: '2px',
+    overflow: 'hidden'
+  });
+  const progreso = document.createElement('div');
+  Object.assign(progreso.style, {
+    width: '0%',
+    height: '100%',
+    background: '#3b82f6', // azul
+    transition: 'width 0.3s'
+  });
+  barra.appendChild(progreso);
+  btn.appendChild(barra);
+
   let cards = [];
   let usados = [];
   let contador = 0;
   let totalVersiculos = 0;
 
-  let intervaloHora = null;
-  let angelusTimeout = null;
-  let coronillaTimeout = null;
-
+  let horariosTimeouts = [];
   const sonido = new Audio('/campana.mp3');
 
   fetch('cards.json')
@@ -725,8 +743,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function actualizarContador() {
     btn.innerHTML = `${contador}/${totalVersiculos}`;
+    progreso.style.width = `${(contador / totalVersiculos) * 100}%`;
+    btn.appendChild(barra);
     if (contador >= totalVersiculos) {
-      btn.style.background = '#3b82f6'; // azul cuando completas todos
+      btn.style.background = '#3b82f6'; // azul cuando completas
     } else {
       btn.style.background = '#22c55e'; // verde mientras faltan
     }
@@ -738,6 +758,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function enviarVersiculo() {
+    const ahora = new Date();
+    if (ahora.getHours() < 7 || ahora.getHours() > 22) return; // no notificaciones fuera de horario
+
     if (!cards.length) return;
 
     if (usados.length === cards.length) usados = [];
@@ -756,50 +779,18 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   }
 
-  function programarCadaHora() {
-    const ahora = new Date();
-    const proximaHora = new Date();
-    proximaHora.setMinutes(0, 0, 0);
-    proximaHora.setHours(ahora.getHours() + 1);
-
-    setTimeout(() => {
-      enviarVersiculo();
-      intervaloHora = setInterval(enviarVersiculo, 3600000);
-    }, proximaHora - ahora);
-  }
-
-  function programarAngelus() {
+  function programarHorario(hora, minuto, titulo, mensaje, esVersiculo=false) {
     const ahora = new Date();
     const proximo = new Date();
-    proximo.setHours(12, 0, 0, 0);
+    proximo.setHours(hora, minuto, 0, 0);
     if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
 
-    angelusTimeout = setTimeout(() => {
-      mostrarNotificacion('🙏 Ángelus (Mediodía)', 'Detente un momento para orar.');
-      setInterval(() => {
-        mostrarNotificacion('🙏 Ángelus', 'Recuerda tu oración.');
-      }, 86400000);
+    const timeout = setTimeout(() => {
+      if (esVersiculo) enviarVersiculo();
+      else mostrarNotificacion(titulo, mensaje);
     }, proximo - ahora);
-  }
 
-  function programarCoronilla() {
-    const ahora = new Date();
-    const proximo = new Date();
-    proximo.setHours(15, 0, 0, 0);
-    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
-
-    coronillaTimeout = setTimeout(() => {
-      mostrarNotificacion(
-        '🕒 Hora de la Misericordia',
-        'A las 3:00 p.m., recuerda rezar la Coronilla a la Divina Misericordia.'
-      );
-      setInterval(() => {
-        mostrarNotificacion(
-          '🕒 Hora de la Misericordia',
-          'Es momento de la Coronilla a la Divina Misericordia.'
-        );
-      }, 86400000);
-    }, proximo - ahora);
+    horariosTimeouts.push(timeout);
   }
 
   async function iniciarNotificaciones() {
@@ -809,17 +800,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     mostrarNotificacion('🔔 Notificaciones activadas', 'Recibirás palabras de Dios durante el día.');
     enviarVersiculo();
-    programarCadaHora();
-    programarAngelus();
-    programarCoronilla();
+
+    // ⏰ Horarios especiales
+    programarHorario(7, 0, '⛪ Ir a Misa', 'Comienza tu día participando de la Misa');
+    programarHorario(12, 0, '🙏 Ángelus', 'Detente un momento para orar', true);
+    programarHorario(15, 0, '🕒 Coronilla', 'Hora de la Misericordia', true);
+    programarHorario(17, 0, '📿 Rosario', 'Es momento de rezar el Rosario');
+    programarHorario(18, 0, '🛐 Oración a San José', 'Dedica unos minutos a San José');
+    programarHorario(22, 0, '🛐 Oración de gracias', 'Agradece a Dios por este día');
+
+    // ⏰ Versículos cada hora excepto 7,12,15,17,18,22
+    const horasVersiculos = [8,9,10,11,13,14,16,19,20,21];
+    horasVersiculos.forEach(h => programarHorario(h, 0, '', '', true));
   }
 
   btn.onclick = () => {
-    if (intervaloHora) {
-      clearInterval(intervaloHora);
-      clearTimeout(angelusTimeout);
-      clearTimeout(coronillaTimeout);
-      intervaloHora = null;
+    if (horariosTimeouts.length) {
+      horariosTimeouts.forEach(t => clearTimeout(t));
+      horariosTimeouts = [];
       btn.style.background = '#22c55e';
       actualizarContador();
     } else {
@@ -838,6 +836,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-  
 </body>
 </html>
