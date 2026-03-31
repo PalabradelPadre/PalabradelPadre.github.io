@@ -1,4 +1,4 @@
-const CACHE_NAME = 'palabra-del-padre-v8';
+const CACHE_NAME = 'palabra-del-padre-v9';
 const urlsToCache = [
   './',
   './index.html',
@@ -44,6 +44,15 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => caches.match(event.request))
   );
+});
+
+// Mostrar notificación desde el script
+self.addEventListener('message', event => {
+  const data = event.data;
+  if (data && data.type === 'SHOW_NOTIFICATION') {
+    const { title, body, icon, badge, tag } = data;
+    self.registration.showNotification(title, { body, icon, badge, tag, vibrate: [200,100,200] });
+  }
 });
 
 // Notificación al hacer click
