@@ -4,7 +4,10 @@ const urlsToCache = [
   './index.html',
   './manifest.json',
   './sw.js',
-  './icono.png'
+  './Palabra192.png',
+  './Palabra512.png',
+  './Palabra360.png',
+  './campana.mp3'
 ];
 
 // Instalación
@@ -43,10 +46,14 @@ self.addEventListener('fetch', event => {
   );
 });
 
+// Notificación al hacer click
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-
   event.waitUntil(
-    clients.openWindow('./')
+    clients.matchAll({ type: 'window' }).then(clientsArr => {
+      const ventana = clientsArr.find(c => c.url.includes('./'));
+      if (ventana) return ventana.focus();
+      return clients.openWindow('./');
+    })
   );
 });
