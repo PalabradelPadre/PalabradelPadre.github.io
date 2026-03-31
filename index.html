@@ -533,6 +533,297 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+ 
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function intercambiarBotones() {
+    const cards = document.querySelectorAll('.card-glass');
+
+    cards.forEach(card => {
+      const btnDiario = card.querySelector('.diario-btn');
+      const btnUnete = card.querySelector('.btn-unete-card');
+
+      // Validar que ambos existan
+      if (!btnDiario || !btnUnete) return;
+
+      // Evitar hacerlo más de una vez
+      if (card.dataset.swapDone) return;
+
+      // Clonar nodos (mantienen eventos porque no usamos innerHTML)
+      const diarioClone = btnDiario;
+      const uneteClone = btnUnete;
+
+      // Intercambiar posiciones
+      const parent = btnDiario.parentNode;
+
+      parent.insertBefore(uneteClone, diarioClone); // Únete va donde estaba Diario
+      parent.appendChild(diarioClone); // Diario pasa al final
+
+      card.dataset.swapDone = 'true';
+    });
+  }
+
+  // Ejecutar al cargar
+  intercambiarBotones();
+
+  // Observar cambios (React vuelve a renderizar)
+  const observer = new MutationObserver(() => {
+    intercambiarBotones();
+  });
+
+  observer.observe(document.getElementById('root'), {
+    childList: true,
+    subtree: true
+  });
+
+});
+</script>
+  
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function moverBotonUnete() {
+
+    // 🔴 Ocultar botón original flotante
+    const btnOriginal = document.querySelector('.evangelizar-btn');
+    if (btnOriginal) {
+      btnOriginal.style.display = 'none';
+    }
+
+    // 🟢 Recorrer todas las cards
+    const cards = document.querySelectorAll('.card-glass');
+
+    cards.forEach(card => {
+
+      // Evitar duplicados
+      if (card.querySelector('.btn-unete-card')) return;
+
+      // Crear botón
+      const btn = document.createElement('button');
+      btn.className = 'btn-unete-card floating-btn';
+      btn.innerHTML = '<i class="bi bi-person-fill-add"></i>';
+
+      // Estilo opcional
+      btn.style.background = 'rgba(255, 204, 0, 0.9)';
+      btn.style.color = '#3b1f5f';
+
+      // Evento → simula click del original
+      btn.onclick = () => {
+        const original = document.querySelector('.evangelizar-btn');
+        if (original) original.click();
+      };
+
+      // Insertarlo en la card (abajo a la derecha)
+      const footer = card.querySelector('.flex.justify-between');
+
+      if (footer) {
+        footer.appendChild(btn);
+      }
+
+    });
+  }
+
+  // Ejecutar al inicio
+  moverBotonUnete();
+
+  // 👀 React vuelve a renderizar → observar cambios
+  const observer = new MutationObserver(() => {
+    moverBotonUnete();
+  });
+
+  observer.observe(document.getElementById('root'), {
+    childList: true,
+    subtree: true
+  });
+
+});
+</script>
+  
+ <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // 🔔 BOTÓN (debajo de Buen Pastor)
+  const btn = document.createElement('button');
+  btn.innerHTML = '🔔';
+
+  Object.assign(btn.style, {
+    position: 'fixed',
+    bottom: '2.1rem', // 👈 MÁS ABAJO (debajo del Buen Pastor)
+    left: '1rem',
+    width: '42px',
+    height: '42px',
+    borderRadius: '50%',
+    background: 'rgba(34,197,94,0.85)',
+    color: '#fff',
+    border: 'none',
+    fontSize: '18px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
+    cursor: 'pointer',
+    zIndex: '9999'
+  });
+
+  document.body.appendChild(btn);
+
+  let cards = [];
+  let usados = [];
+  let intervaloHora = null;
+  let angelusTimeout = null;
+
+  // 🔊 SONIDO
+  const sonido = new Audio('/campana.mp3');
+
+  function reproducirSonido() {
+    sonido.currentTime = 0;
+    sonido.volume = 1;
+
+    const play = sonido.play();
+    if (play !== undefined) {
+      play.catch(() => {});
+    }
+  }
+
+  // 📥 Cargar versículos
+  fetch('cards.json')
+    .then(res => res.json())
+    .then(data => cards = data)
+    .catch(() => console.warn('Error cargando cards.json'));
+
+  // 👉 CLICK BOTÓN
+  btn.onclick = async () => {
+
+    // 🔁 Desactivar
+    if (intervaloHora) {
+      clearInterval(intervaloHora);
+      clearTimeout(angelusTimeout);
+      intervaloHora = null;
+      btn.innerHTML = '🔔';
+      return;
+    }
+
+    const permiso = await Notification.requestPermission();
+
+    if (permiso !== 'granted') {
+      alert('Activa las notificaciones 🙏');
+      return;
+    }
+
+    btn.innerHTML = '🔕';
+
+    // ⏰ Notificación cada hora exacta
+    programarCadaHora();
+
+    // 🙏 Ángelus
+    programarAngelus();
+
+    // Enviar una inicial
+    enviarVersiculo();
+  };
+
+  // ⏰ PROGRAMAR CADA HORA EXACTA
+  function programarCadaHora() {
+    const ahora = new Date();
+
+    const proximaHora = new Date();
+    proximaHora.setMinutes(0, 0, 0);
+    proximaHora.setHours(ahora.getHours() + 1);
+
+    const tiempo = proximaHora - ahora;
+
+    setTimeout(() => {
+      enviarVersiculo();
+
+      intervaloHora = setInterval(() => {
+        enviarVersiculo();
+      }, 60 * 60 * 1000); // cada hora
+
+    }, tiempo);
+  }
+
+  // 📖 VERSÍCULO SIN REPETIR
+  function enviarVersiculo() {
+
+    if (!cards.length) return;
+
+    if (usados.length === cards.length) usados = [];
+
+    const disponibles = cards.filter((_, i) => !usados.includes(i));
+    const index = Math.floor(Math.random() * disponibles.length);
+    const card = disponibles[index];
+    const realIndex = cards.indexOf(card);
+
+    usados.push(realIndex);
+
+    const titulo = card.titulo || 'Palabra del Padre';
+    const mensaje = `${card.cita || ''}\n${card.versiculo || ''}`;
+
+    mostrarNotificacion(titulo, mensaje);
+  }
+
+  // 🔔 MOSTRAR NOTIFICACIÓN
+  function mostrarNotificacion(titulo, mensaje) {
+
+    if (Notification.permission !== 'granted') return;
+
+    reproducirSonido();
+
+    navigator.serviceWorker.getRegistration().then(reg => {
+
+      const options = {
+        body: mensaje,
+        icon: '/Palabra360.png',
+        badge: '/Palabra360.png',
+        vibrate: [200,100,200],
+        tag: 'palabra'
+      };
+
+      if (reg) {
+        reg.showNotification(titulo, options);
+      } else {
+        new Notification(titulo, options);
+      }
+
+    });
+  }
+
+  // 🙏 ÁNGELUS (12:00 exacto)
+  function programarAngelus() {
+
+    const ahora = new Date();
+    const proximo = new Date();
+
+    proximo.setHours(12, 0, 0, 0);
+
+    if (ahora > proximo) {
+      proximo.setDate(proximo.getDate() + 1);
+    }
+
+    const tiempo = proximo - ahora;
+
+    angelusTimeout = setTimeout(() => {
+
+      notificarAngelus();
+
+      // repetir diario
+      setInterval(notificarAngelus, 24 * 60 * 60 * 1000);
+
+    }, tiempo);
+  }
+
+  function notificarAngelus() {
+
+    const titulo = '🙏 Ángelus (Mediodía)';
+    const mensaje = 'El Ángel del Señor anunció a María…\nDetente un momento para orar.';
+
+    mostrarNotificacion(titulo, mensaje);
+  }
+
+});
+</script> 
+  
   
 </body>
 </html>
