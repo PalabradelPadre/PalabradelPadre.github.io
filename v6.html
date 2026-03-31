@@ -534,126 +534,122 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
   
-<script>
+  <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  function agregarBotonUnete() {
+  // Crear botón flotante
+  const btn = document.createElement('button');
+  btn.innerText = '🔔 Activar Notificaciones';
+
+  Object.assign(btn.style, {
+    position: 'fixed',
+    bottom: '9rem',
+    right: '1rem',
+    padding: '10px 14px',
+    borderRadius: '999px',
+    background: '#22c55e',
+    color: '#fff',
+    border: 'none',
+    fontWeight: 'bold',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+    cursor: 'pointer',
+    zIndex: '9999'
+  });
+
+  document.body.appendChild(btn);
+
+  let intervalId = null;
+
+  btn.onclick = async () => {
+
+    // Pedir permiso
+    const permission = await Notification.requestPermission();
+
+    if (permission !== 'granted') {
+      alert('Debes permitir notificaciones');
+      return;
+    }
+
+    btn.innerText = '🔕 Detener Notificaciones';
+
+    // Evitar duplicar intervalos
+    if (intervalId) return;
+
+    intervalId = setInterval(() => {
+      mostrarNotificacion();
+    }, 5 * 60 * 1000); // cada 5 minutos
+
+    // Primera inmediata
+    mostrarNotificacion();
+  };
+
+  function mostrarNotificacion() {
+    if (Notification.permission === 'granted') {
+      navigator.serviceWorker.getRegistration().then(reg => {
+        if (reg) {
+          reg.showNotification('📖 Palabra del Padre', {
+            body: 'Tómate un momento con Dios 🙏',
+            icon: '/icon-192.png',
+            badge: '/icon-192.png'
+          });
+        } else {
+          new Notification('📖 Palabra del Padre', {
+            body: 'Tómate un momento con Dios 🙏'
+          });
+        }
+      });
+    }
+  }
+
+});
+</script>
+ 
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function intercambiarBotones() {
     const cards = document.querySelectorAll('.card-glass');
 
     cards.forEach(card => {
-      // Evita duplicar el botón
-      if (card.querySelector('.btn-unete-card')) return;
+      const btnDiario = card.querySelector('.diario-btn');
+      const btnUnete = card.querySelector('.btn-unete-card');
 
-      // Solo agrega si tiene el botón diario
-      const diarioBtn = card.querySelector('.diario-btn');
-      if (!diarioBtn) return;
+      // Validar que ambos existan
+      if (!btnDiario || !btnUnete) return;
 
-      const btn = document.createElement('button');
-      btn.className = 'btn-unete-card animate-scale-up';
-      btn.innerText = '🙌 Únete';
+      // Evitar hacerlo más de una vez
+      if (card.dataset.swapDone) return;
 
-      // Estilos
-      Object.assign(btn.style, {
-        marginTop: '8px',
-        width: '100%',
-        padding: '8px',
-        borderRadius: '12px',
-        background: '#ffcc00',
-        color: '#3b1f5f',
-        fontWeight: 'bold',
-        border: 'none',
-        cursor: 'pointer',
-        transition: 'transform 0.2s, box-shadow 0.2s'
-      });
+      // Clonar nodos (mantienen eventos porque no usamos innerHTML)
+      const diarioClone = btnDiario;
+      const uneteClone = btnUnete;
 
-      btn.addEventListener('mouseenter', () => {
-        btn.style.transform = 'scale(1.05)';
-        btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-      });
-      btn.addEventListener('mouseleave', () => {
-        btn.style.transform = 'scale(1)';
-        btn.style.boxShadow = 'none';
-      });
+      // Intercambiar posiciones
+      const parent = btnDiario.parentNode;
 
-      // Acción al hacer clic
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const modalBtn = document.querySelector('.evangelizar-btn');
-        if (modalBtn) modalBtn.click();
-      });
+      parent.insertBefore(uneteClone, diarioClone); // Únete va donde estaba Diario
+      parent.appendChild(diarioClone); // Diario pasa al final
 
-      // Insertar debajo del diario-btn
-      diarioBtn.insertAdjacentElement('afterend', btn);
+      card.dataset.swapDone = 'true';
     });
   }
 
-  agregarBotonUnete();
+  // Ejecutar al cargar
+  intercambiarBotones();
 
-  const observer = new MutationObserver(agregarBotonUnete);
-  observer.observe(document.getElementById('root'), { childList: true, subtree: true });
+  // Observar cambios (React vuelve a renderizar)
+  const observer = new MutationObserver(() => {
+    intercambiarBotones();
+  });
+
+  observer.observe(document.getElementById('root'), {
+    childList: true,
+    subtree: true
+  });
 
 });
 </script>
   
-<script>
-document.addEventListener('DOMContentLoaded', async () => {
-
-  // Solicitar permiso
-  const permiso = await Notification.requestPermission();
-  if (permiso !== 'granted') {
-    alert('Debes permitir notificaciones para probarlas.');
-    return;
-  }
-
-  // Traer datos de cards.json
-  let cardsData = [];
-  try {
-    const res = await fetch('cards.json');
-    cardsData = await res.json();
-  } catch (e) {
-    console.error('No se pudo cargar cards.json', e);
-  }
-
-  // Función para mostrar notificación con sonido
-  function mostrarNotificacion(titulo, mensaje) {
-    navigator.serviceWorker.getRegistration().then(reg => {
-      if (reg) {
-        reg.showNotification(titulo, {
-          body: mensaje,
-          icon: '/Palabra360.png',
-          badge: '/Palabra360.png',
-          silent: false,  // permite reproducir sonido si el navegador lo soporta
-          vibrate: [200, 100, 200],
-          tag: 'versiculo'
-        });
-      } else {
-        // fallback sin SW
-        new Notification(titulo, {
-          body: mensaje,
-          icon: '/Palabra360.png'
-        });
-      }
-
-      // reproducir sonido tipo campana
-      const audio = new Audio('https://actions.google.com/sounds/v1/alarms/bell_ring.ogg');
-      audio.play();
-    });
-  }
-
-  // Función para elegir versículo aleatorio completo
-  function enviarVersiculo() {
-    if (!cardsData.length) return;
-    const random = cardsData[Math.floor(Math.random() * cardsData.length)];
-    mostrarNotificacion(random.titulo, random.cita); // muestra el versículo completo
-  }
-
-  // PRUEBA: notificación 1 minuto después de cargar la página
-  setTimeout(() => {
-    enviarVersiculo();
-  }, 60 * 1000); // 1 minuto
-
-});
-</script>
   
 </body>
 </html>
