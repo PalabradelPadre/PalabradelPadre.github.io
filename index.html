@@ -639,17 +639,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-  
- <script>
+
+<script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 🔔 BOTÓN (debajo de Buen Pastor)
   const btn = document.createElement('button');
   btn.innerHTML = '🔔';
-
   Object.assign(btn.style, {
     position: 'fixed',
-    bottom: '2.1rem', // 👈 MÁS ABAJO (debajo del Buen Pastor)
+    bottom: '2.1rem',
     left: '1rem',
     width: '42px',
     height: '42px',
@@ -665,87 +663,55 @@ document.addEventListener('DOMContentLoaded', () => {
     cursor: 'pointer',
     zIndex: '9999'
   });
-
   document.body.appendChild(btn);
 
   let cards = [];
   let usados = [];
   let intervaloHora = null;
   let angelusTimeout = null;
+  let coronillaTimeout = null;
+  let minutoTimeout = null;
 
-  // 🔊 SONIDO
   const sonido = new Audio('/campana.mp3');
 
   function reproducirSonido() {
     sonido.currentTime = 0;
     sonido.volume = 1;
-
-    const play = sonido.play();
-    if (play !== undefined) {
-      play.catch(() => {});
-    }
+    sonido.play().catch(() => {});
   }
 
-  // 📥 Cargar versículos
   fetch('cards.json')
     .then(res => res.json())
-    .then(data => cards = data)
-    .catch(() => console.warn('Error cargando cards.json'));
+    .then(data => cards = data);
 
-  // 👉 CLICK BOTÓN
-  btn.onclick = async () => {
-
-    // 🔁 Desactivar
-    if (intervaloHora) {
-      clearInterval(intervaloHora);
-      clearTimeout(angelusTimeout);
-      intervaloHora = null;
-      btn.innerHTML = '🔔';
-      return;
-    }
-
-    const permiso = await Notification.requestPermission();
-
-    if (permiso !== 'granted') {
-      alert('Activa las notificaciones 🙏');
-      return;
-    }
-
-    btn.innerHTML = '🔕';
-
-    // ⏰ Notificación cada hora exacta
-    programarCadaHora();
-
-    // 🙏 Ángelus
-    programarAngelus();
-
-    // Enviar una inicial
-    enviarVersiculo();
-  };
-
-  // ⏰ PROGRAMAR CADA HORA EXACTA
-  function programarCadaHora() {
-    const ahora = new Date();
-
-    const proximaHora = new Date();
-    proximaHora.setMinutes(0, 0, 0);
-    proximaHora.setHours(ahora.getHours() + 1);
-
-    const tiempo = proximaHora - ahora;
-
-    setTimeout(() => {
-      enviarVersiculo();
-
-      intervaloHora = setInterval(() => {
-        enviarVersiculo();
-      }, 60 * 60 * 1000); // cada hora
-
-    }, tiempo);
+  let swRegistration = null;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => swRegistration = reg);
   }
 
-  // 📖 VERSÍCULO SIN REPETIR
-  function enviarVersiculo() {
+  function mostrarNotificacion(titulo, mensaje) {
+    reproducirSonido();
 
+    const opciones = {
+      body: mensaje,
+      icon: '/Palabra360.png',
+      badge: '/Palabra360.png',
+      tag: 'palabra'
+    };
+
+    if (swRegistration && swRegistration.active) {
+      swRegistration.active.postMessage({
+        type: 'SHOW_NOTIFICATION',
+        ...opciones,
+        title: titulo
+      });
+    } else {
+      new Notification(titulo, opciones);
+    }
+  }
+
+  function enviarVersiculo() {
     if (!cards.length) return;
 
     if (usados.length === cards.length) usados = [];
@@ -753,77 +719,136 @@ document.addEventListener('DOMContentLoaded', () => {
     const disponibles = cards.filter((_, i) => !usados.includes(i));
     const index = Math.floor(Math.random() * disponibles.length);
     const card = disponibles[index];
-    const realIndex = cards.indexOf(card);
 
-    usados.push(realIndex);
+    usados.push(cards.indexOf(card));
 
-    const titulo = card.titulo || 'Palabra del Padre';
-    const mensaje = `${card.cita || ''}\n${card.versiculo || ''}`;
-
-    mostrarNotificacion(titulo, mensaje);
+    mostrarNotificacion(
+      card.titulo || 'Palabra del Padre',
+      `${card.cita || ''}\n${card.versiculo || ''}`
+    );
   }
 
-  // 🔔 MOSTRAR NOTIFICACIÓN
-  function mostrarNotificacion(titulo, mensaje) {
-
-    if (Notification.permission !== 'granted') return;
-
-    reproducirSonido();
-
-    navigator.serviceWorker.getRegistration().then(reg => {
-
-      const options = {
-        body: mensaje,
-        icon: '/Palabra360.png',
-        badge: '/Palabra360.png',
-        vibrate: [200,100,200],
-        tag: 'palabra'
-      };
-
-      if (reg) {
-        reg.showNotification(titulo, options);
-      } else {
-        new Notification(titulo, options);
-      }
-
-    });
+  // ⏱️ después de 1 minuto
+  function programarPrimerVersiculo() {
+    minutoTimeout = setTimeout(() => {
+      enviarVersiculo();
+    }, 60000);
   }
 
-  // 🙏 ÁNGELUS (12:00 exacto)
+  // 🔁 cada hora exacta
+  function programarCadaHora() {
+    const ahora = new Date();
+    const proximaHora = new Date();
+
+    proximaHora.setMinutes(0, 0, 0);
+    proximaHora.setHours(ahora.getHours() + 1);
+
+    setTimeout(() => {
+      enviarVersiculo();
+      intervaloHora = setInterval(enviarVersiculo, 3600000);
+    }, proximaHora - ahora);
+  }
+
+  // 🙏 Ángelus (NO TOCAR)
   function programarAngelus() {
-
     const ahora = new Date();
     const proximo = new Date();
 
     proximo.setHours(12, 0, 0, 0);
-
-    if (ahora > proximo) {
-      proximo.setDate(proximo.getDate() + 1);
-    }
-
-    const tiempo = proximo - ahora;
+    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
 
     angelusTimeout = setTimeout(() => {
+      mostrarNotificacion('🙏 Ángelus (Mediodía)', 'Detente un momento para orar.');
 
-      notificarAngelus();
+      setInterval(() => {
+        mostrarNotificacion('🙏 Ángelus', 'Recuerda tu oración.');
+      }, 86400000);
 
-      // repetir diario
-      setInterval(notificarAngelus, 24 * 60 * 60 * 1000);
-
-    }, tiempo);
+    }, proximo - ahora);
   }
 
-  function notificarAngelus() {
+  // 🕒 Coronilla 3:00 p.m.
+  function programarCoronilla() {
+    const ahora = new Date();
+    const proximo = new Date();
 
-    const titulo = '🙏 Ángelus (Mediodía)';
-    const mensaje = 'El Ángel del Señor anunció a María…\nDetente un momento para orar.';
+    proximo.setHours(15, 0, 0, 0);
 
-    mostrarNotificacion(titulo, mensaje);
+    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
+
+    coronillaTimeout = setTimeout(() => {
+
+      mostrarNotificacion(
+        '🕒 Hora de la Misericordia',
+        'A las 3:00 p.m., recuerda rezar la Coronilla a la Divina Misericordia.'
+      );
+
+      setInterval(() => {
+        mostrarNotificacion(
+          '🕒 Hora de la Misericordia',
+          'Es momento de la Coronilla a la Divina Misericordia.'
+        );
+      }, 86400000);
+
+    }, proximo - ahora);
   }
+
+  async function iniciarNotificaciones() {
+    let permiso = Notification.permission;
+
+    if (permiso === 'default') {
+      permiso = await Notification.requestPermission();
+    }
+
+    if (permiso !== 'granted') return;
+
+    // ✅ 1. Notificación inmediata
+    mostrarNotificacion(
+      '🔔 Notificaciones activadas',
+      'Recibirás palabras de Dios durante el día.'
+    );
+
+    // ✅ 2. después de 1 minuto
+    programarPrimerVersiculo();
+
+    // ✅ 3. cada hora
+    programarCadaHora();
+
+    // ✅ 4. Ángelus
+    programarAngelus();
+
+    // ✅ 5. Coronilla
+    programarCoronilla();
+  }
+
+  btn.onclick = () => {
+
+    if (intervaloHora) {
+      clearInterval(intervaloHora);
+      clearTimeout(angelusTimeout);
+      clearTimeout(coronillaTimeout);
+      clearTimeout(minutoTimeout);
+
+      intervaloHora = null;
+      btn.innerHTML = '🔔';
+      return;
+    }
+
+    iniciarNotificaciones();
+    btn.innerHTML = '🔕';
+  };
+
+  // 🔥 auto iniciar si ya aceptó
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      iniciarNotificaciones();
+      btn.innerHTML = '🔕';
+    }
+  }, 3000);
 
 });
-</script> 
-  
+</script>
+
   
 </body>
 </html>
