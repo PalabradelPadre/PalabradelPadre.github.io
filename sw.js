@@ -1,4 +1,4 @@
-const CACHE_NAME = 'palabra-del-padre-v14';
+const CACHE_NAME = 'palabra-del-padre-v15';
 
 const urlsToCache = [
   './',
