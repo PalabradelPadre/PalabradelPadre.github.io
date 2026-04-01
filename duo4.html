@@ -572,66 +572,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
   
- <script>
-document.addEventListener('DOMContentLoaded', () => {
-
-  function moverBotonUnete() {
-
-    // 🔴 Ocultar botón original flotante
-    const btnOriginal = document.querySelector('.evangelizar-btn');
-    if (btnOriginal) {
-      btnOriginal.style.display = 'none';
-    }
-
-    // 🟢 Recorrer todas las cards
-    const cards = document.querySelectorAll('.card-glass');
-
-    cards.forEach(card => {
-
-      // Evitar duplicados
-      if (card.querySelector('.btn-unete-card')) return;
-
-      // Crear botón
-      const btn = document.createElement('button');
-      btn.className = 'btn-unete-card floating-btn';
-      btn.innerHTML = '<i class="bi bi-person-fill-add"></i>';
-
-      // Estilo opcional
-      btn.style.background = 'rgba(255, 204, 0, 0.9)';
-      btn.style.color = '#3b1f5f';
-
-      // Evento → simula click del original
-      btn.onclick = () => {
-        const original = document.querySelector('.evangelizar-btn');
-        if (original) original.click();
-      };
-
-      // Insertarlo en la card (abajo a la derecha)
-      const footer = card.querySelector('.flex.justify-between');
-
-      if (footer) {
-        footer.appendChild(btn);
-      }
-
-    });
-  }
-
-  // Ejecutar al inicio
-  moverBotonUnete();
-
-  // 👀 React vuelve a renderizar → observar cambios
-  const observer = new MutationObserver(() => {
-    moverBotonUnete();
-  });
-
-  observer.observe(document.getElementById('root'), {
-    childList: true,
-    subtree: true
-  });
-
-});
-</script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -650,8 +590,7 @@ document.addEventListener('DOMContentLoaded', () => {
   Object.assign(btn.style, {
     position: 'fixed',
     bottom: '1.5rem',
-    left: '50%',
-    transform: 'translateX(-50%)', // centrado horizontal
+    left: '1rem',
     width: '75px',
     height: '75px',
     borderRadius: '22px',
@@ -669,12 +608,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const icon = document.createElement('div');
   icon.innerHTML = '🔔';
   icon.style.fontSize = '22px';
+  icon.style.textAlign = 'center';
 
   const contador = document.createElement('div');
   contador.style.fontSize = '13px';
   contador.style.color = '#fff';
   contador.style.fontWeight = 'bold';
   contador.style.marginTop = '4px';
+  contador.style.textAlign = 'center'; // ✅ Centrar texto dentro del botón
+  contador.style.width = '100%';      // ✅ Asegura que tome todo el ancho
+  contador.style.display = 'block';
 
   const barraContainer = document.createElement('div');
   Object.assign(barraContainer.style, {
@@ -701,24 +644,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(btn);
 
   function actualizarUI() {
-    // ✅ Cambiado: mostrar X/42
+    // Mostrar X/42
     contador.innerText = `${Math.min(recibidas, totalObjetivo)}/${totalObjetivo}`;
 
     barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
 
-    // 🎯 Color según permisos
+    // Cambiar color según permisos
     if (Notification.permission !== 'granted') {
-      btn.style.background = '#9ca3af'; // gris
+      btn.style.background = '#9ca3af';
     } else if (recibidas >= totalObjetivo) {
-      btn.style.background = '#facc15'; // dorado
+      btn.style.background = '#facc15';
     } else {
-      btn.style.background = '#22c55e'; // verde
+      btn.style.background = '#22c55e';
     }
   }
 
   function animar() {
-    btn.style.transform = 'translateX(-50%) scale(1.15)';
-    setTimeout(() => btn.style.transform = 'translateX(-50%) scale(1)', 150);
+    btn.style.transform = 'scale(1.15)';
+    setTimeout(() => btn.style.transform = 'scale(1)', 150);
   }
 
   actualizarUI();
@@ -832,13 +775,13 @@ document.addEventListener('DOMContentLoaded', () => {
     notificacionesIniciadas = true;
     actualizarUI();
 
-    // 🎉 Enviar notificación al entrar
+    // Enviar notificación al entrar
     mostrarNotificacion('🔔 Bienvenido', 'Recibirás la Palabra de Dios', false);
 
-    // 📖 Enviar versículo inmediato
+    // Enviar versículo inmediato
     enviarVersiculo();
 
-    // 🔥 Fix → 1 minuto garantizado
+    // Fix → 1 minuto garantizado
     clearTimeout(window._notiMinuto);
     window._notiMinuto = setTimeout(() => {
       if (Notification.permission === 'granted') {
@@ -846,7 +789,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 60000);
 
-    // ⏰ Horarios fijos
+    // Horarios fijos
     programarHorario(7,0,'⛪ Ir a Misa','Comienza tu día con Dios');
     programarHorario(12,0,'🙏 Ángelus','Momento de oración');
     programarHorario(15,0,'🕒 Coronilla','Hora de la Misericordia');
@@ -868,7 +811,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ✅ Auto-inicio al entrar
+  // Auto-inicio al entrar
   iniciar();
 
 });
