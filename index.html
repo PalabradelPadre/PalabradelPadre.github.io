@@ -638,17 +638,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
-  // 🔒 CONTROL
-  let notificacionesIniciadas = false;
-  let ultimoClick = 0;
 
   // 🔔 BOTÓN
   const btn = document.createElement('button');
   btn.innerHTML = '🔔';
+
   Object.assign(btn.style, {
     position: 'fixed',
     bottom: '1.5rem',
@@ -667,6 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cursor: 'pointer',
     zIndex: '9999'
   });
+
   document.body.appendChild(btn);
 
   // 🔴 BADGE
@@ -686,98 +683,47 @@ document.addEventListener('DOMContentLoaded', () => {
     justifyContent: 'center',
     opacity: '0'
   });
+
   btn.appendChild(badge);
 
-  let notificacionesRecibidas = parseInt(localStorage.getItem('noti_contador')) || 0;
-
-  function guardarEstado() {
-    localStorage.setItem('noti_contador', notificacionesRecibidas);
-  }
+  let contador = parseInt(localStorage.getItem('noti_contador')) || 0;
 
   function actualizarBadge() {
-    if (notificacionesRecibidas > 0) {
-      badge.innerText = notificacionesRecibidas;
+    if (contador > 0) {
+      badge.innerText = contador;
       badge.style.opacity = '1';
     }
   }
 
   actualizarBadge();
 
-  function activarBoton() {
-    btn.style.background = '#22c55e';
-  }
-
-  function desactivarBoton() {
-    btn.style.background = '#d1d5db';
-  }
-
-  // 🔔 TOAST
-  const toast = document.createElement('div');
-  Object.assign(toast.style, {
-    position: 'fixed',
-    top: '1rem',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    padding: '12px',
-    background: '#2563eb',
-    color: '#fff',
-    borderRadius: '8px',
-    opacity: '0',
-    transition: '0.3s'
-  });
-  document.body.appendChild(toast);
-
-  function mostrarToast(texto) {
-    toast.innerText = texto;
-    toast.style.opacity = '1';
-    setTimeout(() => toast.style.opacity = '0', 4000);
-  }
-
   // 🔊 SONIDO
   const sonido = new Audio('/campana.mp3');
 
-  function reproducirSonido() {
+  function sonidoPlay() {
     sonido.currentTime = 0;
     sonido.play().catch(()=>{});
   }
 
-  // 🔔 SERVICE WORKER
-  let swRegistration = null;
-
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => swRegistration = reg);
-  }
-
   // 🔔 NOTIFICACIÓN
-  function mostrarNotificacion(titulo, mensaje, contar = true) {
+  function notificar(titulo, mensaje, contar = true) {
 
-    reproducirSonido();
+    if (Notification.permission !== 'granted') return;
+
+    sonidoPlay();
 
     if (contar) {
-      notificacionesRecibidas++;
-      guardarEstado();
+      contador++;
+      localStorage.setItem('noti_contador', contador);
       actualizarBadge();
     }
 
     localStorage.setItem('ultimaNotificacion', Date.now());
 
-    mostrarToast(`${titulo}\n${mensaje}`);
-
-    const opciones = {
+    new Notification(titulo, {
       body: mensaje,
       icon: '/Palabra360.png'
-    };
-
-    if (swRegistration?.active) {
-      swRegistration.active.postMessage({
-        type: 'SHOW_NOTIFICATION',
-        title: titulo,
-        ...opciones
-      });
-    } else {
-      new Notification(titulo, opciones);
-    }
+    });
   }
 
   // 📖 DATA
@@ -795,57 +741,67 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function enviarVersiculo() {
-    const ahora = new Date();
-    if (ahora.getHours() < 7 || ahora.getHours() > 22) return;
 
     if (!cards.length) return;
+
+    const ahora = new Date();
+    const hora = ahora.getHours();
+
+    // horario permitido
+    if (hora < 7 || hora > 22) return;
 
     if (usados.length === cards.length) usados = [];
 
     const disponibles = cards.filter((_, i) => !usados.includes(i));
     const card = disponibles[Math.floor(Math.random() * disponibles.length)];
-
     const indexReal = cards.indexOf(card);
 
     usados.push(indexReal);
     guardarUsados();
 
-    mostrarNotificacion(
+    notificar(
       card.titulo || 'Palabra del Padre',
       `${card.cita || ''}\n${card.versiculo || ''}`
     );
   }
 
-  function programarHorario(hora, minuto, titulo, mensaje, esVersiculo=false) {
-    const ahora = new Date();
-    const proximo = new Date();
+  // 🔥 SISTEMA ROBUSTO (cada minuto revisa)
+  function loopNotificaciones() {
 
-    proximo.setHours(hora, minuto, 0, 0);
-    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
+    setInterval(() => {
 
-    setTimeout(() => {
-      esVersiculo ? enviarVersiculo() : mostrarNotificacion(titulo, mensaje);
-    }, proximo - ahora);
-  }
+      const ahora = new Date();
+      const minutos = ahora.getMinutes();
+      const hora = ahora.getHours();
 
-  // 🧠 RESTAURACIÓN INTELIGENTE
-  function restaurarSesion() {
-    const ultima = parseInt(localStorage.getItem('ultimaNotificacion')) || 0;
+      // solo en minuto 0 (exacto)
+      if (minutos !== 0) return;
 
-    const ahora = Date.now();
-    const diferencia = ahora - ultima;
+      const clave = `noti_${hora}`;
+      const ultima = localStorage.getItem(clave);
 
-    // si pasó más de 2 horas
-    if (diferencia > 7200000 && Notification.permission === 'granted') {
-      enviarVersiculo();
-    }
+      // evitar repetir en mismo día
+      const hoy = new Date().toDateString();
+
+      if (ultima === hoy) return;
+
+      localStorage.setItem(clave, hoy);
+
+      // horarios especiales
+      if (hora === 7) notificar('⛪ Ir a Misa','Comienza tu día con Dios');
+      else if (hora === 12) notificar('🙏 Ángelus','Momento de oración');
+      else if (hora === 15) notificar('🕒 Coronilla','Hora de la Misericordia');
+      else if (hora === 17) notificar('📿 Rosario','Reza el Rosario');
+      else if (hora === 18) notificar('🛐 San José','Ora a San José');
+      else if (hora === 22) notificar('🌙 Oración','Gracias por este día');
+      else enviarVersiculo();
+
+    }, 60000); // cada minuto
+
   }
 
   // 🚀 INICIO
-  async function iniciarNotificaciones() {
-
-    if (notificacionesIniciadas) return;
-    notificacionesIniciadas = true;
+  async function iniciar() {
 
     let permiso = Notification.permission;
 
@@ -853,62 +809,31 @@ document.addEventListener('DOMContentLoaded', () => {
       permiso = await Notification.requestPermission();
     }
 
-    if (permiso !== 'granted') {
-      desactivarBoton();
-      return;
-    }
+    if (permiso !== 'granted') return;
 
-    activarBoton();
+    btn.style.background = '#22c55e';
 
-    mostrarNotificacion(
-      '🔔 Activadas',
-      'Recibirás la Palabra de Dios durante el día',
-      false
-    );
+    notificar('🔔 Activadas','Recibirás mensajes durante el día', false);
 
     enviarVersiculo();
-
-    // 🆕 NUEVA PRUEBA → 1 MINUTO (versículo real)
-    setTimeout(() => {
-      enviarVersiculo();
-    }, 60000);
-
-    // ⏰ HORARIOS
-    programarHorario(7,0,'⛪ Ir a Misa','Comienza tu día participando de la Misa');
-    programarHorario(12,0,'🙏 Ángelus','Detente un momento para orar');
-    programarHorario(15,0,'🕒 Coronilla','Hora de la Misericordia');
-    programarHorario(17,0,'📿 Rosario','Es momento de rezar el Rosario');
-    programarHorario(18,0,'🛐 Coronilla a San José','Dedica unos minutos a San José');
-    programarHorario(22,0,'🌙 Oración de la noche','Agradece a Dios por este día');
-
-    const horasVersiculos = [8,9,10,11,13,14,16,19,20,21];
-    horasVersiculos.forEach(h => programarHorario(h,0,'','',true));
+    loopNotificaciones();
   }
 
   // 👆 CLICK
   btn.onclick = () => {
-    const ahora = Date.now();
-    if (ahora - ultimoClick < 1000) return;
-
-    ultimoClick = ahora;
 
     if (Notification.permission === 'granted') {
       enviarVersiculo();
     } else {
-      iniciarNotificaciones();
+      iniciar();
     }
+
   };
 
-  // 🔥 AUTO START + RESTAURAR
-  setTimeout(() => {
-    if (Notification.permission === 'granted') {
-      restaurarSesion();
-
-      if (!notificacionesIniciadas) {
-        iniciarNotificaciones();
-      }
-    }
-  }, 3000);
+  // 🔥 AUTO REANUDAR
+  if (Notification.permission === 'granted') {
+    loopNotificaciones();
+  }
 
 });
 </script>
