@@ -632,7 +632,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-<script>
 document.addEventListener('DOMContentLoaded', () => {
 
   let notificacionesIniciadas = false;
@@ -650,7 +649,8 @@ document.addEventListener('DOMContentLoaded', () => {
   Object.assign(btn.style, {
     position: 'fixed',
     bottom: '1.5rem',
-    left: '1rem',
+    left: '50%',
+    transform: 'translateX(-50%)', // centrado horizontal
     width: '75px',
     height: '75px',
     borderRadius: '22px',
@@ -670,9 +670,10 @@ document.addEventListener('DOMContentLoaded', () => {
   icon.style.fontSize = '22px';
 
   const contador = document.createElement('div');
-  contador.style.fontSize = '11px';
+  contador.style.fontSize = '13px';
   contador.style.color = '#fff';
   contador.style.fontWeight = 'bold';
+  contador.style.marginTop = '4px';
 
   const barraContainer = document.createElement('div');
   Object.assign(barraContainer.style, {
@@ -699,24 +700,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(btn);
 
   function actualizarUI() {
-
-    contador.innerText = `${Math.min(recibidas, totalObjetivo)} de ${totalObjetivo} versículos`;
+    // ✅ CAMBIO: mostrar X/42
+    contador.innerText = `${Math.min(recibidas, totalObjetivo)}/${totalObjetivo}`;
 
     barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
 
-    // 🎯 COLOR CORRECTO SEGÚN PERMISO REAL
+    // 🎯 COLOR SEGÚN PERMISO
     if (Notification.permission !== 'granted') {
-      btn.style.background = '#9ca3af'; // gris
+      btn.style.background = '#9ca3af';
     } else if (recibidas >= totalObjetivo) {
-      btn.style.background = '#facc15'; // dorado
+      btn.style.background = '#facc15';
     } else {
-      btn.style.background = '#22c55e'; // verde
+      btn.style.background = '#22c55e';
     }
   }
 
   function animar() {
-    btn.style.transform = 'scale(1.15)';
-    setTimeout(() => btn.style.transform = 'scale(1)', 150);
+    btn.style.transform = 'translateX(-50%) scale(1.15)';
+    setTimeout(() => btn.style.transform = 'translateX(-50%) scale(1)', 150);
   }
 
   actualizarUI();
@@ -780,7 +781,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function enviarVersiculo() {
-
     const ahora = new Date();
     if (ahora.getHours() < 7 || ahora.getHours() > 22) return;
 
@@ -804,7 +804,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function programarHorario(hora, minuto, titulo, mensaje, esVersiculo=false) {
     const ahora = new Date();
     const proximo = new Date();
-
     proximo.setHours(hora, minuto, 0, 0);
     if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
 
@@ -830,9 +829,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     notificacionesIniciadas = true;
-    actualizarUI(); // ahora sí se pone verde
+    actualizarUI();
 
-    mostrarNotificacion('🔔 Activadas', 'Recibirás la Palabra de Dios', false);
+    // 🎉 ENVIAR NOTIFICACIÓN AUTOMÁTICA AL ENTRAR
+    mostrarNotificacion('🔔 Bienvenido', 'Recibirás la Palabra de Dios', false);
 
     // 📖 INMEDIATA
     enviarVersiculo();
@@ -867,9 +867,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  // ✅ AUTO-INICIO al entrar
+  iniciar();
+
 });
-</script>
-  
   
   
 </body>
