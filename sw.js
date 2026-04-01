@@ -1,4 +1,4 @@
-const CACHE_NAME = 'palabra-del-padre-v13';
+const CACHE_NAME = 'palabra-del-padre-v14';
 
 const urlsToCache = [
   './',
@@ -8,6 +8,8 @@ const urlsToCache = [
   './Palabra192.png',
   './Palabra512.png',
   './Palabra360.png',
+  './libretaespiritual.html',
+  './BuenPastor.html',
   './campana.mp3'
 ];
 
