@@ -263,7 +263,7 @@
         alert('Instalación aún no disponible.');
       }
     }, 
-    className: 'install-btn' 
+    className: 'install-btn hidden' 
   }, '📲')
 ),
    heroCard && e(HeroCard, { ...heroCard }),
@@ -447,51 +447,57 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
   const btn = document.querySelector('.install-btn');
   if (!btn) return;
 
-  let deferredPrompt = null;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
   function isAppInstalled() {
-    return window.matchMedia('(display-mode: standalone)').matches
-      || window.navigator.standalone === true;
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      window.navigator.standalone === true ||
+      document.referrer.includes('android-app://')
+    );
   }
 
-  // 🔴 OCULTAR SI YA ESTÁ INSTALADA
-  if (isAppInstalled()) {
+  function isReallyInstalled() {
+    return isAppInstalled() || localStorage.getItem('pwa_installed') === 'true';
+  }
+
+  // 🔴 SI YA ESTÁ INSTALADA → OCULTAR
+  if (isReallyInstalled()) {
     btn.classList.add('hidden');
+    return;
   }
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
+  // 🍎 iOS (no hay prompt automático)
+  if (isIOS) {
+    btn.classList.remove('hidden');
+    btn.innerText = '📲 Instalar';
 
-    // Solo mostrar si NO está instalada
-    if (!isAppInstalled()) {
-      btn.classList.remove('hidden');
-    }
+    btn.onclick = () => {
+      alert('Para instalar:\n1. Toca compartir\n2. "Agregar a pantalla de inicio"');
+    };
+
+    return;
+  }
+
+  // 🤖 ANDROID → SOLO ESCUCHAMOS (React ya guarda el evento)
+  window.addEventListener('beforeinstallprompt', () => {
+    btn.classList.remove('hidden');
   });
 
-  btn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-
-    if (choice.outcome === 'accepted') {
-      btn.classList.add('hidden');
-    }
-
-    deferredPrompt = null;
-  });
-
+  // 💾 CUANDO SE INSTALA
   window.addEventListener('appinstalled', () => {
+    localStorage.setItem('pwa_installed', 'true');
     btn.classList.add('hidden');
-    deferredPrompt = null;
   });
+
 });
 </script>
-
+  
   <script>
 document.addEventListener('DOMContentLoaded', () => {
 
