@@ -263,7 +263,7 @@
         alert('Instalación aún no disponible.');
       }
     }, 
-    className: 'install-btn hidden' 
+    className: 'install-btn' 
   }, '📲')
 ),
    heroCard && e(HeroCard, { ...heroCard }),
@@ -447,57 +447,51 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
   const btn = document.querySelector('.install-btn');
   if (!btn) return;
 
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let deferredPrompt = null;
 
   function isAppInstalled() {
-    return (
-      window.matchMedia('(display-mode: standalone)').matches ||
-      window.matchMedia('(display-mode: fullscreen)').matches ||
-      window.navigator.standalone === true ||
-      document.referrer.includes('android-app://')
-    );
+    return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
   }
 
-  function isReallyInstalled() {
-    return isAppInstalled() || localStorage.getItem('pwa_installed') === 'true';
-  }
-
-  // 🔴 SI YA ESTÁ INSTALADA → OCULTAR
-  if (isReallyInstalled()) {
+  // 🔴 OCULTAR SI YA ESTÁ INSTALADA
+  if (isAppInstalled()) {
     btn.classList.add('hidden');
-    return;
   }
 
-  // 🍎 iOS (no hay prompt automático)
-  if (isIOS) {
-    btn.classList.remove('hidden');
-    btn.innerText = '📲 Instalar';
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
 
-    btn.onclick = () => {
-      alert('Para instalar:\n1. Toca compartir\n2. "Agregar a pantalla de inicio"');
-    };
-
-    return;
-  }
-
-  // 🤖 ANDROID → SOLO ESCUCHAMOS (React ya guarda el evento)
-  window.addEventListener('beforeinstallprompt', () => {
-    btn.classList.remove('hidden');
+    // Solo mostrar si NO está instalada
+    if (!isAppInstalled()) {
+      btn.classList.remove('hidden');
+    }
   });
 
-  // 💾 CUANDO SE INSTALA
+  btn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+
+    if (choice.outcome === 'accepted') {
+      btn.classList.add('hidden');
+    }
+
+    deferredPrompt = null;
+  });
+
   window.addEventListener('appinstalled', () => {
-    localStorage.setItem('pwa_installed', 'true');
     btn.classList.add('hidden');
+    deferredPrompt = null;
   });
-
 });
 </script>
-  
+
   <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -639,26 +633,16 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
 
   // 🔒 CONTROL
+  let notificacionesIniciadas = false;
   let ultimoClick = 0;
-  let swReady = false;
-
-  // 🔔 REGISTRAR SERVICE WORKER
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js').then(() => {
-      navigator.serviceWorker.ready.then(() => {
-        swReady = true;
-      });
-    });
-  }
 
   // 🔔 BOTÓN
   const btn = document.createElement('button');
   btn.innerHTML = '🔔';
-
   Object.assign(btn.style, {
     position: 'fixed',
     bottom: '1.5rem',
@@ -677,7 +661,6 @@ document.addEventListener('DOMContentLoaded', () => {
     cursor: 'pointer',
     zIndex: '9999'
   });
-
   document.body.appendChild(btn);
 
   // 🔴 BADGE
@@ -697,14 +680,17 @@ document.addEventListener('DOMContentLoaded', () => {
     justifyContent: 'center',
     opacity: '0'
   });
-
   btn.appendChild(badge);
 
-  let contador = parseInt(localStorage.getItem('noti_contador')) || 0;
+  let notificacionesRecibidas = parseInt(localStorage.getItem('noti_contador')) || 0;
+
+  function guardarEstado() {
+    localStorage.setItem('noti_contador', notificacionesRecibidas);
+  }
 
   function actualizarBadge() {
-    if (contador > 0) {
-      badge.innerText = contador;
+    if (notificacionesRecibidas > 0) {
+      badge.innerText = notificacionesRecibidas;
       badge.style.opacity = '1';
     }
   }
@@ -719,14 +705,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.style.background = '#d1d5db';
   }
 
-  // 🔊 SONIDO
-  const sonido = new Audio('/campana.mp3');
-
-  function sonidoPlay() {
-    sonido.currentTime = 0;
-    sonido.play().catch(()=>{});
-  }
-
   // 🔔 TOAST
   const toast = document.createElement('div');
   Object.assign(toast.style, {
@@ -739,12 +717,8 @@ document.addEventListener('DOMContentLoaded', () => {
     color: '#fff',
     borderRadius: '8px',
     opacity: '0',
-    transition: '0.3s',
-    zIndex: '9999',
-    textAlign: 'center',
-    whiteSpace: 'pre-line'
+    transition: '0.3s'
   });
-
   document.body.appendChild(toast);
 
   function mostrarToast(texto) {
@@ -753,16 +727,30 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => toast.style.opacity = '0', 4000);
   }
 
-  // 🔔 NOTIFICACIÓN (USANDO SERVICE WORKER)
-  function notificar(titulo, mensaje, contar = true) {
+  // 🔊 SONIDO
+  const sonido = new Audio('/campana.mp3');
 
-    if (Notification.permission !== 'granted') return;
+  function reproducirSonido() {
+    sonido.currentTime = 0;
+    sonido.play().catch(()=>{});
+  }
 
-    sonidoPlay();
+  // 🔔 SERVICE WORKER
+  let swRegistration = null;
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => swRegistration = reg);
+  }
+
+  // 🔔 NOTIFICACIÓN
+  function mostrarNotificacion(titulo, mensaje, contar = true) {
+
+    reproducirSonido();
 
     if (contar) {
-      contador++;
-      localStorage.setItem('noti_contador', contador);
+      notificacionesRecibidas++;
+      guardarEstado();
       actualizarBadge();
     }
 
@@ -772,12 +760,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const opciones = {
       body: mensaje,
-      icon: '/Palabra360.png',
-      badge: '/Palabra192.png'
+      icon: '/Palabra360.png'
     };
 
-    if (swReady && navigator.serviceWorker.controller) {
-      navigator.serviceWorker.controller.postMessage({
+    if (swRegistration?.active) {
+      swRegistration.active.postMessage({
         type: 'SHOW_NOTIFICATION',
         title: titulo,
         ...opciones
@@ -802,13 +789,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function enviarVersiculo() {
+    const ahora = new Date();
+    if (ahora.getHours() < 7 || ahora.getHours() > 22) return;
 
     if (!cards.length) return;
-
-    const ahora = new Date();
-    const hora = ahora.getHours();
-
-    if (hora < 7 || hora > 22) return;
 
     if (usados.length === cards.length) usados = [];
 
@@ -820,44 +804,42 @@ document.addEventListener('DOMContentLoaded', () => {
     usados.push(indexReal);
     guardarUsados();
 
-    notificar(
+    mostrarNotificacion(
       card.titulo || 'Palabra del Padre',
       `${card.cita || ''}\n${card.versiculo || ''}`
     );
   }
 
-  // 🔥 LOOP ESTABLE (NO SE ROMPE AL RECARGAR)
-  function loopNotificaciones() {
+  function programarHorario(hora, minuto, titulo, mensaje, esVersiculo=false) {
+    const ahora = new Date();
+    const proximo = new Date();
 
-    setInterval(() => {
+    proximo.setHours(hora, minuto, 0, 0);
+    if (ahora > proximo) proximo.setDate(proximo.getDate() + 1);
 
-      const ahora = new Date();
-      const hora = ahora.getHours();
-      const minutos = ahora.getMinutes();
-
-      if (minutos !== 0) return;
-
-      const clave = `noti_${hora}`;
-      const hoy = new Date().toDateString();
-
-      if (localStorage.getItem(clave) === hoy) return;
-
-      localStorage.setItem(clave, hoy);
-
-      if (hora === 7) notificar('⛪ Ir a Misa','Comienza tu día con Dios');
-      else if (hora === 12) notificar('🙏 Ángelus','Momento de oración');
-      else if (hora === 15) notificar('🕒 Coronilla','Hora de la Misericordia');
-      else if (hora === 17) notificar('📿 Rosario','Reza el Rosario');
-      else if (hora === 18) notificar('🛐 San José','Ora a San José');
-      else if (hora === 22) notificar('🌙 Oración','Gracias por este día');
-      else enviarVersiculo();
-
-    }, 60000);
-
+    setTimeout(() => {
+      esVersiculo ? enviarVersiculo() : mostrarNotificacion(titulo, mensaje);
+    }, proximo - ahora);
   }
 
-  // 🚀 INICIAR
-  async function iniciar() {
+  // 🧠 RESTAURACIÓN INTELIGENTE
+  function restaurarSesion() {
+    const ultima = parseInt(localStorage.getItem('ultimaNotificacion')) || 0;
+
+    const ahora = Date.now();
+    const diferencia = ahora - ultima;
+
+    // si pasó más de 2 horas
+    if (diferencia > 7200000 && Notification.permission === 'granted') {
+      enviarVersiculo();
+    }
+  }
+
+  // 🚀 INICIO
+  async function iniciarNotificaciones() {
+
+    if (notificacionesIniciadas) return;
+    notificacionesIniciadas = true;
 
     let permiso = Notification.permission;
 
@@ -872,35 +854,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     activarBoton();
 
-    notificar('🔔 Activadas','Recibirás mensajes durante el día', false);
+    mostrarNotificacion(
+      '🔔 Activadas',
+      'Recibirás la Palabra de Dios durante el día',
+      false
+    );
 
     enviarVersiculo();
-    loopNotificaciones();
+
+    // 🆕 NUEVA PRUEBA → 1 MINUTO (versículo real)
+    setTimeout(() => {
+      enviarVersiculo();
+    }, 60000);
+
+    // ⏰ HORARIOS
+    programarHorario(7,0,'⛪ Ir a Misa','Comienza tu día participando de la Misa');
+    programarHorario(12,0,'🙏 Ángelus','Detente un momento para orar');
+    programarHorario(15,0,'🕒 Coronilla','Hora de la Misericordia');
+    programarHorario(17,0,'📿 Rosario','Es momento de rezar el Rosario');
+    programarHorario(18,0,'🛐 Coronilla a San José','Dedica unos minutos a San José');
+    programarHorario(22,0,'🌙 Oración de la noche','Agradece a Dios por este día');
+
+    const horasVersiculos = [8,9,10,11,13,14,16,19,20,21];
+    horasVersiculos.forEach(h => programarHorario(h,0,'','',true));
   }
 
   // 👆 CLICK
   btn.onclick = () => {
-
     const ahora = Date.now();
     if (ahora - ultimoClick < 1000) return;
+
     ultimoClick = ahora;
 
     if (Notification.permission === 'granted') {
       enviarVersiculo();
     } else {
-      iniciar();
+      iniciarNotificaciones();
     }
-
   };
 
-  // 🔥 AUTO REANUDAR
-  if (Notification.permission === 'granted') {
-    activarBoton();
-    loopNotificaciones();
-  }
+  // 🔥 AUTO START + RESTAURAR
+  setTimeout(() => {
+    if (Notification.permission === 'granted') {
+      restaurarSesion();
+
+      if (!notificacionesIniciadas) {
+        iniciarNotificaciones();
+      }
+    }
+  }, 3000);
 
 });
 </script>
+  
   
   
 </body>
