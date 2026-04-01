@@ -632,6 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+<script>
 document.addEventListener('DOMContentLoaded', () => {
 
   let notificacionesIniciadas = false;
@@ -700,18 +701,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(btn);
 
   function actualizarUI() {
-    // ✅ CAMBIO: mostrar X/42
+    // ✅ Cambiado: mostrar X/42
     contador.innerText = `${Math.min(recibidas, totalObjetivo)}/${totalObjetivo}`;
 
     barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
 
-    // 🎯 COLOR SEGÚN PERMISO
+    // 🎯 Color según permisos
     if (Notification.permission !== 'granted') {
-      btn.style.background = '#9ca3af';
+      btn.style.background = '#9ca3af'; // gris
     } else if (recibidas >= totalObjetivo) {
-      btn.style.background = '#facc15';
+      btn.style.background = '#facc15'; // dorado
     } else {
-      btn.style.background = '#22c55e';
+      btn.style.background = '#22c55e'; // verde
     }
   }
 
@@ -831,13 +832,13 @@ document.addEventListener('DOMContentLoaded', () => {
     notificacionesIniciadas = true;
     actualizarUI();
 
-    // 🎉 ENVIAR NOTIFICACIÓN AUTOMÁTICA AL ENTRAR
+    // 🎉 Enviar notificación al entrar
     mostrarNotificacion('🔔 Bienvenido', 'Recibirás la Palabra de Dios', false);
 
-    // 📖 INMEDIATA
+    // 📖 Enviar versículo inmediato
     enviarVersiculo();
 
-    // 🔥 FIX REAL → 1 MINUTO GARANTIZADO
+    // 🔥 Fix → 1 minuto garantizado
     clearTimeout(window._notiMinuto);
     window._notiMinuto = setTimeout(() => {
       if (Notification.permission === 'granted') {
@@ -845,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 60000);
 
-    // ⏰ HORARIOS
+    // ⏰ Horarios fijos
     programarHorario(7,0,'⛪ Ir a Misa','Comienza tu día con Dios');
     programarHorario(12,0,'🙏 Ángelus','Momento de oración');
     programarHorario(15,0,'🕒 Coronilla','Hora de la Misericordia');
@@ -867,11 +868,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  // ✅ AUTO-INICIO al entrar
+  // ✅ Auto-inicio al entrar
   iniciar();
 
 });
-  
+</script>
   
 </body>
 </html>
