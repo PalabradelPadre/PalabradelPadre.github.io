@@ -956,6 +956,108 @@ window.addEventListener('load', () => {
 
 
 
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function crearBotonAgregarVersiculo() {
+
+    // Buscar el botón de "Reflexión diaria"
+    const reflexionBtn = document.querySelector('a[href*="whatsapp"]');
+    if (!reflexionBtn) return;
+
+    // Evitar duplicado
+    if (document.querySelector('.btn-agregar-versiculo')) return;
+
+    // Contenedor padre
+    const container = reflexionBtn.parentNode;
+
+    // Crear botón
+    const btn = document.createElement('a');
+    btn.className = 'btn-agregar-versiculo';
+    btn.target = '_blank';
+
+    // 📲 MENSAJE WHATSAPP (puedes personalizarlo)
+    const mensaje = `Hola 🙏 quiero agregar un nuevo versículo:
+
+📖 Título:
+✝️ Versículo:
+📌 Cita:
+🧠 Reflexión:
+🏷️ Categoría:`;
+
+    btn.href = 'https://api.whatsapp.com/send?phone=52XXXXXXXXXX&text=' + encodeURIComponent(mensaje);
+
+    btn.innerHTML = `
+      <i class="bi bi-plus-circle-fill"></i>
+      <span>Agregar versículo</span>
+    `;
+
+    // 🎨 ESTILO iOS 18
+    Object.assign(btn.style, {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      padding: '10px 14px',
+      borderRadius: '16px',
+      fontWeight: '600',
+      fontSize: '14px',
+      textDecoration: 'none',
+      color: '#fff',
+      background: 'rgba(255,255,255,0.15)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      border: '1px solid rgba(255,255,255,0.25)',
+      boxShadow: '0 8px 25px rgba(0,0,0,0.3)',
+      transition: 'all 0.25s ease',
+      position: 'relative',
+      overflow: 'hidden'
+    });
+
+    // 🌊 Hover estilo iOS
+    btn.onmouseenter = () => {
+      btn.style.transform = 'scale(1.08)';
+      btn.style.background = 'rgba(255,255,255,0.25)';
+    };
+
+    btn.onmouseleave = () => {
+      btn.style.transform = 'scale(1)';
+      btn.style.background = 'rgba(255,255,255,0.15)';
+    };
+
+    // ✨ Animación pulse (llamativo pero elegante)
+    btn.animate([
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.08)' },
+      { transform: 'scale(1)' }
+    ], {
+      duration: 2000,
+      iterations: Infinity
+    });
+
+    // 📍 Insertar al lado del botón existente
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
+    container.style.gap = '12px';
+
+    container.appendChild(btn);
+  }
+
+  // Ejecutar
+  crearBotonAgregarVersiculo();
+
+  // 👀 React vuelve a renderizar → observar cambios
+  const observer = new MutationObserver(() => {
+    crearBotonAgregarVersiculo();
+  });
+
+  observer.observe(document.getElementById('root'), {
+    childList: true,
+    subtree: true
+  });
+
+});
+</script>
+
   
 </body>
 </html>
