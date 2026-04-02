@@ -955,267 +955,106 @@ window.addEventListener('load', () => {
 </script>
 
 
-
   <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  function crearBotonAgregarVersiculo() {
+  function mejorarBotonVersiculo() {
 
-    // Buscar el botón de "Reflexión diaria"
-    const reflexionBtn = document.querySelector('a[href*="whatsapp"]');
-    if (!reflexionBtn) return;
+    const btn = document.querySelector('.btn-agregar-versiculo');
+    if (!btn) return;
 
-    // Evitar duplicado
-    if (document.querySelector('.btn-agregar-versiculo')) return;
+    if (document.querySelector('.modal-versiculo')) return;
 
-    // Contenedor padre
-    const container = reflexionBtn.parentNode;
+    // =========================
+    // 🌟 MODAL iOS
+    // =========================
+    const modal = document.createElement('div');
 
-    // Crear botón
-    const btn = document.createElement('a');
-    btn.className = 'btn-agregar-versiculo';
-    btn.target = '_blank';
+    modal.className = 'modal-versiculo';
 
-    // 📲 MENSAJE WHATSAPP (puedes personalizarlo)
-    const mensaje = `Hola 🙏 quiero agregar un nuevo versículo:
-
-📖 Título:
-✝️ Versículo:
-📌 Cita:
-🧠 Reflexión:
-🏷️ Categoría:`;
-
-    btn.href = 'https://api.whatsapp.com/send?phone=52XXXXXXXXXX&text=' + encodeURIComponent(mensaje);
-
-    btn.innerHTML = `
-      <i class="bi bi-plus-circle-fill"></i>
-      <span>🙌 Evangelizar</span>
-    `;
-
-    // 🎨 ESTILO iOS 18
-    Object.assign(btn.style, {
+    Object.assign(modal.style, {
+      position: 'fixed',
+      inset: '0',
+      background: 'rgba(0,0,0,0.4)',
+      backdropFilter: 'blur(6px)',
       display: 'flex',
       alignItems: 'center',
-      gap: '8px',
-      padding: '10px 14px',
-      borderRadius: '16px',
-      fontWeight: '600',
-      fontSize: '14px',
-      textDecoration: 'none',
-      color: '#fff',
+      justifyContent: 'center',
+      zIndex: '99999',
+      opacity: '0',
+      pointerEvents: 'none',
+      transition: 'all 0.3s ease'
+    });
+
+    const card = document.createElement('div');
+
+    Object.assign(card.style, {
       background: 'rgba(255,255,255,0.15)',
       backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      border: '1px solid rgba(255,255,255,0.25)',
-      boxShadow: '0 8px 25px rgba(0,0,0,0.3)',
-      transition: 'all 0.25s ease',
-      position: 'relative',
-      overflow: 'hidden'
+      borderRadius: '20px',
+      padding: '20px',
+      width: '90%',
+      maxWidth: '320px',
+      color: '#fff',
+      boxShadow: '0 20px 50px rgba(0,0,0,0.4)',
+      transform: 'scale(0.9)',
+      transition: 'all 0.3s ease'
     });
-
-    // 🌊 Hover estilo iOS
-    btn.onmouseenter = () => {
-      btn.style.transform = 'scale(1.08)';
-      btn.style.background = 'rgba(255,255,255,0.25)';
-    };
-
-    btn.onmouseleave = () => {
-      btn.style.transform = 'scale(1)';
-      btn.style.background = 'rgba(255,255,255,0.15)';
-    };
-
-    // ✨ Animación pulse (llamativo pero elegante)
-    btn.animate([
-      { transform: 'scale(1)' },
-      { transform: 'scale(1.08)' },
-      { transform: 'scale(1)' }
-    ], {
-      duration: 2000,
-      iterations: Infinity
-    });
-
-    // 📍 Insertar al lado del botón existente
-    container.style.display = 'flex';
-    container.style.justifyContent = 'center';
-    container.style.gap = '12px';
-
-    container.appendChild(btn);
-  }
-
-  // Ejecutar
-  crearBotonAgregarVersiculo();
-
-  // 👀 React vuelve a renderizar → observar cambios
-  const observer = new MutationObserver(() => {
-    crearBotonAgregarVersiculo();
-  });
-
-  observer.observe(document.getElementById('root'), {
-    childList: true,
-    subtree: true
-  });
-
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-  // =========================
-  // 👤 DATA (puedes luego traerlo de JSON)
-  // =========================
-  const colaboradores = [
-    {
-      nombre: "María 🙏",
-      mensaje: "Donó con amor",
-      foto: "https://i.pravatar.cc/100?img=1"
-    },
-    {
-      nombre: "José ✝️",
-      mensaje: "Apoya la misión",
-      foto: "https://i.pravatar.cc/100?img=2"
-    },
-    {
-      nombre: "Ana 💛",
-      mensaje: "Comparte la palabra",
-      foto: "https://i.pravatar.cc/100?img=3"
-    }
-  ];
-
-  let index = 0;
-
-  // =========================
-  // 🌟 CONTENEDOR
-  // =========================
-  const container = document.createElement('div');
-
-  Object.assign(container.style, {
-    position: 'fixed',
-    bottom: '110px',
-    right: '20px',
-    width: '70px',
-    height: '70px',
-    borderRadius: '50%',
-    zIndex: '9999',
-    cursor: 'pointer',
-    transition: 'all 0.4s ease'
-  });
-
-  // =========================
-  // 🔵 CÍRCULO GIRATORIO
-  // =========================
-  const circle = document.createElement('div');
-
-  Object.assign(circle.style, {
-    width: '100%',
-    height: '100%',
-    borderRadius: '50%',
-    background: 'conic-gradient(#facc15, #ffffff, #facc15)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    animation: 'spin 6s linear infinite'
-  });
-
-  // =========================
-  // 🖼️ AVATAR
-  // =========================
-  const avatar = document.createElement('img');
-
-  Object.assign(avatar.style, {
-    width: '85%',
-    height: '85%',
-    borderRadius: '50%',
-    objectFit: 'cover',
-    border: '2px solid white'
-  });
-
-  circle.appendChild(avatar);
-  container.appendChild(circle);
-
-  // =========================
-  // 💬 CARD EXPANDIBLE
-  // =========================
-  const card = document.createElement('div');
-
-  Object.assign(card.style, {
-    position: 'absolute',
-    bottom: '80px',
-    right: '0',
-    width: '200px',
-    padding: '12px',
-    borderRadius: '16px',
-    background: 'rgba(255,255,255,0.15)',
-    backdropFilter: 'blur(20px)',
-    color: '#fff',
-    fontSize: '13px',
-    opacity: '0',
-    transform: 'translateY(10px)',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.4)'
-  });
-
-  container.appendChild(card);
-  document.body.appendChild(container);
-
-  // =========================
-  // 🔁 ROTACIÓN DE USUARIOS
-  // =========================
-  function actualizar() {
-    const user = colaboradores[index];
-
-    avatar.src = user.foto;
 
     card.innerHTML = `
-      <strong>${user.nombre}</strong><br>
-      <span style="opacity:0.8">${user.mensaje}</span>
+      <div style="font-weight:700; margin-bottom:10px;">
+        📖 Comparte la Palabra
+      </div>
+
+      <div style="font-size:13px; opacity:0.85; margin-bottom:15px;">
+        Cada versículo toma tiempo en prepararse 🙏<br>
+        Si deseas, puedes ayudar a que esta misión continúe
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        
+        <a href="https://api.whatsapp.com/send?phone=52XXXXXXXXXX&text=${encodeURIComponent('Hola 🙏 quiero compartir un versículo:')}" 
+           target="_blank"
+           style="padding:10px; border-radius:12px; background:#2563eb; text-align:center; font-weight:600;">
+           ✍️ Enviar versículo
+        </a>
+
+        <a href="https://paypal.me/silenciodeSanJose" 
+           target="_blank"
+           style="padding:10px; border-radius:12px; background:#facc15; color:#000; text-align:center; font-weight:600;">
+           🙏 Sostener misión
+        </a>
+
+      </div>
     `;
 
-    index = (index + 1) % colaboradores.length;
+    modal.appendChild(card);
+    document.body.appendChild(modal);
+
+    // =========================
+    // 👆 EVENTO
+    // =========================
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+
+      modal.style.opacity = '1';
+      modal.style.pointerEvents = 'auto';
+      card.style.transform = 'scale(1)';
+    });
+
+    // cerrar
+    modal.addEventListener('click', () => {
+      modal.style.opacity = '0';
+      modal.style.pointerEvents = 'none';
+      card.style.transform = 'scale(0.9)';
+    });
+
   }
 
-  actualizar();
-
-  setInterval(() => {
-    actualizar();
-  }, 5000);
-
-  // =========================
-  // ✨ EXPANSIÓN AUTOMÁTICA
-  // =========================
-  setInterval(() => {
-    card.style.opacity = '1';
-    card.style.transform = 'translateY(0)';
-
-    setTimeout(() => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(10px)';
-    }, 3000);
-
-  }, 7000);
-
-  // =========================
-  // 👆 INTERACCIÓN
-  // =========================
-  container.onclick = () => {
-    window.open('https://paypal.me/silenciodeSanJose', '_blank');
-  };
-
-  // =========================
-  // 🎞️ ANIMACIÓN GLOBAL
-  // =========================
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
+  mejorarBotonVersiculo();
 
 });
 </script>
-  
   
 </body>
 </html>
