@@ -599,14 +599,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 🔒 CONTROL
   let notificacionesIniciadas = false;
-
-  // 🎯 TOTAL REAL
   let totalObjetivo = 42;
   let recibidas = parseInt(localStorage.getItem('noti_recibidas')) || 0;
 
@@ -614,8 +610,11 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('noti_recibidas', recibidas);
   }
 
-  // 🎨 BOTÓN
+  // =========================
+  // 🔔 BOTÓN FLOTANTE
+  // =========================
   const btn = document.createElement('div');
+  btn.className = 'btn-notificaciones-floating';
 
   Object.assign(btn.style, {
     position: 'fixed',
@@ -624,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
     width: '75px',
     height: '75px',
     borderRadius: '22px',
-    background: '#9ca3af', // 🔘 gris inicial
+    background: '#9ca3af',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -668,26 +667,22 @@ document.addEventListener('DOMContentLoaded', () => {
   btn.appendChild(barraContainer);
   document.body.appendChild(btn);
 
+  function actualizarUI() {
+    contador.innerText = recibidas >= totalObjetivo
+      ? '✔ 42 / 42'
+      : `${recibidas} / 42`;
 
-function actualizarUI() {
+    barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
 
-  contador.innerText = recibidas >= totalObjetivo
-    ? '✔ 42 / 42'
-    : `${recibidas} / 42`;
-
-  barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
-
-  // 🎨 COLOR SEGÚN ESTADO
-  if (!notificacionesIniciadas) {
-    btn.style.background = '#9ca3af'; // gris
-  } else if (recibidas >= totalObjetivo) {
-    btn.style.background = '#facc15'; // dorado
-  } else {
-    btn.style.background = '#22c55e'; // verde
+    if (!notificacionesIniciadas) {
+      btn.style.background = '#9ca3af';
+    } else if (recibidas >= totalObjetivo) {
+      btn.style.background = '#facc15';
+    } else {
+      btn.style.background = '#22c55e';
+    }
   }
-}
 
-  
   function animar() {
     btn.style.transform = 'scale(1.15)';
     setTimeout(() => btn.style.transform = 'scale(1)', 150);
@@ -695,26 +690,38 @@ function actualizarUI() {
 
   actualizarUI();
 
+  // =========================
   // 🔊 SONIDO
+  // =========================
   const sonido = new Audio('/campana.mp3');
   function sonidoPlay() {
     sonido.currentTime = 0;
     sonido.play().catch(()=>{});
   }
 
+  // =========================
   // 🔔 SERVICE WORKER
+  // =========================
   let swRegistration = null;
+
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => swRegistration = reg);
   }
 
-  // 🔔 NOTIFICACIÓN
+  // =========================
+  // 🔔 NOTIFICACIÓN (FIX REAL)
+  // =========================
   function mostrarNotificacion(titulo, mensaje, contar = true) {
 
     if (!titulo && !mensaje) return;
 
     sonidoPlay();
+
+    // ✅ TOAST SIEMPRE (clave del fix)
+    if (document.visibilityState === 'visible' && window.mostrarToastGlobal) {
+      window.mostrarToastGlobal(titulo, mensaje);
+    }
 
     if (contar) {
       recibidas++;
@@ -739,7 +746,9 @@ function actualizarUI() {
     }
   }
 
+  // =========================
   // 📖 DATA
+  // =========================
   let cards = [];
   let usados = JSON.parse(localStorage.getItem('usados')) || [];
 
@@ -754,10 +763,8 @@ function actualizarUI() {
   }
 
   function enviarVersiculo() {
-
     const ahora = new Date();
     if (ahora.getHours() < 7 || ahora.getHours() > 22) return;
-
     if (!cards.length) return;
 
     if (usados.length === cards.length) usados = [];
@@ -774,7 +781,6 @@ function actualizarUI() {
     );
   }
 
-  // ⏰ HORARIOS
   function programarHorario(hora, minuto, titulo, mensaje, esVersiculo=false) {
     const ahora = new Date();
     const proximo = new Date();
@@ -787,7 +793,6 @@ function actualizarUI() {
     }, proximo - ahora);
   }
 
-  // 🚀 INICIAR
   async function iniciar() {
 
     if (notificacionesIniciadas) return;
@@ -805,19 +810,14 @@ function actualizarUI() {
       return;
     }
 
-    actualizarUI(); // cambia a verde
+    actualizarUI();
 
     mostrarNotificacion('🔔 Activadas', 'Recibirás la Palabra de Dios', false);
 
-    // 📖 INMEDIATA
     enviarVersiculo();
 
-    // ⏳ 1 MINUTO DESPUÉS
-    setTimeout(() => {
-      enviarVersiculo();
-    }, 60000);
+    setTimeout(() => enviarVersiculo(), 60000);
 
-    // ⏰ FIJAS
     programarHorario(7,0,'⛪ Ir a Misa','Comienza tu día con Dios');
     programarHorario(12,0,'🙏 Ángelus','Momento de oración');
     programarHorario(15,0,'🕒 Coronilla','Hora de la Misericordia');
@@ -825,184 +825,74 @@ function actualizarUI() {
     programarHorario(18,0,'🛐 San José','Ora a San José');
     programarHorario(22,0,'🌙 Noche','Agradece el día');
 
-    // 📖 VERSÍCULOS
     [8,9,10,11,13,14,16,19,20,21].forEach(h => {
       programarHorario(h,0,'','',true);
     });
   }
 
-  // 👆 CLICK
   btn.onclick = () => {
-    if (!notificacionesIniciadas) {
-      iniciar();
-    } else {
-      enviarVersiculo();
-    }
+    if (!notificacionesIniciadas) iniciar();
+    else enviarVersiculo();
   };
 
 });
 </script>
-  
-  
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // 🔎 Esperar a que el botón exista (porque lo creas dinámicamente)
-  function esperarBoton(callback) {
-    const intervalo = setInterval(() => {
-      const btn = document.querySelector('div[style*="position: fixed"][style*="75px"]');
-      if (btn) {
-        clearInterval(intervalo);
-        callback(btn);
-      }
-    }, 300);
+  const toast = document.createElement('div');
+
+  Object.assign(toast.style, {
+    position: 'fixed',
+    top: '40px',
+    left: '50%',
+    transform: 'translateX(-50%) translateY(-30px)',
+    background: 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(240,240,255,0.8))',
+    backdropFilter: 'blur(12px)',
+    color: '#222',
+    padding: '16px 20px',
+    borderRadius: '16px',
+    width: '340px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+    opacity: '0',
+    transition: 'all 0.35s ease',
+    zIndex: '99999',
+    border: '1px solid rgba(255,255,255,0.4)'
+  });
+
+  const titulo = document.createElement('div');
+  titulo.style.fontWeight = 'bold';
+  titulo.style.marginBottom = '5px';
+
+  const texto = document.createElement('div');
+  texto.style.fontSize = '14px';
+
+  toast.appendChild(titulo);
+  toast.appendChild(texto);
+  document.body.appendChild(toast);
+
+  function mostrarToast(t, m) {
+    titulo.innerText = t || '';
+    texto.innerText = m || '';
+
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(-50%) translateY(-30px)';
+    }, 5000);
   }
 
-  esperarBoton((btn) => {
-
-    // =========================
-    // 🟣 1. TEXTO "Versículos"
-    // =========================
-    if (!btn.querySelector('.label-versiculos')) {
-      const label = document.createElement('div');
-      label.innerText = 'Versículos';
-      label.className = 'label-versiculos';
-
-      Object.assign(label.style, {
-        fontSize: '10px',
-        color: '#fff',
-        marginTop: '2px',
-        opacity: '0.9'
-      });
-
-      btn.appendChild(label);
-    }
-
-    // =========================
-    // 🟣 2. TOAST PREMIUM
-    // =========================
-    const toast = document.createElement('div');
-
-    Object.assign(toast.style, {
-  position: 'fixed',
-  top: '40px', // 🔼 MÁS ARRIBA (antes 80px)
-  left: '50%',
-  transform: 'translateX(-50%) translateY(-30px)',
-  
-  // 🎨 Fondo más claro y moderno
-  background: 'linear-gradient(135deg, rgba(255,255,255,0.85), rgba(240,240,255,0.75))',
-  
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  
-  // 🖋️ Texto más oscuro para contraste
-  color: '#222',
-
-  padding: '16px 20px',
-  borderRadius: '16px',
-  maxWidth: '90%',
-  width: '360px',
-
-  // 💡 Sombra más suave
-  boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
-
-  opacity: '0',
-  pointerEvents: 'none',
-  transition: 'all 0.35s ease',
-
-  zIndex: '99999',
-
-  // ✨ borde más sutil
-  border: '1px solid rgba(255,255,255,0.4)'
-});
-    const icono = document.createElement('div');
-    icono.innerText = '📖';
-    icono.style.fontSize = '22px';
-    icono.style.marginBottom = '6px';
-
-    const titulo = document.createElement('div');
-    titulo.style.fontWeight = 'bold';
-    titulo.style.marginBottom = '6px';
-    titulo.style.fontSize = '15px';
-
-    const texto = document.createElement('div');
-    texto.style.fontSize = '14px';
-    texto.style.lineHeight = '1.4';
-    texto.style.opacity = '0.95';
-
-    toast.appendChild(icono);
-    toast.appendChild(titulo);
-    toast.appendChild(texto);
-    document.body.appendChild(toast);
-
-    function mostrarToast(t, m) {
-      titulo.innerText = t || 'Palabra del Padre';
-      texto.innerText = m || '';
-
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(-50%) translateY(0)';
-      toast.style.pointerEvents = 'auto';
-
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateX(-50%) translateY(-20px)';
-        toast.style.pointerEvents = 'none';
-      }, 5000);
-    }
-
-    // =========================
-    // 🟣 3. INTERCEPTAR NOTIFICACIONES
-    // =========================
-
-    const OriginalNotification = window.Notification;
-
-    // Override elegante
-    window.Notification = function(titulo, options) {
-
-      if (document.visibilityState === 'visible') {
-        mostrarToast(titulo, options?.body);
-      }
-
-      return new OriginalNotification(titulo, options);
-    };
-
-    window.Notification.permission = OriginalNotification.permission;
-    window.Notification.requestPermission = OriginalNotification.requestPermission.bind(OriginalNotification);
-
-    // =========================
-    // 🟣 4. CLICK → MOSTRAR ÚLTIMO VERSÍCULO
-    // =========================
-
-    let ultimoTitulo = '';
-    let ultimoMensaje = '';
-
-    // Interceptar también desde tu lógica interna
-    const originalMostrar = window.mostrarNotificacion;
-
-    if (typeof originalMostrar === 'function') {
-      window.mostrarNotificacion = function(t, m, c) {
-        ultimoTitulo = t;
-        ultimoMensaje = m;
-
-        if (document.visibilityState === 'visible') {
-          mostrarToast(t, m);
-        }
-
-        return originalMostrar(t, m, c);
-      };
-    }
-
-    btn.addEventListener('click', () => {
-      if (ultimoMensaje) {
-        mostrarToast(ultimoTitulo, ultimoMensaje);
-      }
-    });
-
-  });
+  // 🌍 GLOBAL (CLAVE)
+  window.mostrarToastGlobal = mostrarToast;
 
 });
 </script>
 
+
+  
 
  <script>
 // SCRIPT INDEPENDIENTE SEGURO
