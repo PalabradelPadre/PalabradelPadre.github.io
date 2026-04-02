@@ -299,7 +299,6 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
       const shareCard = (platform) => {
         const text = `${cita}\n${versiculo}\nCompartir: ${"https://palabradelpadre.github.io"}`;
         if (platform === 'whatsapp') window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-        if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(text)}`, '_blank');
       };
 
       return e('div', { className: `card-glass cursor-pointer ${catObj.color}`, onClick: () => setExpanded(!expanded) },
@@ -311,7 +310,7 @@ e('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4'
         ),
         e('div', { className: 'flex justify-between mt-2 items-center' },
           e('button', { onClick: () => shareCard('whatsapp'), className: 'share-btn' }, e('i', { className: 'bi bi-whatsapp text-green-500' })),
-          e('button', { onClick: () => shareCard('facebook'), className: 'share-btn' }, e('i', { className: 'bi bi-facebook text-blue-500' })),
+          e('button', { onClick: () => window.location.href = '/BuenPastor.html', className: 'share-btn'}, e('span', null, '🐏')),
           e('button', { className: 'floating-btn diario-btn' }, e('i', { className: 'bi bi-journal-text' }), '')
         )
       );
@@ -492,39 +491,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-  <script>
-document.addEventListener('DOMContentLoaded', () => {
 
-  if (document.getElementById('mi-boton-flotante')) return;
-
-  const btn = document.createElement('button');
-  btn.id = 'mi-boton-flotante';
-  btn.innerHTML = '🐏 Buen Pastor'; // Aquí cambiamos el ícono y el texto
-
-  Object.assign(btn.style, {
-    position: 'fixed',
-    bottom: '5rem', // Lo movemos a la parte inferior
-    left: '1rem',   // Lo colocamos en la parte izquierda
-    padding: '11px 15px',
-    borderRadius: '999px',
-    background: '#FFFFFF', // Botón de color verde
-    color: '#000',
-    border: 'none',
-    fontWeight: 'bold',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
-    cursor: 'pointer',
-    zIndex: '9999'
-  });
-
-  // Evento para redirigir a la página "Buen Pastor"
-  btn.onclick = () => {
-    window.location.href = '/BuenPastor.html'; // Asegúrate de que la ruta sea correcta
-  };
-
-  document.body.appendChild(btn);
-
-});
-</script>
  
   <script>
 document.addEventListener('DOMContentLoaded', () => {
