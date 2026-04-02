@@ -983,7 +983,7 @@ Hola 🙏 quiero agregar un nuevo versículo:
 ✝️ Versículo:
 📌 Cita:
 🧠 Reflexión:
-🏷️ Categoría:Si te es posible, considéralo 🙏)
+🏷️ Categoría:
 `;
 
     btn.href = 'https://api.whatsapp.com/send?phone=52XXXXXXXXXX&text=' + encodeURIComponent(mensaje);
@@ -1059,26 +1059,24 @@ Hola 🙏 quiero agregar un nuevo versículo:
 });
 </script>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
   // =========================
   // 📊 CONFIG
   // =========================
-  const TOTAL_DIA = 5;
-
-  let progreso = parseInt(localStorage.getItem('versiculos_hoy')) || 0;
-  let ultimaPersona = localStorage.getItem('ultima_persona') || "Alguien 🙏";
+  const aportes = JSON.parse(localStorage.getItem('aportes')) || []; // {nombre, tipo, foto}
 
   // =========================
-  // 🌟 CONTENEDOR (IZQUIERDA)
+  // 🌟 CONTENEDOR BOTÓN
   // =========================
   const container = document.createElement('div');
 
   Object.assign(container.style, {
     position: 'fixed',
-    bottom: '110px',
-    left: '20px', // 👈 CAMBIO IMPORTANTE
+    top: '20px', // Subido al inicio
+    left: '20px',
     width: '72px',
     height: '72px',
     borderRadius: '50%',
@@ -1117,7 +1115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '24px',
-    background: '#111'
+    background: '#fff',
+    color: '#333'
   });
 
   circle.appendChild(avatar);
@@ -1130,66 +1129,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
   Object.assign(card.style, {
     position: 'absolute',
-    bottom: '85px',
+    top: '80px', // justo debajo del botón
     left: '0',
-    width: '230px',
+    width: '250px',
     padding: '14px',
     borderRadius: '18px',
-    background: 'rgba(255,255,255,0.18)',
-    backdropFilter: 'blur(20px)',
-    color: '#fff',
+    background: 'rgba(255,255,255,0.95)',
+    color: '#333',
     fontSize: '13px',
     opacity: '0',
     transform: 'translateY(10px)',
-    transition: 'all 0.35s ease',
-    boxShadow: '0 15px 40px rgba(0,0,0,0.4)'
+    transition: 'all 0.3s ease',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
   });
 
   container.appendChild(card);
   document.body.appendChild(container);
 
   // =========================
-  // 📊 BARRA PROGRESO
-  // =========================
-  function barraHTML() {
-    const porcentaje = (progreso / TOTAL_DIA) * 100;
-
-    return `
-      <div style="margin-top:8px;">
-        <div style="font-size:11px; opacity:0.8;">
-          Hoy: ${progreso} / ${TOTAL_DIA} versículos
-        </div>
-        <div style="height:6px; background:rgba(255,255,255,0.3); border-radius:999px; margin-top:4px;">
-          <div style="
-            width:${porcentaje}%;
-            height:100%;
-            background:#facc15;
-            border-radius:999px;
-            transition:0.4s;">
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // =========================
-  // 🔁 ACTUALIZAR UI
+  // 🧾 MOSTRAR APORTES
   // =========================
   function actualizarUI() {
-    card.innerHTML = `
-      <div style="font-weight:700;">✨ Última ayuda</div>
-      <div style="font-size:12px; opacity:0.85;">
-        Gracias a <strong>${ultimaPersona}</strong><br>
-        hoy hay nueva palabra 🙏
-      </div>
-      ${barraHTML()}
-    `;
+    card.innerHTML = ''; // limpiar primero
+
+    if(aportes.length === 0){
+      card.innerHTML = `<strong>Nadie ha aportado todavía 🙏</strong>`;
+      return;
+    }
+
+    const header = document.createElement('div');
+    header.innerHTML = `<strong>Gracias a quienes apoyan 💛</strong>`;
+    card.appendChild(header);
+
+    aportes.forEach(aporte => {
+      const div = document.createElement('div');
+      div.style.display = 'flex';
+      div.style.alignItems = 'center';
+      div.style.marginTop = '6px';
+      div.innerHTML = `
+        <img src="${aporte.foto || ''}" alt="${aporte.nombre}" width="40" height="40" style="border-radius:50%; margin-right:8px; ${aporte.foto ? '' : 'display:none;'}">
+        <span>${aporte.nombre} (${aporte.tipo})</span>
+      `;
+      card.appendChild(div);
+    });
   }
 
   actualizarUI();
 
   // =========================
-  // ✨ MOSTRAR AUTOMÁTICO
+  // 🔁 APARECER Y DESAPARECER
   // =========================
   setInterval(() => {
     card.style.opacity = '1';
@@ -1200,48 +1188,16 @@ document.addEventListener('DOMContentLoaded', () => {
       card.style.transform = 'translateY(10px)';
     }, 3500);
 
-  }, 8000);
+  }, 6000);
 
   // =========================
-  // 🔔 NOTIFICACIÓN SUAVE
-  // =========================
-  function mostrarNotiNuevaPalabra() {
-
-    if (!window.mostrarToastGlobal) return;
-
-    window.mostrarToastGlobal(
-      '🙏 Nueva palabra',
-      `Gracias a ${ultimaPersona}, hoy hay nueva palabra`
-    );
-  }
-
-  // =========================
-  // 🧠 SIMULAR NUEVA AYUDA
-  // (luego lo conectas a WhatsApp real)
-  // =========================
-  window.registrarNuevaAyuda = function(nombre = "Alguien 🙏") {
-
-    progreso++;
-    if (progreso > TOTAL_DIA) progreso = TOTAL_DIA;
-
-    ultimaPersona = nombre;
-
-    localStorage.setItem('versiculos_hoy', progreso);
-    localStorage.setItem('ultima_persona', ultimaPersona);
-
-    actualizarUI();
-    mostrarNotiNuevaPalabra();
-
-    // animación
-    container.style.transform = 'scale(1.15)';
-    setTimeout(() => container.style.transform = 'scale(1)', 200);
-  };
-
-  // =========================
-  // 👆 CLICK → DONAR
+  // 👆 CLICK → PREGUNTA DONAR
   // =========================
   container.onclick = () => {
-    window.open('https://paypal.me/silenciodeSanJose', '_blank');
+    const deseaDonar = confirm("¿Quieres apoyar económicamente la app? 🙏");
+    if(deseaDonar){
+      window.open('https://paypal.me/silenciodeSanJose', '_blank');
+    }
   };
 
   // =========================
@@ -1257,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.head.appendChild(style);
 
 });
-</script>
+</script>  
 
   
   
