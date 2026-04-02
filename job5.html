@@ -600,8 +600,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
-
-
 <script>
 window.addEventListener('load', () => {
 
@@ -712,29 +710,30 @@ window.addEventListener('load', () => {
   }
 
   // =========================
-  // ✨ TOAST iOS PRO
+  // ✨ TOAST iOS PRO (MEJORADO)
   // =========================
   const toast = document.createElement('div');
 
-Object.assign(toast.style, {
-  position: 'fixed',
-  top: '20px',
-  left: '50%',
-  transform: 'translateX(-50%) translateY(-80px) scale(0.92)',
-  background: 'rgba(255,255,255,0.75)',
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
-  color: '#111',
-  padding: '16px',
-  borderRadius: '22px',
-  width: '92%',
-  maxWidth: '360px',
-  boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
-  opacity: '0',
-  zIndex: '99999',
-  transition: 'all 0.5s cubic-bezier(.22,1,.36,1)',
-  border: '1px solid rgba(255,255,255,0.4)'
-});
+  Object.assign(toast.style, {
+    position: 'fixed',
+    top: '20px',
+    left: '50%',
+    transform: 'translateX(-50%) translateY(-80px) scale(0.92)',
+    background: 'rgba(255,255,255,0.75)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    color: '#111',
+    padding: '16px',
+    borderRadius: '22px',
+    width: '92%',
+    maxWidth: '360px',
+    boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
+    opacity: '0',
+    zIndex: '99999',
+    transition: 'all 0.5s cubic-bezier(.22,1,.36,1)',
+    border: '1px solid rgba(255,255,255,0.4)'
+  });
+
   // 📖 ICONO
   const icono = document.createElement('div');
   icono.innerText = '📖';
@@ -767,38 +766,61 @@ Object.assign(toast.style, {
   let hideTimeout;
 
   function mostrarToast(t, m) {
-  titulo.innerText = t || 'Palabra del Padre';
-  texto.innerText = m || '';
+    titulo.innerText = t || 'Palabra del Padre';
+    texto.innerText = m || '';
 
-  toast.style.opacity = '1';
-  toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
 
-  toast.style.boxShadow = '0 30px 80px rgba(0,0,0,0.35)';
+    toast.style.boxShadow = '0 30px 80px rgba(0,0,0,0.35)';
 
-  clearTimeout(hideTimeout);
-  hideTimeout = setTimeout(cerrarToast, 5000);
-}
+    clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(cerrarToast, 5000);
+  }
 
-function cerrarToast() {
-  toast.style.opacity = '0';
-  toast.style.transform = 'translateX(-50%) translateY(-80px) scale(0.92)';
-}
+  function cerrarToast() {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(-80px) scale(0.92)';
+  }
+
+  // =========================
+  // 👆 GESTO DESLIZAR iOS REAL
+  // =========================
+  let startX = 0, startY = 0;
+  let currentX = 0, currentY = 0;
+
+  toast.addEventListener('touchstart', e => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    currentX = startX;
+    currentY = startY;
+    toast.style.transition = 'none';
+  });
+
   toast.addEventListener('touchmove', e => {
+    currentX = e.touches[0].clientX;
     currentY = e.touches[0].clientY;
-    let diff = currentY - startY;
 
-    if (diff < 0) {
-      toast.style.transform = `translateX(-50%) translateY(${diff}px) scale(1)`;
-    }
+    let diffX = currentX - startX;
+    let diffY = currentY - startY;
+
+    toast.style.transform = `translateX(calc(-50% + ${diffX}px)) translateY(${diffY}px) scale(1)`;
+    toast.style.opacity = `${Math.max(0, 1 - Math.abs(diffY)/120 - Math.abs(diffX)/200)}`;
   });
 
   toast.addEventListener('touchend', () => {
-    let diff = currentY - startY;
+    let diffX = currentX - startX;
+    let diffY = currentY - startY;
 
-    if (diff < -50) {
-      cerrarToast();
+    toast.style.transition = 'all 0.3s ease';
+
+    if (diffY < -50 || diffY > 80 || Math.abs(diffX) > 100) {
+      toast.style.transform = `translateX(calc(-50% + ${diffX * 1.5}px)) translateY(${diffY * 1.5}px) scale(0.9)`;
+      toast.style.opacity = '0';
+      setTimeout(cerrarToast, 200);
     } else {
       toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+      toast.style.opacity = '1';
     }
   });
 
@@ -933,44 +955,6 @@ function cerrarToast() {
 </script>
 
 
-
-<script>
-// SCRIPT SEGURO (NO ROMPE NADA)
-document.addEventListener('DOMContentLoaded', () => {
-
-  const btnAgregar = document.getElementById('btn-agregar-card');
-  const btnCerrar = document.getElementById('btn-cerrar-modal');
-  const btnWhatsapp = document.getElementById('btn-whatsapp');
-  const btnDonativo = document.getElementById('btn-donativo');
-
-  if (btnAgregar) {
-    btnAgregar.onclick = () => {
-      document.getElementById('modal-agregar-card').style.display = 'flex';
-    };
-  }
-
-  if (btnCerrar) {
-    btnCerrar.onclick = () => {
-      document.getElementById('modal-agregar-card').style.display = 'none';
-    };
-  }
-
-  if (btnWhatsapp) {
-    btnWhatsapp.onclick = () => {
-      const mensaje = `📖 Quiero enviar un versículo`;
-      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, '_blank');
-    };
-  }
-
-  if (btnDonativo) {
-    btnDonativo.onclick = () => {
-      window.open('https://www.paypal.com/donate/tu-link', '_blank');
-    };
-  }
-
-});
-</script>
 
   
 </body>
