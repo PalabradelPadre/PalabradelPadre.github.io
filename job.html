@@ -668,25 +668,26 @@ document.addEventListener('DOMContentLoaded', () => {
   btn.appendChild(barraContainer);
   document.body.appendChild(btn);
 
-  function actualizarUI() {
-    const faltan = totalObjetivo - recibidas;
 
-    contador.innerText = recibidas >= totalObjetivo
-      ? '✔ Completo'
-      : `${faltan} / 42`;
+function actualizarUI() {
 
-    barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
+  contador.innerText = recibidas >= totalObjetivo
+    ? '✔ 42 / 42'
+    : `${recibidas} / 42`;
 
-    // 🎨 COLOR SEGÚN ESTADO
-    if (!notificacionesIniciadas) {
-      btn.style.background = '#9ca3af'; // gris
-    } else if (recibidas >= totalObjetivo) {
-      btn.style.background = '#facc15'; // dorado
-    } else {
-      btn.style.background = '#22c55e'; // verde
-    }
+  barra.style.width = ((recibidas / totalObjetivo) * 100) + '%';
+
+  // 🎨 COLOR SEGÚN ESTADO
+  if (!notificacionesIniciadas) {
+    btn.style.background = '#9ca3af'; // gris
+  } else if (recibidas >= totalObjetivo) {
+    btn.style.background = '#facc15'; // dorado
+  } else {
+    btn.style.background = '#22c55e'; // verde
   }
+}
 
+  
   function animar() {
     btn.style.transform = 'scale(1.15)';
     setTimeout(() => btn.style.transform = 'scale(1)', 150);
