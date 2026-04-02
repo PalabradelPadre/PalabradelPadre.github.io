@@ -992,155 +992,36 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
-  <script>
-document.addEventListener('DOMContentLoaded', () => {
 
-  // =========================
-  // 🟣 1. AGREGAR BOTÓN "+"
-  // =========================
-  function agregarBoton() {
-    const contenedor = document.querySelector('.flex.justify-center.my-4');
+ <script>
+// SCRIPT INDEPENDIENTE SEGURO
+document.getElementById('btn-agregar-card').onclick = () => {
+    document.getElementById('modal-agregar-card').style.display = 'flex';
+};
 
-    if (!contenedor || contenedor.querySelector('.btn-agregar')) return;
+document.getElementById('btn-cerrar-modal').onclick = () => {
+    document.getElementById('modal-agregar-card').style.display = 'none';
+};
 
-    const btn = document.createElement('button');
-    btn.innerText = '＋';
-    btn.className = 'btn-agregar';
+// Abrir WhatsApp con mensaje predefinido (número de ejemplo)
+document.getElementById('btn-whatsapp').onclick = () => {
+    const mensaje = `📖 Quiero enviar un versículo para agregar a la PWA:\n\n[Título del versículo]\n[Versículo]\n[Reflexión]`;
+    const url = `https://api.whatsapp.com/send?phone=52XXXXXXXXXX&text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+};
 
-    Object.assign(btn.style, {
-      marginLeft: '10px',
-      background: 'linear-gradient(135deg, #22c55e, #16a34a)',
-      color: '#fff',
-      borderRadius: '12px',
-      padding: '0 14px',
-      fontSize: '22px',
-      fontWeight: 'bold',
-      boxShadow: '0 6px 15px rgba(0,0,0,0.4)',
-      cursor: 'pointer'
-    });
+// Abrir link de donativo (puede ser PayPal, MercadoPago, etc.)
+document.getElementById('btn-donativo').onclick = () => {
+    window.open('https://www.paypal.com/donate/tu-link', '_blank');
+};
 
-    btn.onclick = abrirModal;
-
-    contenedor.appendChild(btn);
-  }
-
-  // =========================
-  // 🟣 2. MODAL
-  // =========================
-  const modal = document.createElement('div');
-
-  Object.assign(modal.style, {
-    position: 'fixed',
-    inset: '0',
-    background: 'rgba(0,0,0,0.6)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: '99999',
-    opacity: '0',
-    pointerEvents: 'none',
-    transition: '0.3s'
-  });
-
-  const contenido = document.createElement('div');
-
-  Object.assign(contenido.style, {
-    background: 'rgba(255,255,255,0.95)',
-    color: '#000',
-    padding: '20px',
-    borderRadius: '18px',
-    width: '90%',
-    maxWidth: '400px',
-    boxShadow: '0 20px 50px rgba(0,0,0,0.5)'
-  });
-
-  contenido.innerHTML = `
-    <h2 style="font-weight:bold; margin-bottom:10px;">📖 Nuevo Versículo</h2>
-
-    <input id="titulo" placeholder="Título"
-      style="width:100%; margin-bottom:8px; padding:8px; border-radius:8px;" />
-
-    <input id="versiculo" placeholder="Versículo (Juan 3:16)"
-      style="width:100%; margin-bottom:8px; padding:8px; border-radius:8px;" />
-
-    <textarea id="cita" placeholder="Texto bíblico"
-      style="width:100%; margin-bottom:8px; padding:8px; border-radius:8px;"></textarea>
-
-    <textarea id="reflexion" placeholder="Reflexión"
-      style="width:100%; margin-bottom:10px; padding:8px; border-radius:8px;"></textarea>
-
-    <button id="guardar"
-      style="width:100%; background:#22c55e; color:#fff; padding:10px; border-radius:10px;">
-      Guardar
-    </button>
-  `;
-
-  modal.appendChild(contenido);
-  document.body.appendChild(modal);
-
-  function abrirModal() {
-    modal.style.opacity = '1';
-    modal.style.pointerEvents = 'auto';
-  }
-
-  modal.addEventListener('click', () => {
-    modal.style.opacity = '0';
-    modal.style.pointerEvents = 'none';
-  });
-
-  contenido.addEventListener('click', e => e.stopPropagation());
-
-  // =========================
-  // 🟣 3. GUARDAR CARD
-  // =========================
-  contenido.querySelector('#guardar').onclick = () => {
-
-    const nueva = {
-      titulo: document.getElementById('titulo').value,
-      versiculo: document.getElementById('versiculo').value,
-      cita: document.getElementById('cita').value,
-      reflexion: document.getElementById('reflexion').value,
-      categoria: 'inspiracion'
-    };
-
-    let guardadas = JSON.parse(localStorage.getItem('cards_user')) || [];
-    guardadas.push(nueva);
-    localStorage.setItem('cards_user', JSON.stringify(guardadas));
-
-    alert('✅ Versículo guardado');
-
-    modal.style.opacity = '0';
-    modal.style.pointerEvents = 'none';
-  };
-
-  // =========================
-  // 🟣 4. INYECTAR EN APP
-  // =========================
-  function inyectarCards() {
-    const originalFetch = window.fetch;
-
-    window.fetch = async (...args) => {
-      const res = await originalFetch(...args);
-
-      if (args[0].includes('cards.json')) {
-        const data = await res.clone().json();
-        const user = JSON.parse(localStorage.getItem('cards_user')) || [];
-
-        return new Response(JSON.stringify([...data, ...user]));
-      }
-
-      return res;
-    };
-  }
-
-  // =========================
-  // 🟣 INIT
-  // =========================
-  agregarBoton();
-  inyectarCards();
-
-});
-</script>
+// Cerrar modal al hacer clic fuera de él
+window.onclick = (e) => {
+    if (e.target.id === 'modal-agregar-card') {
+        document.getElementById('modal-agregar-card').style.display = 'none';
+    }
+};
+</script> 
   
 </body>
 </html>
