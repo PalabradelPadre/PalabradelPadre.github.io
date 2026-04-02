@@ -1059,13 +1059,13 @@ Hola 🙏 quiero agregar un nuevo versículo:
 });
 </script>
 
+
   <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const espacioHeader = 120; // para no cubrir el header
-  let toastCerrado = false;
+  const espacioHeader = 120;
 
-  // Lista de aportes (puedes reemplazar con tu data real)
-  const aportes = JSON.parse(localStorage.getItem('aportes')) || [];
+  // Lista de aportes
+  let aportes = JSON.parse(localStorage.getItem('aportes')) || [];
 
   // =========================
   // CÍRCULO 🙏
@@ -1100,10 +1100,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 800);
 
   // =========================
-  // TOAST
+  // VENTANA FLOTA
   // =========================
-  const toast = document.createElement('div');
-  Object.assign(toast.style, {
+  const ventana = document.createElement('div');
+  Object.assign(ventana.style, {
     position: 'fixed',
     top: (espacioHeader + 70) + 'px',
     left: '30px',
@@ -1121,12 +1121,13 @@ document.addEventListener('DOMContentLoaded', () => {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-    pointerEvents: 'none' // 👈 importante, solo activo cuando visible
+    pointerEvents: 'auto'
   });
-  document.body.appendChild(toast);
+  document.body.appendChild(ventana);
 
-  function actualizarToast() {
-    toast.innerHTML = '';
+  // Función para actualizar ventana
+  function actualizarVentana() {
+    ventana.innerHTML = '';
 
     // Cerrar
     const cerrarBtn = document.createElement('span');
@@ -1139,12 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
       fontWeight: '700'
     });
     cerrarBtn.onclick = () => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(-20px)';
-      toast.style.pointerEvents = 'none';
-      toastCerrado = true;
+      ventana.style.opacity = '0';
+      ventana.style.transform = 'translateY(-20px)';
     };
-    toast.appendChild(cerrarBtn);
+    ventana.appendChild(cerrarBtn);
 
     // Mensaje
     const msg = document.createElement('div');
@@ -1154,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       msg.innerHTML = `<strong>Gracias a quienes ya apoyaron 💛</strong>`;
     }
-    toast.appendChild(msg);
+    ventana.appendChild(msg);
 
     // Lista de aportes
     aportes.forEach(aporte => {
@@ -1163,7 +1162,7 @@ document.addEventListener('DOMContentLoaded', () => {
       div.style.alignItems = 'center';
       div.style.gap = '8px';
       div.innerHTML = `${aporte.foto ? `<img src="${aporte.foto}" width="32" height="32" style="border-radius:50%">` : ''} <span>${aporte.nombre} (${aporte.tipo})</span>`;
-      toast.appendChild(div);
+      ventana.appendChild(div);
     });
 
     // Botón donar
@@ -1180,38 +1179,26 @@ document.addEventListener('DOMContentLoaded', () => {
       alignSelf: 'flex-start'
     });
     btn.onclick = (e) => {
-      e.stopPropagation(); // evita que el clic burbujee al círculo
+      e.stopPropagation();
       window.open('https://paypal.me/silenciodeSanJose', '_blank');
     };
-    toast.appendChild(btn);
+    ventana.appendChild(btn);
   }
 
-  function mostrarToast() {
-    toast.style.opacity = '1';
-    toast.style.transform = 'translateY(0)';
-    toast.style.pointerEvents = 'auto'; // 👈 solo ahora captura clics
-    setTimeout(() => {
-      toast.style.opacity = '0';
-      toast.style.transform = 'translateY(-20px)';
-      toast.style.pointerEvents = 'none'; // 👈 desactiva clics
-    }, 5000);
+  // Mostrar ventana
+  function mostrarVentana() {
+    actualizarVentana();
+    ventana.style.opacity = '1';
+    ventana.style.transform = 'translateY(0)';
   }
 
-  // Click círculo → mostrar toast
-  circle.addEventListener('click', () => {
-    if (!toastCerrado) {
-      actualizarToast();
-      mostrarToast();
-    }
-  });
+  // Click círculo → siempre muestra ventana
+  circle.addEventListener('click', mostrarVentana);
 
-  // Toast automático, menor frecuencia
+  // Aparición automática cada 2 minutos
   setInterval(() => {
-    if (!toastCerrado) {
-      actualizarToast();
-      mostrarToast();
-    }
-  }, 120000); // cada 2 minutos
+    mostrarVentana();
+  }, 120000); 
 });
 </script>
   
