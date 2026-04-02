@@ -601,41 +601,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-  
-
- <script>
-// SCRIPT INDEPENDIENTE SEGURO
-document.getElementById('btn-agregar-card').onclick = () => {
-    document.getElementById('modal-agregar-card').style.display = 'flex';
-};
-
-document.getElementById('btn-cerrar-modal').onclick = () => {
-    document.getElementById('modal-agregar-card').style.display = 'none';
-};
-
-// Abrir WhatsApp con mensaje predefinido (número de ejemplo)
-document.getElementById('btn-whatsapp').onclick = () => {
-    const mensaje = `📖 Quiero enviar un versículo para agregar a la PWA:\n\n[Título del versículo]\n[Versículo]\n[Reflexión]`;
-    const url = `https://api.whatsapp.com/send?phone=52XXXXXXXXXX&text=${encodeURIComponent(mensaje)}`;
-    window.open(url, '_blank');
-};
-
-// Abrir link de donativo (puede ser PayPal, MercadoPago, etc.)
-document.getElementById('btn-donativo').onclick = () => {
-    window.open('https://www.paypal.com/donate/tu-link', '_blank');
-};
-
-// Cerrar modal al hacer clic fuera de él
-window.onclick = (e) => {
-    if (e.target.id === 'modal-agregar-card') {
-        document.getElementById('modal-agregar-card').style.display = 'none';
-    }
-};
-</script> 
-
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
 
   // =========================
   // 🔔 ESTADO
@@ -971,7 +939,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+<script>
+// SCRIPT SEGURO (NO ROMPE NADA)
+document.addEventListener('DOMContentLoaded', () => {
 
+  const btnAgregar = document.getElementById('btn-agregar-card');
+  const btnCerrar = document.getElementById('btn-cerrar-modal');
+  const btnWhatsapp = document.getElementById('btn-whatsapp');
+  const btnDonativo = document.getElementById('btn-donativo');
+
+  if (btnAgregar) {
+    btnAgregar.onclick = () => {
+      document.getElementById('modal-agregar-card').style.display = 'flex';
+    };
+  }
+
+  if (btnCerrar) {
+    btnCerrar.onclick = () => {
+      document.getElementById('modal-agregar-card').style.display = 'none';
+    };
+  }
+
+  if (btnWhatsapp) {
+    btnWhatsapp.onclick = () => {
+      const mensaje = `📖 Quiero enviar un versículo`;
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
+    };
+  }
+
+  if (btnDonativo) {
+    btnDonativo.onclick = () => {
+      window.open('https://www.paypal.com/donate/tu-link', '_blank');
+    };
+  }
+
+});
+</script>
 
   
 </body>
