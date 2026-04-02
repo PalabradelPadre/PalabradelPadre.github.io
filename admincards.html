@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Cards</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: linear-gradient(to bottom, #2a1e3b, #3b1f5f);
+  color: white;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: none;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 15px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-add { background: #22c55e; }
+.btn-download { background: #3b82f6; }
+.btn-load { background: #f59e0b; }
+.btn-delete { background: #ef4444; }
+
+.preview { opacity: 0.9; }
+</style>
+</head>
+
+<body>
+
+<div class="container" id="app" style="display:none;">
+
+<h1>✨ Panel de Cards</h1>
+
+<div class="card">
+  <input id="titulo" placeholder="Título">
+  <input id="versiculo" placeholder="Versículo">
+  <textarea id="cita" placeholder="Cita"></textarea>
+  <textarea id="reflexion" placeholder="Reflexión"></textarea>
+
+  <select id="categoria">
+    <option value="paz">Paz</option>
+    <option value="fortaleza">Fortaleza</option>
+    <option value="inspiracion">Inspiración</option>
+    <option value="amor">Amor</option>
+    <option value="fe">Fe</option>
+    <option value="devocion">Devoción</option>
+    <option value="evangelio">Evangelio</option>
+  </select>
+
+  <button class="btn-add" onclick="agregar()">➕ Agregar</button>
+  <button class="btn-download" onclick="descargar()">💾 Descargar JSON</button>
+</div>
+
+<div class="card">
+  <h3>📂 Cargar cards.json existente</h3>
+  <input type="file" id="fileInput" accept=".json">
+</div>
+
+<h2>👀 Preview</h2>
+<div id="preview"></div>
+
+<h2>📚 Lista</h2>
+<div id="lista"></div>
+
+</div>
+
+<script>
+// 🔐 CONTRASEÑA
+const PASS = "admin123";
+const input = prompt("🔐 Contraseña:");
+
+if (input !== PASS) {
+  document.body.innerHTML = "<h2 style='text-align:center;margin-top:50px;'>⛔ Acceso denegado</h2>";
+} else {
+  document.getElementById("app").style.display = "block";
+}
+
+// 📦 SOLO MEMORIA (NO localStorage)
+let cards = [];
+
+// 📂 CARGAR JSON
+document.getElementById("fileInput").addEventListener("change", function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    try {
+      cards = JSON.parse(event.target.result);
+      render();
+      alert("✅ JSON cargado");
+    } catch {
+      alert("❌ Error en JSON");
+    }
+  };
+  reader.readAsText(file);
+});
+
+// 👀 PREVIEW
+document.querySelectorAll("input, textarea, select").forEach(el => {
+  el.addEventListener("input", preview);
+});
+
+function preview() {
+  const c = getData();
+  document.getElementById("preview").innerHTML = cardHTML(c);
+}
+
+// 📥 DATA
+function getData() {
+  return {
+    id: generarID(),
+    titulo: titulo.value,
+    versiculo: versiculo.value,
+    cita: cita.value,
+    reflexion: reflexion.value,
+    categoria: categoria.value
+  };
+}
+
+// 🧠 ID automático tipo "paz8"
+function generarID() {
+  const cat = categoria.value;
+  const count = cards.filter(c => c.categoria === cat).length + 1;
+  return cat + count;
+}
+
+// ➕ AGREGAR
+function agregar() {
+  if (!cards.length) {
+    alert("Primero carga tu cards.json");
+    return;
+  }
+
+  const c = getData();
+
+  if (!c.titulo || !c.cita) {
+    alert("Faltan campos");
+    return;
+  }
+
+  cards.push(c);
+  render();
+  limpiar();
+}
+
+// 📃 RENDER
+function render() {
+  const cont = document.getElementById("lista");
+  cont.innerHTML = "";
+
+  cards.forEach((c, i) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = cardHTML(c);
+
+    const btn = document.createElement("button");
+    btn.textContent = "Eliminar";
+    btn.className = "btn-delete";
+    btn.onclick = () => {
+      cards.splice(i, 1);
+      render();
+    };
+
+    div.appendChild(btn);
+    cont.appendChild(div);
+  });
+}
+
+// 🎨 CARD
+function cardHTML(c) {
+  return `
+    <div class="preview">
+      <h3>${c.titulo}</h3>
+      <small>${c.versiculo}</small>
+      <p><b>${c.cita}</b></p>
+      <p>${c.reflexion}</p>
+      <span>📂 ${c.categoria}</span>
+    </div>
+  `;
+}
+
+// 🧹 LIMPIAR
+function limpiar() {
+  titulo.value = "";
+  versiculo.value = "";
+  cita.value = "";
+  reflexion.value = "";
+  preview();
+}
+
+// ⬇️ DESCARGAR
+function descargar() {
+  const blob = new Blob(
+    [JSON.stringify(cards, null, 2)],
+    { type: "application/json" }
+  );
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "cards.json";
+  a.click();
+}
+
+// INIT
+preview();
+</script>
+
+</body>
+</html>
