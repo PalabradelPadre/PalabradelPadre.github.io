@@ -844,6 +844,154 @@ function actualizarUI() {
 </script>
   
   
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // 🔎 Esperar a que el botón exista (porque lo creas dinámicamente)
+  function esperarBoton(callback) {
+    const intervalo = setInterval(() => {
+      const btn = document.querySelector('div[style*="position: fixed"][style*="75px"]');
+      if (btn) {
+        clearInterval(intervalo);
+        callback(btn);
+      }
+    }, 300);
+  }
+
+  esperarBoton((btn) => {
+
+    // =========================
+    // 🟣 1. TEXTO "Versículos"
+    // =========================
+    if (!btn.querySelector('.label-versiculos')) {
+      const label = document.createElement('div');
+      label.innerText = 'Versículos';
+      label.className = 'label-versiculos';
+
+      Object.assign(label.style, {
+        fontSize: '10px',
+        color: '#fff',
+        marginTop: '2px',
+        opacity: '0.9'
+      });
+
+      btn.appendChild(label);
+    }
+
+    // =========================
+    // 🟣 2. TOAST PREMIUM
+    // =========================
+    const toast = document.createElement('div');
+
+    Object.assign(toast.style, {
+      position: 'fixed',
+      top: '80px',
+      left: '50%',
+      transform: 'translateX(-50%) translateY(-20px)',
+      background: 'linear-gradient(135deg, rgba(40,40,60,0.85), rgba(20,20,30,0.85))',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      color: '#fff',
+      padding: '18px 22px',
+      borderRadius: '20px',
+      maxWidth: '90%',
+      width: '380px',
+      boxShadow: '0 15px 40px rgba(0,0,0,0.6)',
+      opacity: '0',
+      pointerEvents: 'none',
+      transition: 'all 0.4s ease',
+      zIndex: '99999',
+      border: '1px solid rgba(255,255,255,0.2)'
+    });
+
+    const icono = document.createElement('div');
+    icono.innerText = '📖';
+    icono.style.fontSize = '22px';
+    icono.style.marginBottom = '6px';
+
+    const titulo = document.createElement('div');
+    titulo.style.fontWeight = 'bold';
+    titulo.style.marginBottom = '6px';
+    titulo.style.fontSize = '15px';
+
+    const texto = document.createElement('div');
+    texto.style.fontSize = '14px';
+    texto.style.lineHeight = '1.4';
+    texto.style.opacity = '0.95';
+
+    toast.appendChild(icono);
+    toast.appendChild(titulo);
+    toast.appendChild(texto);
+    document.body.appendChild(toast);
+
+    function mostrarToast(t, m) {
+      titulo.innerText = t || 'Palabra del Padre';
+      texto.innerText = m || '';
+
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      toast.style.pointerEvents = 'auto';
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-20px)';
+        toast.style.pointerEvents = 'none';
+      }, 5000);
+    }
+
+    // =========================
+    // 🟣 3. INTERCEPTAR NOTIFICACIONES
+    // =========================
+
+    const OriginalNotification = window.Notification;
+
+    // Override elegante
+    window.Notification = function(titulo, options) {
+
+      if (document.visibilityState === 'visible') {
+        mostrarToast(titulo, options?.body);
+      }
+
+      return new OriginalNotification(titulo, options);
+    };
+
+    window.Notification.permission = OriginalNotification.permission;
+    window.Notification.requestPermission = OriginalNotification.requestPermission.bind(OriginalNotification);
+
+    // =========================
+    // 🟣 4. CLICK → MOSTRAR ÚLTIMO VERSÍCULO
+    // =========================
+
+    let ultimoTitulo = '';
+    let ultimoMensaje = '';
+
+    // Interceptar también desde tu lógica interna
+    const originalMostrar = window.mostrarNotificacion;
+
+    if (typeof originalMostrar === 'function') {
+      window.mostrarNotificacion = function(t, m, c) {
+        ultimoTitulo = t;
+        ultimoMensaje = m;
+
+        if (document.visibilityState === 'visible') {
+          mostrarToast(t, m);
+        }
+
+        return originalMostrar(t, m, c);
+      };
+    }
+
+    btn.addEventListener('click', () => {
+      if (ultimoMensaje) {
+        mostrarToast(ultimoTitulo, ultimoMensaje);
+      }
+    });
+
+  });
+
+});
+</script>
+
   
 </body>
 </html>
