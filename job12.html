@@ -1060,18 +1060,19 @@ Hola 🙏 quiero agregar un nuevo versículo:
 </script>
 
 
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
+
   const espacioHeader = 120;
 
-  // Lista de aportes
+  // Lista de aportes (ejemplo)
   let aportes = JSON.parse(localStorage.getItem('aportes')) || [];
 
   // =========================
-  // CÍRCULO 🙏
+  // BOTÓN 🙏
   // =========================
-  const circle = document.createElement('div');
-  Object.assign(circle.style, {
+  const boton = document.createElement('div');
+  Object.assign(boton.style, {
     position: 'fixed',
     top: espacioHeader + 'px',
     left: '20px',
@@ -1089,18 +1090,18 @@ document.addEventListener('DOMContentLoaded', () => {
     color: '#333',
     transition: 'transform 0.3s ease',
   });
-  circle.innerText = '🙏';
-  document.body.appendChild(circle);
+  boton.innerText = '🙏';
+  document.body.appendChild(boton);
 
-  // Pulso suave
+  // Pulso animado
   let scaleUp = true;
   setInterval(() => {
-    circle.style.transform = scaleUp ? 'scale(1.15)' : 'scale(1)';
+    boton.style.transform = scaleUp ? 'scale(1.15)' : 'scale(1)';
     scaleUp = !scaleUp;
   }, 800);
 
   // =========================
-  // VENTANA FLOTA
+  // VENTANA DONACIÓN
   // =========================
   const ventana = document.createElement('div');
   Object.assign(ventana.style, {
@@ -1114,18 +1115,16 @@ document.addEventListener('DOMContentLoaded', () => {
     color: '#333',
     fontSize: '14px',
     boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
-    opacity: '0',
     transform: 'translateY(-20px)',
     transition: 'all 0.35s ease',
     zIndex: '9998',
-    display: 'flex',
+    display: 'none', // empieza oculta
     flexDirection: 'column',
     gap: '8px',
-    pointerEvents: 'auto'
+    pointerEvents: 'auto',
   });
   document.body.appendChild(ventana);
 
-  // Función para actualizar ventana
   function actualizarVentana() {
     ventana.innerHTML = '';
 
@@ -1140,8 +1139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       fontWeight: '700'
     });
     cerrarBtn.onclick = () => {
-      ventana.style.opacity = '0';
-      ventana.style.transform = 'translateY(-20px)';
+      ventana.style.display = 'none';
     };
     ventana.appendChild(cerrarBtn);
 
@@ -1149,13 +1147,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const msg = document.createElement('div');
     if (aportes.length === 0) {
       msg.innerHTML = `<strong>🙌 Aún nadie ha aportado 🙏</strong><br>
-      Tu apoyo mantiene viva la app, cualquier contribución ayuda 💛`;
+        Tu apoyo mantiene viva la app, cualquier contribución ayuda 💛`;
     } else {
       msg.innerHTML = `<strong>Gracias a quienes ya apoyaron 💛</strong>`;
     }
     ventana.appendChild(msg);
 
-    // Lista de aportes
+    // Lista aportes
     aportes.forEach(aporte => {
       const div = document.createElement('div');
       div.style.display = 'flex';
@@ -1185,20 +1183,20 @@ document.addEventListener('DOMContentLoaded', () => {
     ventana.appendChild(btn);
   }
 
-  // Mostrar ventana
   function mostrarVentana() {
     actualizarVentana();
+    ventana.style.display = 'flex';
     ventana.style.opacity = '1';
     ventana.style.transform = 'translateY(0)';
   }
 
-  // Click círculo → siempre muestra ventana
-  circle.addEventListener('click', mostrarVentana);
+  // Click en el botón siempre muestra ventana
+  boton.addEventListener('click', mostrarVentana);
 
-  // Aparición automática cada 2 minutos
+  // Mostrar ocasionalmente cada 2 minutos
   setInterval(() => {
     mostrarVentana();
-  }, 120000); 
+  }, 120000);
 });
 </script>
   
