@@ -1059,16 +1059,18 @@ Hola 🙏 quiero agregar un nuevo versículo:
 });
 </script>
 
-<script>
+
+  <script>
 document.addEventListener('DOMContentLoaded', () => {
 
   // =========================
   // 📊 CONFIG
   // =========================
-  const aportes = JSON.parse(localStorage.getItem('aportes')) || []; 
-  const espacioHeader = 120; // bajar un poco el toast para no tapar header
-  const intervaloToast = 25000; // aparece cada 25 segundos
-  let toastCerrado = false; // para no reaparecer si se cierra
+  const aportes = JSON.parse(localStorage.getItem('aportes')) || [];
+  const espacioHeader = 120; // bajar toast para no tapar header
+  const intervaloToast = 25000; // toast automático cada 25 seg
+  const intervaloCirculo = 15000; // círculo aparece/desaparece cada 15 seg
+  let toastCerrado = false;
 
   // =========================
   // 🔵 CÍRCULO INTERACTIVO 🙏
@@ -1086,14 +1088,14 @@ document.addEventListener('DOMContentLoaded', () => {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: '#facc15', // amarillo brillante
-    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    background: '#facc15',
+    transition: 'transform 0.3s ease, opacity 0.5s ease, box-shadow 0.3s ease',
     boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
     fontSize: '24px',
     color: '#333',
-    fontWeight: '700'
+    fontWeight: '700',
+    opacity: '0'
   });
-
   circleContainer.innerText = '🙏';
   document.body.appendChild(circleContainer);
 
@@ -1149,7 +1151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const msg = document.createElement('div');
     if (aportes.length === 0) {
       msg.innerHTML = `<strong>🙌 Aún nadie ha aportado 🙏</strong><br>
-        Tu ayuda mantiene viva la app, cualquier contribución suma 💛`;
+        Tu apoyo mantiene viva la app, cualquier contribución ayuda 💛`;
     } else {
       msg.innerHTML = `<strong>Gracias a quienes ya apoyaron 💛</strong>`;
     }
@@ -1191,28 +1193,41 @@ document.addEventListener('DOMContentLoaded', () => {
   // 🔁 MOSTRAR TOAST
   // =========================
   function mostrarToast() {
-    if (!toastCerrado) {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateY(0)';
-      setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(-20px)';
-      }, 5000);
-    }
+    toastCerrado = false;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-20px)';
+    }, 5000);
   }
 
-  // Click en círculo para mostrar toast
+  // =========================
+  // 👆 CLICK EN CÍRCULO
+  // =========================
   circleContainer.onclick = () => {
     mostrarToast();
-    circleContainer.style.transform = 'scale(1.2)';
+    circleContainer.style.transform = 'scale(1.2) rotate(20deg)';
     circleContainer.style.boxShadow = '0 10px 25px rgba(0,0,0,0.35)';
     setTimeout(() => {
-      circleContainer.style.transform = 'scale(1)';
+      circleContainer.style.transform = 'scale(1) rotate(0deg)';
       circleContainer.style.boxShadow = '0 6px 18px rgba(0,0,0,0.25)';
     }, 200);
   };
 
-  // reaparece automáticamente cada intervalo
+  // =========================
+  // 🔄 ANIMACIÓN APARECER / DESAPARECER CÍRCULO
+  // =========================
+  let circuloVisible = false;
+  setInterval(() => {
+    circuloVisible = !circuloVisible;
+    circleContainer.style.opacity = circuloVisible ? '1' : '0';
+    circleContainer.style.transform = circuloVisible ? 'scale(1) rotate(0deg)' : 'scale(0.5) rotate(-180deg)';
+  }, intervaloCirculo);
+
+  // =========================
+  // 🔁 TOAST AUTOMÁTICO
+  // =========================
   setInterval(() => mostrarToast(), intervaloToast);
 
 });
