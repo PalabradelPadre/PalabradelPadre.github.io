@@ -1059,16 +1059,11 @@ Hola 🙏 quiero agregar un nuevo versículo:
 });
 </script>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-
-  // =========================
-  // CONFIG
-  // =========================
   const aportes = JSON.parse(localStorage.getItem('aportes')) || [];
-  const espacioHeader = 120; // para no tapar header/buscador
-  const intervaloToast = 60000; // toast automático cada 60 seg
+  const espacioHeader = 120;
+  const intervaloToast = 90000; // cada 90 seg
   let toastCerrado = false;
 
   // =========================
@@ -1090,14 +1085,13 @@ document.addEventListener('DOMContentLoaded', () => {
     boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
     zIndex: '9999',
     fontSize: '24px',
-    fontWeight: '700',
     color: '#333',
     transition: 'transform 0.3s ease',
   });
   circle.innerText = '🙏';
   document.body.appendChild(circle);
 
-  // Pulsación suave constante
+  // Pulsación suave
   let scaleUp = true;
   setInterval(() => {
     circle.style.transform = scaleUp ? 'scale(1.15)' : 'scale(1)';
@@ -1125,13 +1119,18 @@ document.addEventListener('DOMContentLoaded', () => {
     zIndex: '9998',
     display: 'flex',
     flexDirection: 'column',
-    gap: '8px'
+    gap: '8px',
+    pointerEvents: 'auto'
   });
   document.body.appendChild(toast);
 
+  // =========================
+  // FUNCIONES
+  // =========================
   function actualizarToast() {
     toast.innerHTML = '';
 
+    // Cerrar
     const cerrarBtn = document.createElement('span');
     cerrarBtn.innerHTML = '✖';
     Object.assign(cerrarBtn.style, {
@@ -1148,6 +1147,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     toast.appendChild(cerrarBtn);
 
+    // Mensaje
     const msg = document.createElement('div');
     if (aportes.length === 0) {
       msg.innerHTML = `<strong>🙌 Aún nadie ha aportado 🙏</strong><br>
@@ -1157,6 +1157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     toast.appendChild(msg);
 
+    // Lista de aportes
     aportes.forEach(aporte => {
       const div = document.createElement('div');
       div.style.display = 'flex';
@@ -1166,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', () => {
       toast.appendChild(div);
     });
 
+    // Botón donar
     const btn = document.createElement('button');
     btn.innerText = '💛 Aportar / Donar';
     Object.assign(btn.style, {
@@ -1182,8 +1184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     toast.appendChild(btn);
   }
 
-  actualizarToast();
-
   function mostrarToast() {
     if (toastCerrado) return;
     toast.style.opacity = '1';
@@ -1195,9 +1195,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =========================
-  // CLICK CÍRCULO → DONAR
+  // CLICK CÍRCULO → MOSTRAR TOAST
   // =========================
   circle.addEventListener('click', () => {
+    actualizarToast();
     mostrarToast();
   });
 
@@ -1205,10 +1206,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // TOAST AUTOMÁTICO
   // =========================
   setInterval(() => {
-    mostrarToast();
+    if (!toastCerrado) {
+      actualizarToast();
+      mostrarToast();
+    }
   }, intervaloToast);
 
 });
 </script>
+  
 </body>
 </html>
