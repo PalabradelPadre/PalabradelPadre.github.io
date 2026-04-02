@@ -1059,8 +1059,7 @@ Hola 🙏 quiero agregar un nuevo versículo:
 });
 </script>
 
-
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
 
   // =========================
@@ -1068,44 +1067,34 @@ document.addEventListener('DOMContentLoaded', () => {
   // =========================
   const aportes = JSON.parse(localStorage.getItem('aportes')) || []; 
   const espacioHeader = 120; // bajar un poco el toast para no tapar header
-  const intervaloToast = 20000; // aparece cada 20 segundos
+  const intervaloToast = 25000; // aparece cada 25 segundos
   let toastCerrado = false; // para no reaparecer si se cierra
 
   // =========================
-  // 🔵 CÍRCULO INTERACTIVO
+  // 🔵 CÍRCULO INTERACTIVO 🙏
   // =========================
   const circleContainer = document.createElement('div');
   Object.assign(circleContainer.style, {
     position: 'fixed',
     top: espacioHeader + 'px',
     left: '20px',
-    width: '72px',
-    height: '72px',
+    width: '56px',
+    height: '56px',
     borderRadius: '50%',
     cursor: 'pointer',
     zIndex: '9999',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'conic-gradient(#60a5fa, #a78bfa, #60a5fa)',
-    transition: 'transform 0.3s ease',
-    boxShadow: '0 6px 18px rgba(0,0,0,0.3)'
+    background: '#facc15', // amarillo brillante
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+    fontSize: '24px',
+    color: '#333',
+    fontWeight: '700'
   });
 
-  const avatar = document.createElement('div');
-  avatar.innerText = '🙏';
-  Object.assign(avatar.style, {
-    width: '80%',
-    height: '80%',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '28px',
-    background: '#ffffff',
-  });
-
-  circleContainer.appendChild(avatar);
+  circleContainer.innerText = '🙏';
   document.body.appendChild(circleContainer);
 
   // =========================
@@ -1114,7 +1103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toast = document.createElement('div');
   Object.assign(toast.style, {
     position: 'fixed',
-    top: (espacioHeader + 90) + 'px',
+    top: (espacioHeader + 80) + 'px',
     left: '30px',
     width: '300px',
     padding: '14px',
@@ -1156,6 +1145,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     toast.appendChild(cerrarBtn);
 
+    // Mensaje principal
     const msg = document.createElement('div');
     if (aportes.length === 0) {
       msg.innerHTML = `<strong>🙌 Aún nadie ha aportado 🙏</strong><br>
@@ -1211,11 +1201,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // click en círculo para mostrar toast
+  // Click en círculo para mostrar toast
   circleContainer.onclick = () => {
     mostrarToast();
-    circleContainer.style.transform = 'scale(1.15)';
-    setTimeout(() => circleContainer.style.transform = 'scale(1)', 200);
+    circleContainer.style.transform = 'scale(1.2)';
+    circleContainer.style.boxShadow = '0 10px 25px rgba(0,0,0,0.35)';
+    setTimeout(() => {
+      circleContainer.style.transform = 'scale(1)';
+      circleContainer.style.boxShadow = '0 6px 18px rgba(0,0,0,0.25)';
+    }, 200);
   };
 
   // reaparece automáticamente cada intervalo
@@ -1223,6 +1217,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-  
+    
 </body>
 </html>
