@@ -716,23 +716,25 @@ window.addEventListener('load', () => {
   // =========================
   const toast = document.createElement('div');
 
-  Object.assign(toast.style, {
-    position: 'fixed',
-    top: '40px',
-    left: '50%',
-    transform: 'translateX(-50%) translateY(-60px) scale(0.95)',
-    background: 'linear-gradient(135deg, #ffffff, #f1f5ff)',
-    color: '#111',
-    padding: '16px',
-    borderRadius: '18px',
-    width: '340px',
-    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-    opacity: '0',
-    zIndex: '99999',
-    transition: 'all 0.45s cubic-bezier(.22,1,.36,1)',
-    border: '1px solid rgba(0,0,0,0.05)'
-  });
-
+Object.assign(toast.style, {
+  position: 'fixed',
+  top: '20px',
+  left: '50%',
+  transform: 'translateX(-50%) translateY(-80px) scale(0.92)',
+  background: 'rgba(255,255,255,0.75)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  color: '#111',
+  padding: '16px',
+  borderRadius: '22px',
+  width: '92%',
+  maxWidth: '360px',
+  boxShadow: '0 25px 60px rgba(0,0,0,0.25)',
+  opacity: '0',
+  zIndex: '99999',
+  transition: 'all 0.5s cubic-bezier(.22,1,.36,1)',
+  border: '1px solid rgba(255,255,255,0.4)'
+});
   // 📖 ICONO
   const icono = document.createElement('div');
   icono.innerText = '📖';
@@ -765,29 +767,22 @@ window.addEventListener('load', () => {
   let hideTimeout;
 
   function mostrarToast(t, m) {
-    titulo.innerText = t || 'Palabra del Padre';
-    texto.innerText = m || '';
+  titulo.innerText = t || 'Palabra del Padre';
+  texto.innerText = m || '';
 
-    toast.style.opacity = '1';
-    toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0) scale(1)';
 
-    clearTimeout(hideTimeout);
-    hideTimeout = setTimeout(cerrarToast, 5000);
-  }
+  toast.style.boxShadow = '0 30px 80px rgba(0,0,0,0.35)';
 
-  function cerrarToast() {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) translateY(-60px) scale(0.95)';
-  }
+  clearTimeout(hideTimeout);
+  hideTimeout = setTimeout(cerrarToast, 5000);
+}
 
-  // 👉 SWIPE PARA CERRAR
-  let startY = 0;
-  let currentY = 0;
-
-  toast.addEventListener('touchstart', e => {
-    startY = e.touches[0].clientY;
-  });
-
+function cerrarToast() {
+  toast.style.opacity = '0';
+  toast.style.transform = 'translateX(-50%) translateY(-80px) scale(0.92)';
+}
   toast.addEventListener('touchmove', e => {
     currentY = e.touches[0].clientY;
     let diff = currentY - startY;
