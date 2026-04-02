@@ -1059,7 +1059,6 @@ Hola 🙏 quiero agregar un nuevo versículo:
 });
 </script>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -1067,155 +1066,102 @@ document.addEventListener('DOMContentLoaded', () => {
   // 📊 CONFIG
   // =========================
   const aportes = JSON.parse(localStorage.getItem('aportes')) || []; // {nombre, tipo, foto}
+  const intervaloToast = 10000; // reaparece cada 10 segundos
+  const espacioHeader = 80; // espacio desde top para no tapar header
 
   // =========================
-  // 🌟 CONTENEDOR BOTÓN
+  // 🍋 CONTENEDOR TOAST
   // =========================
-  const container = document.createElement('div');
-
-  Object.assign(container.style, {
+  const toast = document.createElement('div');
+  Object.assign(toast.style, {
     position: 'fixed',
-    top: '20px', // Subido al inicio
-    left: '20px',
-    width: '72px',
-    height: '72px',
-    borderRadius: '50%',
-    zIndex: '9999',
-    cursor: 'pointer',
-    transition: 'all 0.4s ease'
-  });
-
-  // =========================
-  // 🔵 CÍRCULO
-  // =========================
-  const circle = document.createElement('div');
-
-  Object.assign(circle.style, {
-    width: '100%',
-    height: '100%',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    animation: 'spin 10s linear infinite',
-    background: 'conic-gradient(#60a5fa, #a78bfa, #60a5fa)'
-  });
-
-  // =========================
-  // 🖼️ AVATAR
-  // =========================
-  const avatar = document.createElement('div');
-  avatar.innerText = '🙏';
-
-  Object.assign(avatar.style, {
-    width: '80%',
-    height: '80%',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '24px',
-    background: '#fff',
-    color: '#333'
-  });
-
-  circle.appendChild(avatar);
-  container.appendChild(circle);
-
-  // =========================
-  // 💬 CARD INFO
-  // =========================
-  const card = document.createElement('div');
-
-  Object.assign(card.style, {
-    position: 'absolute',
-    top: '80px', // justo debajo del botón
-    left: '0',
-    width: '250px',
+    top: espacioHeader + 'px',
+    left: '30px',
+    width: '300px',
     padding: '14px',
-    borderRadius: '18px',
-    background: 'rgba(255,255,255,0.95)',
+    borderRadius: '15px',
+    background: '#ffffffcc',
     color: '#333',
-    fontSize: '13px',
+    fontSize: '14px',
+    boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
     opacity: '0',
-    transform: 'translateY(10px)',
-    transition: 'all 0.3s ease',
-    boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+    transform: 'translateY(-20px)',
+    transition: 'all 0.35s ease',
+    zIndex: '9999',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px'
   });
-
-  container.appendChild(card);
-  document.body.appendChild(container);
+  document.body.appendChild(toast);
 
   // =========================
-  // 🧾 MOSTRAR APORTES
+  // 🧾 FUNCION ACTUALIZAR TOAST
   // =========================
-  function actualizarUI() {
-    card.innerHTML = ''; // limpiar primero
+  function actualizarToast() {
+    toast.innerHTML = ''; // limpiar
 
-    if(aportes.length === 0){
-      card.innerHTML = `<strong>Nadie ha aportado todavía 🙏</strong>`;
-      return;
+    // Mensaje principal
+    const msg = document.createElement('div');
+    if (aportes.length === 0) {
+      msg.innerHTML = `<strong>🙌 Aún nadie ha aportado 🙏</strong><br>
+        Tu ayuda mantiene viva la app, cualquier contribución suma 💛`;
+    } else {
+      msg.innerHTML = `<strong>Gracias a quienes ya apoyaron 💛</strong>`;
     }
+    toast.appendChild(msg);
 
-    const header = document.createElement('div');
-    header.innerHTML = `<strong>Gracias a quienes apoyan 💛</strong>`;
-    card.appendChild(header);
-
+    // Lista de aportes si hay
     aportes.forEach(aporte => {
       const div = document.createElement('div');
       div.style.display = 'flex';
       div.style.alignItems = 'center';
-      div.style.marginTop = '6px';
+      div.style.gap = '8px';
       div.innerHTML = `
-        <img src="${aporte.foto || ''}" alt="${aporte.nombre}" width="40" height="40" style="border-radius:50%; margin-right:8px; ${aporte.foto ? '' : 'display:none;'}">
+        ${aporte.foto ? `<img src="${aporte.foto}" alt="${aporte.nombre}" width="32" height="32" style="border-radius:50%">` : ''}
         <span>${aporte.nombre} (${aporte.tipo})</span>
       `;
-      card.appendChild(div);
+      toast.appendChild(div);
     });
+
+    // Botón de donar siempre visible
+    const btn = document.createElement('button');
+    btn.innerText = '💛 Aportar / Donar';
+    Object.assign(btn.style, {
+      padding: '8px 12px',
+      border: 'none',
+      borderRadius: '10px',
+      background: '#facc15',
+      color: '#333',
+      fontWeight: '700',
+      cursor: 'pointer',
+      alignSelf: 'flex-start'
+    });
+    btn.onclick = () => window.open('https://paypal.me/silenciodeSanJose', '_blank');
+    toast.appendChild(btn);
   }
 
-  actualizarUI();
+  actualizarToast();
 
   // =========================
-  // 🔁 APARECER Y DESAPARECER
+  // 🔁 MOSTRAR / OCULTAR TOAST
   // =========================
-  setInterval(() => {
-    card.style.opacity = '1';
-    card.style.transform = 'translateY(0)';
-
+  function mostrarToast() {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
     setTimeout(() => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(10px)';
-    }, 3500);
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-20px)';
+    }, 5000);
+  }
 
-  }, 6000);
+  // mostrar al cargar
+  mostrarToast();
 
-  // =========================
-  // 👆 CLICK → PREGUNTA DONAR
-  // =========================
-  container.onclick = () => {
-    const deseaDonar = confirm("¿Quieres apoyar económicamente la app? 🙏");
-    if(deseaDonar){
-      window.open('https://paypal.me/silenciodeSanJose', '_blank');
-    }
-  };
-
-  // =========================
-  // 🎞️ ANIMACIÓN
-  // =========================
-  const style = document.createElement('style');
-  style.innerHTML = `
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-  `;
-  document.head.appendChild(style);
+  // reaparece automáticamente cada intervalo
+  setInterval(() => mostrarToast(), intervaloToast);
 
 });
-</script>  
-
-  
+</script>
   
 </body>
 </html>
