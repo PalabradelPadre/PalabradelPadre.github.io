@@ -1061,10 +1061,11 @@ Hola 🙏 quiero agregar un nuevo versículo:
 
   <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const aportes = JSON.parse(localStorage.getItem('aportes')) || [];
-  const espacioHeader = 120;
-  const intervaloToast = 90000; // cada 90 seg
+  const espacioHeader = 120; // para no cubrir el header
   let toastCerrado = false;
+
+  // Lista de aportes (puedes reemplazar con tu data real)
+  const aportes = JSON.parse(localStorage.getItem('aportes')) || [];
 
   // =========================
   // CÍRCULO 🙏
@@ -1074,24 +1075,24 @@ document.addEventListener('DOMContentLoaded', () => {
     position: 'fixed',
     top: espacioHeader + 'px',
     left: '20px',
-    width: '50px',
-    height: '50px',
+    width: '45px',
+    height: '45px',
     borderRadius: '50%',
     background: '#facc15',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    boxShadow: '0 6px 18px rgba(0,0,0,0.25)',
+    boxShadow: '0 6px 15px rgba(0,0,0,0.25)',
     zIndex: '9999',
-    fontSize: '24px',
+    fontSize: '22px',
     color: '#333',
     transition: 'transform 0.3s ease',
   });
   circle.innerText = '🙏';
   document.body.appendChild(circle);
 
-  // Pulsación suave
+  // Pulso suave
   let scaleUp = true;
   setInterval(() => {
     circle.style.transform = scaleUp ? 'scale(1.15)' : 'scale(1)';
@@ -1104,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const toast = document.createElement('div');
   Object.assign(toast.style, {
     position: 'fixed',
-    top: (espacioHeader + 80) + 'px',
+    top: (espacioHeader + 70) + 'px',
     left: '30px',
     width: '300px',
     padding: '14px',
@@ -1120,13 +1121,10 @@ document.addEventListener('DOMContentLoaded', () => {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-    pointerEvents: 'auto'
+    pointerEvents: 'none' // 👈 importante, solo activo cuando visible
   });
   document.body.appendChild(toast);
 
-  // =========================
-  // FUNCIONES
-  // =========================
   function actualizarToast() {
     toast.innerHTML = '';
 
@@ -1143,6 +1141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cerrarBtn.onclick = () => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(-20px)';
+      toast.style.pointerEvents = 'none';
       toastCerrado = true;
     };
     toast.appendChild(cerrarBtn);
@@ -1151,7 +1150,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const msg = document.createElement('div');
     if (aportes.length === 0) {
       msg.innerHTML = `<strong>🙌 Aún nadie ha aportado 🙏</strong><br>
-        Tu apoyo mantiene viva la app, cualquier contribución ayuda 💛`;
+      Tu apoyo mantiene viva la app, cualquier contribución ayuda 💛`;
     } else {
       msg.innerHTML = `<strong>Gracias a quienes ya apoyaron 💛</strong>`;
     }
@@ -1180,38 +1179,39 @@ document.addEventListener('DOMContentLoaded', () => {
       cursor: 'pointer',
       alignSelf: 'flex-start'
     });
-    btn.onclick = () => window.open('https://paypal.me/silenciodeSanJose', '_blank');
+    btn.onclick = (e) => {
+      e.stopPropagation(); // evita que el clic burbujee al círculo
+      window.open('https://paypal.me/silenciodeSanJose', '_blank');
+    };
     toast.appendChild(btn);
   }
 
   function mostrarToast() {
-    if (toastCerrado) return;
     toast.style.opacity = '1';
     toast.style.transform = 'translateY(0)';
+    toast.style.pointerEvents = 'auto'; // 👈 solo ahora captura clics
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateY(-20px)';
+      toast.style.pointerEvents = 'none'; // 👈 desactiva clics
     }, 5000);
   }
 
-  // =========================
-  // CLICK CÍRCULO → MOSTRAR TOAST
-  // =========================
+  // Click círculo → mostrar toast
   circle.addEventListener('click', () => {
-    actualizarToast();
-    mostrarToast();
+    if (!toastCerrado) {
+      actualizarToast();
+      mostrarToast();
+    }
   });
 
-  // =========================
-  // TOAST AUTOMÁTICO
-  // =========================
+  // Toast automático, menor frecuencia
   setInterval(() => {
     if (!toastCerrado) {
       actualizarToast();
       mostrarToast();
     }
-  }, intervaloToast);
-
+  }, 120000); // cada 2 minutos
 });
 </script>
   
