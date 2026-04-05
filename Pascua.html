@@ -72,7 +72,7 @@ word-wrap: break-word;
 <br>
   <div class="flex flex-col items-center gap-3">
     <button id="apoya-btn" class="btn btn-warning w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform">Apoya y Descarga</button>
-    <button id="descarga-btn" class="btn btn-primary w-48 font-bold text-lg shadow-lg hidden hover:scale-105 transition-transform opacity-0">Descargar Tarjeta</button>
+    <button id="descarga-btn" class="btn btn-primary w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform" style="display:none; opacity:0;">Descargar Tarjeta</button>
   </div>
 
   <!-- html2canvas -->
@@ -87,15 +87,17 @@ word-wrap: break-word;
       nombreOverlay.textContent = nombreInput.value || "Tu Nombre";
     });
 
-    apoyaBtn.addEventListener('click', () => {
-      window.open('https://paypal.me/silenciodeSanJose', '_blank');
+apoyaBtn.addEventListener('click', () => {
+  // Abrir PayPal en nueva pestaña
+  window.open('https://paypal.me/', '_blank');
 
-      setTimeout(() => {
-        apoyaBtn.classList.add('hidden');
-        descargaBtn.classList.remove('hidden');
-        descargaBtn.style.opacity = 1;
-      }, 5000);
-    });
+  // Mostrar el botón de descarga en la misma página después de 5 segundos
+  setTimeout(() => {
+    apoyaBtn.style.display = 'none';      // ocultar botón de apoyo
+    descargaBtn.style.display = 'inline-block'; // mostrar botón de descarga
+    descargaBtn.style.opacity = 1;        // asegurar visibilidad
+  }, 5000);
+});
 
     descargaBtn.addEventListener('click', () => {
       const tarjetaContainer = document.getElementById('tarjeta-container');
