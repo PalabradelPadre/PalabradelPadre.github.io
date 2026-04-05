@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarjeta de Pascua</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to bottom, #fffef5, #fff8e1);
+      font-family: 'Roboto', sans-serif;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+    }
+    #tarjeta-container {
+      position: relative;
+      display: inline-block;
+      max-width: 90%;
+      margin: auto;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+      transition: transform 0.3s;
+    }
+    #tarjeta-container:hover {
+      transform: scale(1.02);
+    }
+    #nombre-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      font-weight: bold;
+      color: #FFD700;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+      text-align: center;
+      pointer-events: none;
+      width: 80%;
+      word-wrap: break-word;
+    }
+    input::placeholder {
+      color: #b28e4a;
+    }
+    #descarga-btn {
+      transition: opacity 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4">
+
+  <h1 class="text-5xl font-bold mb-6 text-center text-yellow-600 drop-shadow-md">Felicita esta Pascua</h1>
+
+  <div class="mb-6 w-full max-w-md">
+    <input id="nombre-input" type="text" class="form-control form-control-lg text-center rounded-lg shadow-sm border-2 border-yellow-300 focus:ring-2 focus:ring-yellow-400 focus:outline-none" placeholder="Escribe tu nombre aquí">
+  </div>
+
+  <div id="tarjeta-container" class="mb-6">
+    <img src="/pascua.png" id="tarjeta-img" class="img-fluid rounded-lg">
+    <div id="nombre-overlay">Tu Nombre</div>
+  </div>
+
+  <div class="flex flex-col items-center gap-3">
+    <button id="apoya-btn" class="btn btn-warning w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform">Apoya y Descarga</button>
+    <button id="descarga-btn" class="btn btn-primary w-48 font-bold text-lg shadow-lg hidden hover:scale-105 transition-transform opacity-0">Descargar Tarjeta</button>
+  </div>
+
+  <!-- html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script>
+    const nombreInput = document.getElementById('nombre-input');
+    const nombreOverlay = document.getElementById('nombre-overlay');
+    const descargaBtn = document.getElementById('descarga-btn');
+    const apoyaBtn = document.getElementById('apoya-btn');
+
+    nombreInput.addEventListener('input', () => {
+      nombreOverlay.textContent = nombreInput.value || "Tu Nombre";
+    });
+
+    apoyaBtn.addEventListener('click', () => {
+      window.open('TU_LINK_DE_PAYPAL_AQUI', '_blank');
+
+      setTimeout(() => {
+        apoyaBtn.classList.add('hidden');
+        descargaBtn.classList.remove('hidden');
+        descargaBtn.style.opacity = 1;
+      }, 5000);
+    });
+
+    descargaBtn.addEventListener('click', () => {
+      const tarjetaContainer = document.getElementById('tarjeta-container');
+      html2canvas(tarjetaContainer).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'tarjeta-pascua.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    });
+  </script>
+
+</body>
+</html>
