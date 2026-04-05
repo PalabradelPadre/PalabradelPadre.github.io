@@ -115,5 +115,43 @@ apoyaBtn.addEventListener('click', () => {
     });
   </script>
 
+<script>
+  // Elementos
+  const nombreInput = document.getElementById('nombre-input');
+  const nombreOverlay = document.getElementById('nombre-overlay');
+  const descargaBtn = document.getElementById('descarga-btn');
+  const tarjetaContainer = document.getElementById('tarjeta-container');
+
+  // Recuperar nombre guardado si existe
+  const nombreGuardado = localStorage.getItem('nombreUsuario');
+  if (nombreGuardado) {
+    nombreInput.value = nombreGuardado;
+    nombreOverlay.textContent = nombreGuardado;
+  }
+
+  // Guardar nombre mientras el usuario escribe
+  nombreInput.addEventListener('input', () => {
+    const valor = nombreInput.value || "Tu Nombre";
+    nombreOverlay.textContent = valor;
+    localStorage.setItem('nombreUsuario', valor);
+  });
+
+  // Cuando descarga la tarjeta, limpiar localStorage
+  descargaBtn.addEventListener('click', () => {
+    // Guardar nombre temporal por si lo necesita html2canvas
+    const nombreActual = nombreInput.value || "Tu Nombre";
+
+    html2canvas(tarjetaContainer).then(canvas => {
+      const link = document.createElement('a');
+      link.download = 'tarjeta-pascua.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+
+      // Limpiar datos guardados de manera segura
+      localStorage.removeItem('nombreUsuario');
+    });
+  });
+</script>
+  
 </body>
 </html>
