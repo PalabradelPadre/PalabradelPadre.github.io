@@ -491,6 +491,7 @@ closeModal.onclick = ()=> modal.style.display='none';
 modal.onclick = e => { if(e.target===modal) modal.style.display='none'; };
 </script>
 
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <script>
@@ -498,7 +499,7 @@ modal.onclick = e => { if(e.target===modal) modal.style.display='none'; };
 const pdfButton = document.createElement('button');
 pdfButton.className = 'pdf-btn';
 pdfButton.title = 'Descargar PDF';
-pdfButton.innerText = '📄';
+pdfButton.innerHTML = '<i class="bi bi-file-earmark-pdf"></i>';  // Cambiar por icono PDF
 document.body.appendChild(pdfButton);
 
 // Estilo del botón PDF
@@ -508,22 +509,28 @@ style.innerHTML = `
     position: fixed;
     bottom: 90px;
     right: 20px;
-    background: #26a69a;
+    background: #007bff;  /* Color más neutro, similar a un azul de Bootstrap */
     color: white;
     border: none;
     border-radius: 50%;
     width: 60px;
     height: 60px;
-    font-size: 26px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    cursor:pointer;
-    box-shadow:0 5px 18px rgba(0,0,0,0.25);
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 5px 18px rgba(0,0,0,0.25);
+    transition: background-color 0.2s ease, transform 0.2s ease;
   }
 
   .pdf-btn:hover {
+    background-color: #0056b3;  /* Azul más oscuro en hover */
     transform: scale(1.1);
+  }
+
+  .pdf-btn i {
+    font-size: 32px; /* Ajustar tamaño del icono */
   }
 `;
 document.head.appendChild(style);
@@ -535,36 +542,39 @@ function generarPDF() {
     return;
   }
 
-  // Crear contenedor temporal
+  // Crear contenedor temporal para el PDF
   const container = document.createElement('div');
   container.style.padding = '20px';
   container.style.fontFamily = 'Inter, sans-serif';
   container.style.background = '#fff';
+  container.style.boxSizing = 'border-box';
 
   // Título
   const title = document.createElement('h2');
   title.innerText = "📓 Libreta Espiritual";
   title.style.textAlign = 'center';
   title.style.color = '#5a2b7f';
+  title.style.marginBottom = '20px';
   container.appendChild(title);
 
-  // Recorrer notas
+  // Recorrer las notas y agregarlas al contenedor
   notes.forEach(n => {
     const noteDiv = document.createElement('div');
     noteDiv.style.margin = '15px 0';
     noteDiv.style.padding = '12px';
     noteDiv.style.borderRadius = '10px';
     noteDiv.style.background = '#f4f2ee';
-    
+    noteDiv.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+
     noteDiv.innerHTML = `
       <strong style="color:#5a2b7f;">${n.date}</strong>
       <p style="margin-top:5px;">${n.text.replace(/\n/g, "<br>")}</p>
     `;
-    
+
     container.appendChild(noteDiv);
   });
 
-  // Configuración PDF
+  // Configuración del PDF
   const opt = {
     margin: 0.5,
     filename: 'Libreta_Espiritual.pdf',
@@ -573,13 +583,13 @@ function generarPDF() {
     jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
   };
 
+  // Generar el PDF y descargarlo
   html2pdf().set(opt).from(container).save();
 }
 
 // Evento al hacer clic en el botón para generar el PDF
 pdfButton.addEventListener('click', generarPDF);
 </script>
-
   
 </body>
 </html>
