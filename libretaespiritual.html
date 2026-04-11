@@ -490,6 +490,96 @@ verseBtn.onclick = ()=> menu.style.display = menu.style.display==='flex' ? 'none
 closeModal.onclick = ()=> modal.style.display='none';
 modal.onclick = e => { if(e.target===modal) modal.style.display='none'; };
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+// Agregar el botón para descargar el PDF
+const pdfButton = document.createElement('button');
+pdfButton.className = 'pdf-btn';
+pdfButton.title = 'Descargar PDF';
+pdfButton.innerText = '📄';
+document.body.appendChild(pdfButton);
+
+// Estilo del botón PDF
+const style = document.createElement('style');
+style.innerHTML = `
+  .pdf-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    background: #26a69a;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 26px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    box-shadow:0 5px 18px rgba(0,0,0,0.25);
+  }
+
+  .pdf-btn:hover {
+    transform: scale(1.1);
+  }
+`;
+document.head.appendChild(style);
+
+// Función para generar el PDF
+function generarPDF() {
+  if (notes.length === 0) {
+    alert("No hay notas para exportar 🙏");
+    return;
+  }
+
+  // Crear contenedor temporal
+  const container = document.createElement('div');
+  container.style.padding = '20px';
+  container.style.fontFamily = 'Inter, sans-serif';
+  container.style.background = '#fff';
+
+  // Título
+  const title = document.createElement('h2');
+  title.innerText = "📓 Libreta Espiritual";
+  title.style.textAlign = 'center';
+  title.style.color = '#5a2b7f';
+  container.appendChild(title);
+
+  // Recorrer notas
+  notes.forEach(n => {
+    const noteDiv = document.createElement('div');
+    noteDiv.style.margin = '15px 0';
+    noteDiv.style.padding = '12px';
+    noteDiv.style.borderRadius = '10px';
+    noteDiv.style.background = '#f4f2ee';
+    
+    noteDiv.innerHTML = `
+      <strong style="color:#5a2b7f;">${n.date}</strong>
+      <p style="margin-top:5px;">${n.text.replace(/\n/g, "<br>")}</p>
+    `;
+    
+    container.appendChild(noteDiv);
+  });
+
+  // Configuración PDF
+  const opt = {
+    margin: 0.5,
+    filename: 'Libreta_Espiritual.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(container).save();
+}
+
+// Evento al hacer clic en el botón para generar el PDF
+pdfButton.addEventListener('click', generarPDF);
+</script>
+
   
 </body>
 </html>
