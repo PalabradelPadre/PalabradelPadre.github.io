@@ -5,116 +5,123 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reflexión y Acompañamiento</title>
 
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
-
-<!-- Bootstrap Icons -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
-  body {
-    background: #f7f4ee;
-  }
+  body { background: #f7f4ee; }
 </style>
 </head>
 
 <body class="text-gray-800">
 
 <!-- HERO -->
-<section class="text-center px-6 py-16">
+<section class="text-center px-6 py-14">
 
-  <h1 class="text-4xl md:text-5xl font-bold text-amber-700">
+  <h1 class="text-4xl font-bold text-amber-700">
     <i class="bi bi-heart-fill text-amber-600"></i>
     Reflexión y Acompañamiento
   </h1>
 
-  <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
-    Un espacio donde puedes compartir tu situación y recibir una reflexión y orientación general basada en tu caso.
+  <p class="mt-3 text-gray-600 max-w-2xl mx-auto">
+    Un espacio para compartir tu situación y recibir una reflexión automática con orientación general.
   </p>
 
-  <!-- CITA BÍBLICA -->
-  <p class="mt-6 text-amber-700 italic text-lg">
+</section>
+
+<!-- CITA BÍBLICA (NUEVA - ANTES DEL FORMULARIO) -->
+<section class="text-center px-6 pb-6">
+
+  <p class="text-amber-700 italic text-lg max-w-2xl mx-auto">
     “Lleven las cargas los unos de los otros.”<br>
     <span class="text-sm text-gray-500">Gálatas 6:2</span>
   </p>
 
 </section>
 
-<!-- FORM -->
-<section class="px-6 py-10 max-w-4xl mx-auto">
+<!-- SELECTOR + RESPUESTA -->
+<section class="max-w-4xl mx-auto px-6">
 
-  <div class="bg-white border shadow-sm p-6 rounded-2xl">
+  <div class="bg-white border shadow-sm rounded-2xl p-6">
 
-    <h2 class="text-2xl font-bold text-amber-700 mb-3">
-      <i class="bi bi-chat-dots text-amber-600"></i> Comparte tu situación
-    </h2>
+    <label class="font-semibold text-amber-700">
+      ¿En qué situación te encuentras?
+    </label>
 
-    <p class="text-gray-600 mb-6">
-      Completa el formulario para recibir una respuesta automática con reflexión y orientación general.
-    </p>
+    <select id="categoria" class="w-full mt-3 p-3 border rounded-xl">
 
-    <iframe
-      src="TU_GOOGLE_FORM_URL?embedded=true"
-      class="w-full h-[650px] rounded-xl border">
-    </iframe>
+      <option value="">Selecciona una opción</option>
+      <option value="ansiedad">Ansiedad / estrés</option>
+      <option value="tristeza">Tristeza / vacío</option>
+      <option value="decision">Decisiones importantes</option>
+      <option value="energia">Falta de motivación</option>
+      <option value="espiritual">Crecimiento espiritual</option>
 
-  </div>
+    </select>
 
-  <!-- DONACIÓN (MOMENTO CLAVE) -->
-  <div class="mt-6 bg-white border shadow-sm p-6 rounded-2xl text-center">
-
-    <h3 class="text-xl font-bold text-amber-700 mb-3">
-      <i class="bi bi-heart text-amber-600"></i> Apoyo voluntario
-    </h3>
-
-    <p class="text-gray-600 mb-4">
-      Tu apoyo permite dedicar más tiempo a algunos casos para una búsqueda más profunda de reflexión y acompañamiento.
-    </p>
-
-    <a href="TU_PAYPAL_LINK"
-       class="inline-block bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl font-semibold">
-      Apoyar
-    </a>
+    <button onclick="mostrarRespuesta()"
+      class="mt-4 bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl w-full">
+      Ver reflexión
+    </button>
 
   </div>
 
-</section>
+  <!-- RESPUESTA -->
+  <div id="respuesta" class="hidden mt-6 bg-white border shadow-sm rounded-2xl p-6">
 
-<!-- PROCESO -->
-<section class="px-6 py-10 max-w-4xl mx-auto">
-
-  <div class="bg-white border shadow-sm p-6 rounded-2xl">
-
-    <h2 class="text-2xl font-bold text-amber-700 mb-4">
-      <i class="bi bi-info-circle text-amber-600"></i> Cómo funciona
+    <h2 class="text-xl font-bold text-amber-700 mb-3">
+      ✨ Reflexión
     </h2>
 
-    <div class="text-gray-600 space-y-2">
-      <p>1. Envías tu situación.</p>
-      <p>2. Recibes una respuesta automática con reflexión general.</p>
-      <p>3. En algunos casos, si hay disponibilidad, se puede realizar una búsqueda más profunda.</p>
-      <p>4. La profundidad depende del tiempo disponible.</p>
+    <p id="texto" class="text-gray-700"></p>
+
+    <!-- DONACIÓN -->
+    <div class="mt-6 border-t pt-4 text-center">
+
+      <p class="text-gray-600 text-sm mb-3">
+        Tu apoyo permite dedicar más tiempo a algunos casos y sostener este espacio.
+      </p>
+
+      <a href="TU_PAYPAL_LINK"
+         class="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2 rounded-xl inline-block">
+        Apoyar
+      </a>
+
+    </div>
+
+    <!-- EMAIL -->
+    <div class="mt-4 text-center">
+
+      <p class="text-gray-600 text-sm mb-2">
+        ¿Quieres una búsqueda más profunda?
+      </p>
+
+      <a id="correo" href="#"
+         class="text-amber-700 underline text-sm">
+        Escribir para apoyo personalizado
+      </a>
+
     </div>
 
   </div>
 
 </section>
 
-<!-- COMUNIDAD -->
-<section class="px-6 py-10 max-w-4xl mx-auto">
+<!-- ORACIÓN -->
+<section class="max-w-4xl mx-auto px-6 py-10">
 
-  <div class="bg-white border shadow-sm p-6 rounded-2xl text-center">
+  <div class="bg-white border shadow-sm rounded-2xl p-6 text-center">
 
-    <h2 class="text-2xl font-bold text-amber-700 mb-3">
-      <i class="bi bi-people text-amber-600"></i> Comunidad de acompañamiento
+    <h2 class="text-2xl font-bold text-amber-700">
+      🙏 Comunidad de oración
     </h2>
 
-    <p class="text-gray-600 mb-6">
-      Puedes unirte a la comunidad donde compartimos apoyo e intenciones de oración.
+    <p class="text-gray-600 mt-2 mb-4">
+      Puedes unirte a la comunidad para compartir intenciones y acompañamiento.
     </p>
 
     <a href="TU_GRUPO_FACEBOOK_URL"
-       class="inline-block bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl font-semibold">
+       class="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-xl inline-block">
       Unirme a la comunidad
     </a>
 
@@ -122,29 +129,29 @@
 
 </section>
 
-<!-- TRANSPARENCIA -->
-<section class="px-6 py-6 max-w-4xl mx-auto text-center">
+<!-- ORACIÓN PERSONAL -->
+<section class="max-w-4xl mx-auto px-6">
 
-  <p class="text-gray-500 text-sm">
-    Este servicio es un espacio de acompañamiento y reflexión personal.
-    No sustituye la dirección espiritual ni profesional.
-  </p>
+  <div class="bg-white border shadow-sm rounded-2xl p-6 text-center">
+
+    <h2 class="text-xl font-bold text-amber-700">
+      🌿 Oración
+    </h2>
+
+    <p class="text-gray-600 mt-2">
+      Señor, acompaña a cada persona que llega a este espacio. Dales paz, luz y fortaleza en su camino. Amén.
+    </p>
+
+  </div>
 
 </section>
 
-<!-- CIERRE -->
-<section class="text-center px-6 py-10">
+<!-- TRANSPARENCIA -->
+<section class="text-center px-6 py-6">
 
   <p class="text-gray-500 text-sm max-w-2xl mx-auto">
-    Gracias por compartir tu situación. Este espacio existe para acompañar y ofrecer reflexión y apoyo.
+    Este espacio ofrece acompañamiento y reflexión. No sustituye dirección espiritual ni profesional.
   </p>
-
-  <div class="mt-4">
-    <a href="TU_PAYPAL_LINK"
-       class="text-amber-600 hover:text-amber-500 underline text-sm">
-      Apoyar este proyecto
-    </a>
-  </div>
 
 </section>
 
@@ -152,6 +159,43 @@
 <footer class="text-center text-gray-500 text-sm py-10">
   ✨ Servicio de acompañamiento y reflexión
 </footer>
+
+<script>
+function mostrarRespuesta() {
+
+  const cat = document.getElementById("categoria").value;
+  const box = document.getElementById("respuesta");
+  const text = document.getElementById("texto");
+  const mail = document.getElementById("correo");
+
+  let contenido = "";
+
+  if(cat === "ansiedad"){
+    contenido = "La ansiedad puede ser pesada, pero no estás solo. 'El Señor está cerca de los quebrantados de corazón' (Salmo 34:18).";
+  }
+
+  if(cat === "tristeza"){
+    contenido = "Incluso en el vacío, hay esperanza. 'El Señor es mi luz y mi salvación' (Salmo 27:1).";
+  }
+
+  if(cat === "decision"){
+    contenido = "Pide sabiduría y camina con calma. No todo se resuelve con prisa.";
+  }
+
+  if(cat === "energia"){
+    contenido = "Pequeños pasos también son avance. No te detengas.";
+  }
+
+  if(cat === "espiritual"){
+    contenido = "El crecimiento espiritual es un proceso continuo, no inmediato.";
+  }
+
+  text.innerText = contenido;
+  box.classList.remove("hidden");
+
+  mail.href = "mailto:tuemail@gmail.com?subject=Apoyo%20personalizado&body=Quiero%20una%20orientacion%20mas%20profunda%20sobre%20mi%20caso.";
+}
+</script>
 
 </body>
 </html>
