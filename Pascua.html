@@ -25,7 +25,6 @@
       font-family: 'Playfair Display', serif;
     }
 
-    /* HEADER */
     #topbar {
       position: fixed;
       top: 0;
@@ -48,7 +47,6 @@
       text-decoration: none;
     }
 
-    /* TARJETA (ESTILO ORIGINAL RESTAURADO) */
     #tarjeta-container {
       position: relative;
       display: inline-block;
@@ -59,23 +57,23 @@
       box-shadow: 0 12px 24px rgba(0,0,0,0.25);
     }
 
- #cita-overlay {
-  position: absolute;
-  top: 4%; /* 👈 más arriba */
-  left: 50%;
-  transform: translateX(-50%); /* 👈 quitamos el -50% vertical */
-  font-size: 2.2rem;
-  line-height: 1.2;
-  font-weight: 700;
-  font-family: 'Playfair Display', serif;
-  color: #DAA520;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-  text-align: center;
-  width: 90%;
-  word-wrap: break-word;
-  pointer-events: none;
-  white-space: pre-line;
-}
+    #cita-overlay {
+      position: absolute;
+      top: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.2rem;
+      line-height: 1.2;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: #DAA520;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 90%;
+      word-wrap: break-word;
+      pointer-events: none;
+      white-space: pre-line;
+    }
 
     .versiculo-btn {
       background: linear-gradient(to bottom, #fffef5, #fff8e1);
@@ -108,7 +106,6 @@
 
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-  <!-- HEADER RESTAURADO -->
   <div id="topbar">
     <div style="font-weight:600; color:#5a3d00;">
       Tarjetas Bíblicas
@@ -123,16 +120,13 @@
     Diseña y comparte tu tarjeta
   </h1>
 
-  <!-- LISTA -->
   <div id="lista-versiculos" class="mb-4"></div>
 
-  <!-- TARJETA -->
   <div id="tarjeta-container">
     <img src="https://palabradelpadre.github.io/pascua3.png" class="img-fluid rounded-lg">
     <div id="cita-overlay">Selecciona un versículo</div>
   </div>
 
-  <!-- DONACIÓN (FOOTER RESTAURADO) -->
   <div class="flex flex-col items-center gap-3 mt-4">
 
     <button id="apoya-btn" class="btn btn-warning w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform">
@@ -143,6 +137,10 @@
       style="display:none; opacity:0;">
       Descargar Tarjeta
     </button>
+
+    <p class="text-xs text-yellow-700 text-center">
+      Donación sugerida: $3 MXN
+    </p>
 
     <p id="leyenda-donar" class="text-sm text-yellow-600 mt-2 text-center">
       Después de donar, regresa a esta página para descargar tu tarjeta. ¡Dios te multiplique!
@@ -169,6 +167,12 @@
     const apoyaBtn = document.getElementById('apoya-btn');
     const descargaBtn = document.getElementById('descarga-btn');
 
+    function activarDescarga() {
+      apoyaBtn.style.display = 'none';
+      descargaBtn.style.display = 'inline-block';
+      descargaBtn.style.opacity = 1;
+    }
+
     versiculos.forEach(v => {
       const btn = document.createElement('button');
       btn.className = 'versiculo-btn';
@@ -189,13 +193,18 @@
       overlay.textContent = `${v.text}\n${v.ref}`;
     }
 
+    // 🔥 SOLUCIÓN AL PROBLEMA DE PAYPAL
+    if (localStorage.getItem('donacionIniciada')) {
+      activarDescarga();
+    }
+
     apoyaBtn.addEventListener('click', () => {
+      localStorage.setItem('donacionIniciada', 'true');
+
       window.open('https://www.paypal.com/paypalme/silenciodeSanJose', '_blank');
 
       setTimeout(() => {
-        apoyaBtn.style.display = 'none';
-        descargaBtn.style.display = 'inline-block';
-        descargaBtn.style.opacity = 1;
+        activarDescarga();
       }, 5000);
     });
 
@@ -205,6 +214,9 @@
         link.download = 'tarjeta-biblica.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
+
+        // limpiar estado después de descargar
+        localStorage.removeItem('donacionIniciada');
       });
     });
   </script>
