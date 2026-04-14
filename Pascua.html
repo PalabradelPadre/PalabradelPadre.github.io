@@ -59,23 +59,23 @@
       box-shadow: 0 12px 24px rgba(0,0,0,0.25);
     }
 
-    #cita-overlay {
-      position: absolute;
-      top: 7%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2.2rem;
-      line-height: 1.2;
-      font-weight: 700;
-      font-family: 'Playfair Display', serif;
-      color: #DAA520;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-      text-align: center;
-      width: 90%;
-      word-wrap: break-word;
-      pointer-events: none;
-      white-space: pre-line;
-    }
+ #cita-overlay {
+  position: absolute;
+  top: 4%; /* 👈 más arriba */
+  left: 50%;
+  transform: translateX(-50%); /* 👈 quitamos el -50% vertical */
+  font-size: 2.2rem;
+  line-height: 1.2;
+  font-weight: 700;
+  font-family: 'Playfair Display', serif;
+  color: #DAA520;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  text-align: center;
+  width: 90%;
+  word-wrap: break-word;
+  pointer-events: none;
+  white-space: pre-line;
+}
 
     .versiculo-btn {
       background: linear-gradient(to bottom, #fffef5, #fff8e1);
