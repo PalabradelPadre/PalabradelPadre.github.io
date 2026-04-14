@@ -27,28 +27,23 @@
     #topbar {
       position: fixed;
       top: 0;
-      left: 0;
       width: 100%;
       height: 55px;
       background: rgba(255, 248, 225, 0.95);
-      backdrop-filter: blur(6px);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 16px;
-      z-index: 1000;
       border-bottom: 1px solid rgba(0,0,0,0.08);
     }
 
     #home-btn {
       font-size: 1.4rem;
       color: #5a3d00;
-      text-decoration: none;
     }
 
     #tarjeta-container {
       position: relative;
-      display: inline-block;
       max-width: 90%;
       margin: 80px auto 20px;
       border-radius: 16px;
@@ -67,97 +62,60 @@
       font-weight: 700;
       font-family: 'Playfair Display', serif;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-      line-height: 1.2;
       white-space: pre-line;
-      pointer-events: none;
-      transition: font-size 0.3s ease;
     }
 
     .versiculo-btn {
-      background: linear-gradient(to bottom, #fffef5, #fff8e1);
+      background: #fff8e1;
       border: 2px solid #d4af37;
-      color: #5a3d00;
-      padding: 10px 12px;
+      padding: 10px;
       border-radius: 10px;
-      font-size: 0.95rem;
-      font-family: 'Roboto', sans-serif;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 100%;
       text-align: left;
-      width: 100%;
+      margin-bottom: 8px;
     }
 
-    #donacion-info {
-      font-size: 0.9rem;
-      color: #b8860b;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    #contador {
-      font-size: 0.85rem;
-      color: #8a6d1a;
-      text-align: center;
-      margin-top: 5px;
-    }
-
-    .bloqueado {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    #lista-versiculos {
-      max-width: 850px;
-      width: 100%;
-      display: grid;
-      gap: 10px;
-      margin-bottom: 20px;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 
-<body class="flex flex-col items-center justify-center min-h-screen p-4">
+<body class="flex flex-col items-center p-4">
 
   <!-- HEADER -->
   <div id="topbar">
-    <div style="font-weight:600; color:#5a3d00;">
-      Tarjetas Bíblicas
-    </div>
-
+    <div style="font-weight:600;">Tarjetas Bíblicas</div>
     <a id="home-btn" href="https://palabradelpadre.github.io">
       <i class="bi bi-house-fill"></i>
     </a>
   </div>
 
-  <h1 class="text-4xl md:text-5xl font-bold mb-3 text-center text-yellow-700 mt-16">
+  <h1 class="text-4xl text-center mt-16 text-yellow-700">
     Diseña y comparte tu tarjeta
   </h1>
 
-  <div id="lista-versiculos"></div>
+  <!-- LISTA -->
+  <div id="lista-versiculos" class="w-full max-w-2xl mt-4"></div>
 
   <!-- TARJETA -->
   <div id="tarjeta-container">
-    <img src="https://palabradelpadre.github.io/pascua3.png" class="img-fluid rounded-lg">
+    <img src="https://palabradelpadre.github.io/pascua3.png" class="img-fluid">
     <div id="cita-overlay">Selecciona un versículo</div>
   </div>
 
-  <!-- DONACIÓN -->
-  <div class="flex flex-col items-center gap-2 mt-4">
+  <!-- BOTONES -->
+  <div class="text-center mt-4">
 
-    <button id="apoya-btn" class="btn btn-warning w-48 font-bold text-lg shadow-lg">
-      Apoya con $3 MXN
+    <button id="apoya-btn" class="btn btn-warning w-48">
+      Apoya y Descarga
     </button>
 
-    <button id="descarga-btn" class="btn btn-primary w-48 font-bold text-lg shadow-lg bloqueado">
-      🔒 Descargar Tarjeta
+    <button id="descarga-btn" class="btn btn-primary w-48 hidden">
+      Descargar Tarjeta
     </button>
 
-    <div id="contador">
-      El botón se desbloqueará después de abrir PayPal
-    </div>
-
-    <p id="donacion-info">
+    <p id="mensaje" class="mt-2 text-yellow-700 text-sm">
       Donación sugerida: $3 MXN
     </p>
 
@@ -178,65 +136,39 @@
 
     const lista = document.getElementById('lista-versiculos');
     const overlay = document.getElementById('cita-overlay');
-    const tarjeta = document.getElementById('tarjeta-container');
-    const apoyaBtn = document.getElementById('apoya-btn');
     const descargaBtn = document.getElementById('descarga-btn');
-    const contador = document.getElementById('contador');
-
-    function ajustarFuente(texto) {
-      const len = texto.length;
-      let size = 2.4;
-
-      if (len > 120) size = 1.4;
-      else if (len > 80) size = 1.7;
-      else if (len > 50) size = 2.0;
-      else size = 2.4;
-
-      overlay.style.fontSize = size + "rem";
-    }
+    const apoyaBtn = document.getElementById('apoya-btn');
+    const mensaje = document.getElementById('mensaje');
 
     versiculos.forEach(v => {
       const btn = document.createElement('button');
       btn.className = 'versiculo-btn';
-      btn.innerHTML = `<strong>${v.text}</strong><br><span style="font-size:0.85rem; opacity:0.7">${v.ref}</span>`;
-
+      btn.innerHTML = `<strong>${v.text}</strong><br><small>${v.ref}</small>`;
       btn.onclick = () => {
-        const texto = `${v.text}\n${v.ref}`;
-        overlay.textContent = texto;
-        ajustarFuente(v.text);
+        overlay.textContent = `${v.text}\n${v.ref}`;
       };
-
       lista.appendChild(btn);
     });
 
-    apoyaBtn.addEventListener('click', () => {
+    apoyaBtn.onclick = () => {
       window.open('https://www.paypal.com/paypalme/silenciodeSanJose', '_blank');
 
-      let time = 5;
-      contador.textContent = `Esperando activación... ${time}s`;
+      mensaje.textContent = "El botón se desbloqueará en 5 segundos mientras realizas el donativo...";
 
-      const interval = setInterval(() => {
-        time--;
-        contador.textContent = `Esperando activación... ${time}s`;
+      setTimeout(() => {
+        descargaBtn.classList.remove('hidden');
+        mensaje.textContent = "¡Ya puedes descargar tu tarjeta!";
+      }, 5000);
+    };
 
-        if (time <= 0) {
-          clearInterval(interval);
-          descargaBtn.classList.remove('bloqueado');
-          contador.textContent = "¡Descarga activada!";
-        }
-      }, 1000);
-    });
-
-    descargaBtn.addEventListener('click', () => {
-      if (descargaBtn.classList.contains('bloqueado')) return;
-
-      html2canvas(tarjeta).then(canvas => {
+    descargaBtn.onclick = () => {
+      html2canvas(document.getElementById('tarjeta-container')).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'tarjeta-biblica.png';
-        link.href = canvas.toDataURL('image/png');
+        link.download = 'tarjeta.png';
+        link.href = canvas.toDataURL();
         link.click();
       });
-    });
+    };
   </script>
 
 </body>
