@@ -1,95 +1,137 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Servicio de Reflexión y Oración</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reflexión y Acompañamiento</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 
-  <style>
-    body {
-      background: radial-gradient(circle at top, #0b1220, #05070d);
-    }
-  </style>
+<style>
+  body {
+    background: radial-gradient(circle at top, #0f172a, #05070d);
+  }
+</style>
 </head>
 
 <body class="text-white">
 
 <!-- HERO -->
 <section class="text-center px-6 py-20">
-  <h1 class="text-4xl md:text-5xl font-bold">
-    🙏 Reflexión y Oración Católica
+
+  <h1 class="text-4xl md:text-5xl font-bold text-amber-200">
+    🙏 Reflexión y Acompañamiento
   </h1>
 
   <p class="mt-4 text-gray-300 max-w-2xl mx-auto">
-    Recibe una reflexión basada en la Biblia, santos y el Magisterio, y comparte tu intención de oración con la comunidad.
+    Comparte tu situación y recibe una respuesta automática con reflexión y orientación general según tu caso.
   </p>
+
 </section>
 
-<!-- SERVICIO PRINCIPAL -->
+<!-- FORM + CTA -->
 <section class="px-6 py-10 max-w-4xl mx-auto">
 
-  <div class="bg-white/5 p-6 rounded-2xl">
-    <h2 class="text-2xl font-bold mb-3">🧠 Servicio de Reflexión Personalizada</h2>
+  <div class="bg-white/5 border border-amber-200/20 p-6 rounded-2xl">
 
-    <p class="text-gray-400 mb-6">
-      Escribe tu situación y recibirás una recopilación de versículos, enseñanzas y reflexiones basadas en fuentes católicas.
-      No es dirección espiritual, sino una búsqueda guiada de contenido relevante.
+    <h2 class="text-2xl font-bold text-amber-100 mb-3">
+      🧠 Comparte tu situación
+    </h2>
+
+    <p class="text-gray-300 mb-6">
+      Completa el formulario para recibir una respuesta automática con reflexión y orientación.
     </p>
 
-    <!-- GOOGLE FORM -->
     <iframe
       src="TU_GOOGLE_FORM_URL?embedded=true"
-      class="w-full h-[650px] rounded-xl">
+      class="w-full h-[650px] rounded-xl bg-white">
     </iframe>
+
   </div>
 
-</section>
+  <!-- DONACIÓN INMEDIATA (POST FORM - CLAVE) -->
+  <div class="mt-6 bg-white/5 border border-amber-200/20 p-6 rounded-2xl text-center">
 
-<!-- ORACIÓN -->
-<section class="px-6 py-10 max-w-4xl mx-auto">
+    <h3 class="text-xl font-bold text-amber-100 mb-3">
+      💙 Apoyo voluntario
+    </h3>
 
-  <div class="bg-white/5 p-6 rounded-2xl">
-    <h2 class="text-2xl font-bold mb-3">🙏 Comunidad de Oración</h2>
-
-    <p class="text-gray-400 mb-6">
-      Comparte tu intención de oración o únete al grupo donde oramos juntos.
-    </p>
-
-    <a href="TU_GRUPO_FACEBOOK_URL"
-       target="_blank"
-       class="inline-block bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-semibold">
-      Ir al grupo de oración
-    </a>
-  </div>
-
-</section>
-
-<!-- DONACIÓN -->
-<section class="px-6 py-10 max-w-4xl mx-auto text-center">
-
-  <div class="bg-white/5 p-6 rounded-2xl">
-
-    <h2 class="text-2xl font-bold mb-3">💙 Apoya esta misión</h2>
-
-    <p class="text-gray-400 mb-6">
-      Si este servicio te ayuda, puedes apoyar voluntariamente para que pueda dedicar más tiempo a cada caso.
+    <p class="text-gray-300 mb-4">
+      Si este espacio te ayuda, puedes apoyar voluntariamente. Esto permite dedicar más tiempo a algunos casos para una búsqueda más profunda.
     </p>
 
     <a href="TU_PAYPAL_LINK"
        target="_blank"
        class="inline-block bg-green-500 hover:bg-green-600 px-6 py-3 rounded-xl font-semibold">
-      Donar
+      Apoyar
     </a>
 
   </div>
 
 </section>
 
+<!-- PROCESO CLARO -->
+<section class="px-6 py-10 max-w-4xl mx-auto">
+
+  <div class="bg-white/5 border border-amber-200/20 p-6 rounded-2xl">
+
+    <h2 class="text-2xl font-bold text-amber-100 mb-4">
+      📖 Cómo funciona
+    </h2>
+
+    <div class="text-gray-300 space-y-2">
+      <p>1. Envías tu situación.</p>
+      <p>2. Recibes una respuesta automática con reflexión general.</p>
+      <p>3. En algunos casos, si hay disponibilidad, se puede realizar una búsqueda más profunda.</p>
+      <p>4. La profundidad depende del tiempo disponible.</p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- COMUNIDAD -->
+<section class="px-6 py-10 max-w-4xl mx-auto">
+
+  <div class="bg-white/5 border border-amber-200/20 p-6 rounded-2xl text-center">
+
+    <h2 class="text-2xl font-bold text-amber-100 mb-3">
+      🙏 Comunidad de acompañamiento
+    </h2>
+
+    <p class="text-gray-300 mb-6">
+      Puedes unirte a la comunidad donde compartimos intenciones y apoyo mutuo.
+    </p>
+
+    <a href="TU_GRUPO_FACEBOOK_URL"
+       target="_blank"
+       class="inline-block bg-amber-500 hover:bg-amber-600 text-black px-6 py-3 rounded-xl font-semibold">
+      Unirme a la comunidad
+    </a>
+
+  </div>
+
+</section>
+
+<!-- SEGUNDO CTA SUAVE -->
+<section class="text-center px-6 py-10">
+
+  <p class="text-gray-400 text-sm max-w-2xl mx-auto">
+    Este servicio se mantiene gracias al apoyo voluntario de quienes desean contribuir a que más personas reciban acompañamiento.
+  </p>
+
+  <div class="mt-4">
+    <a href="TU_PAYPAL_LINK"
+       class="text-green-400 hover:text-green-300 underline text-sm">
+      Apoyar este proyecto
+    </a>
+  </div>
+
+</section>
+
 <!-- FOOTER -->
-<footer class="text-center text-gray-500 text-sm py-10">
-  🙏 Basado en Escritura, tradición católica y reflexión espiritual
+<footer class="text-center text-gray-600 text-sm py-10">
+  ✨ Servicio de acompañamiento y reflexión
 </footer>
 
 </body>
