@@ -3,153 +3,211 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tarjeta de Pascua</title>
-  <!-- Tailwind CSS -->
+
+  <title>Diseña y comparte tu tarjeta bíblica</title>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
+
   <style>
     body {
       background: linear-gradient(to bottom, #fffef5, #fff8e1);
       font-family: 'Roboto', sans-serif;
     }
+
     h1 {
       font-family: 'Playfair Display', serif;
     }
+
+    /* HEADER */
+    #topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 55px;
+      background: rgba(255, 248, 225, 0.95);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    #home-btn {
+      font-size: 1.4rem;
+      color: #5a3d00;
+      text-decoration: none;
+    }
+
+    /* TARJETA (ESTILO ORIGINAL RESTAURADO) */
     #tarjeta-container {
       position: relative;
       display: inline-block;
       max-width: 90%;
-      margin: auto;
+      margin: 80px auto 20px;
       border-radius: 16px;
       overflow: hidden;
       box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-      transition: transform 0.3s;
     }
-    #tarjeta-container:hover {
+
+    #cita-overlay {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2.2rem;
+      line-height: 1.2;
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      color: #DAA520;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+      text-align: center;
+      width: 90%;
+      word-wrap: break-word;
+      pointer-events: none;
+      white-space: pre-line;
+    }
+
+    .versiculo-btn {
+      background: linear-gradient(to bottom, #fffef5, #fff8e1);
+      border: 2px solid #d4af37;
+      color: #5a3d00;
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-family: 'Roboto', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: left;
+      width: 100%;
+    }
+
+    .versiculo-btn:hover {
       transform: scale(1.02);
     }
-#nombre-overlay {
-position: absolute;
-  top: 33%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 3rem;
-  line-height: 1.2;
-  font-weight: 700;
-  font-family: 'Playfair Display', serif;
-  color: #DAA520; /* Color dorado sólido */
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
-  text-align: center;
-  pointer-events: none;
-  width: 90%;
-  word-wrap: break-word;
-}
-    input::placeholder {
-      color: #b28e4a;
-    }
-    #descarga-btn {
-      transition: opacity 0.5s ease-in-out;
+
+    #lista-versiculos {
+      max-width: 850px;
+      width: 100%;
+      display: grid;
+      gap: 10px;
+      margin-bottom: 20px;
     }
   </style>
 </head>
+
 <body class="flex flex-col items-center justify-center min-h-screen p-4">
 
-  <h1 class="text-5xl font-bold mb-6 text-center text-yellow-600 drop-shadow-md">Felicita esta Pascua</h1>
+  <!-- HEADER RESTAURADO -->
+  <div id="topbar">
+    <div style="font-weight:600; color:#5a3d00;">
+      Tarjetas Bíblicas
+    </div>
 
-  <div class="mb-6 w-full max-w-md">
-    <input id="nombre-input" type="text" class="form-control form-control-lg text-center rounded-lg shadow-sm border-2 border-yellow-300 focus:ring-2 focus:ring-yellow-400 focus:outline-none" placeholder="Escribe tu nombre aquí">
+    <a id="home-btn" href="https://palabradelpadre.github.io">
+      <i class="bi bi-house-fill"></i>
+    </a>
   </div>
 
-  <div id="tarjeta-container" class="mb-6">
-    <img src="/Pascua2.png" id="tarjeta-img" class="img-fluid rounded-lg">
-    <div id="nombre-overlay">Tu Nombre</div>
+  <h1 class="text-4xl md:text-5xl font-bold mb-3 text-center text-yellow-700 drop-shadow-md mt-16">
+    Diseña y comparte tu tarjeta
+  </h1>
+
+  <!-- LISTA -->
+  <div id="lista-versiculos" class="mb-4"></div>
+
+  <!-- TARJETA -->
+  <div id="tarjeta-container">
+    <img src="https://palabradelpadre.github.io/pascua3.png" class="img-fluid rounded-lg">
+    <div id="cita-overlay">Selecciona un versículo</div>
   </div>
-<br>
-  <div class="flex flex-col items-center gap-3">
-    <button id="apoya-btn" class="btn btn-warning w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform">Apoya y Descarga</button>
-    <button id="descarga-btn" class="btn btn-primary w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform" style="display:none; opacity:0;">Descargar Tarjeta</button>
+
+  <!-- DONACIÓN (FOOTER RESTAURADO) -->
+  <div class="flex flex-col items-center gap-3 mt-4">
+
+    <button id="apoya-btn" class="btn btn-warning w-48 font-bold text-lg shadow-lg hover:scale-105 transition-transform">
+      Apoya y Descarga
+    </button>
+
+    <button id="descarga-btn" class="btn btn-primary w-48 font-bold text-lg shadow-lg"
+      style="display:none; opacity:0;">
+      Descargar Tarjeta
+    </button>
 
     <p id="leyenda-donar" class="text-sm text-yellow-600 mt-2 text-center">
-  Después de donar, regresa a esta página para descargar tu tarjeta por favor. !Dios te multiplique!.
-</p>
-  
+      Después de donar, regresa a esta página para descargar tu tarjeta. ¡Dios te multiplique!
+    </p>
+
   </div>
 
-  <!-- html2canvas -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script>
-    const nombreInput = document.getElementById('nombre-input');
-    const nombreOverlay = document.getElementById('nombre-overlay');
-    const descargaBtn = document.getElementById('descarga-btn');
-    const apoyaBtn = document.getElementById('apoya-btn');
 
-    nombreInput.addEventListener('input', () => {
-      nombreOverlay.textContent = nombreInput.value || "Tu Nombre";
+  <script>
+    const versiculos = [
+      { ref: "Jeremías 29,11", text: "Porque yo sé los planes que tengo para vosotros." },
+      { ref: "Salmo 23,1", text: "El Señor es mi pastor, nada me falta." },
+      { ref: "Filipenses 4,13", text: "Todo lo puedo en aquel que me fortalece." },
+      { ref: "Juan 14,6", text: "Yo soy el camino, la verdad y la vida." },
+      { ref: "Romanos 8,28", text: "Dios dispone todo para el bien de los que le aman." },
+      { ref: "Mateo 11,28", text: "Venid a mí todos los cansados." },
+      { ref: "Isaías 41,10", text: "No temas, porque yo estoy contigo." }
+    ];
+
+    const lista = document.getElementById('lista-versiculos');
+    const overlay = document.getElementById('cita-overlay');
+    const tarjeta = document.getElementById('tarjeta-container');
+    const apoyaBtn = document.getElementById('apoya-btn');
+    const descargaBtn = document.getElementById('descarga-btn');
+
+    versiculos.forEach(v => {
+      const btn = document.createElement('button');
+      btn.className = 'versiculo-btn';
+
+      btn.innerHTML = `<strong>${v.text}</strong><br><span style="font-size:0.85rem; opacity:0.7">${v.ref}</span>`;
+
+      btn.onclick = () => {
+        overlay.textContent = `${v.text}\n${v.ref}`;
+        localStorage.setItem('versiculo', JSON.stringify(v));
+      };
+
+      lista.appendChild(btn);
     });
 
-apoyaBtn.addEventListener('click', () => {
-  // Abrir PayPal en nueva pestaña
-  window.open('https://www.paypal.com/paypalme/silenciodeSanJose', '_blank');
+    const guardado = localStorage.getItem('versiculo');
+    if (guardado) {
+      const v = JSON.parse(guardado);
+      overlay.textContent = `${v.text}\n${v.ref}`;
+    }
 
-  // Mostrar el botón de descarga en la misma página después de 5 segundos
-  setTimeout(() => {
-    apoyaBtn.style.display = 'none';      // ocultar botón de apoyo
-    descargaBtn.style.display = 'inline-block'; // mostrar botón de descarga
-    descargaBtn.style.opacity = 1;        // asegurar visibilidad
-  }, 5000);
-});
+    apoyaBtn.addEventListener('click', () => {
+      window.open('https://www.paypal.com/paypalme/silenciodeSanJose', '_blank');
+
+      setTimeout(() => {
+        apoyaBtn.style.display = 'none';
+        descargaBtn.style.display = 'inline-block';
+        descargaBtn.style.opacity = 1;
+      }, 5000);
+    });
 
     descargaBtn.addEventListener('click', () => {
-      const tarjetaContainer = document.getElementById('tarjeta-container');
-      html2canvas(tarjetaContainer).then(canvas => {
+      html2canvas(tarjeta).then(canvas => {
         const link = document.createElement('a');
-        link.download = 'tarjeta-pascua.png';
+        link.download = 'tarjeta-biblica.png';
         link.href = canvas.toDataURL('image/png');
         link.click();
       });
     });
   </script>
 
-<script>
-  // Elementos
-  const nombreInput = document.getElementById('nombre-input');
-  const nombreOverlay = document.getElementById('nombre-overlay');
-  const descargaBtn = document.getElementById('descarga-btn');
-  const tarjetaContainer = document.getElementById('tarjeta-container');
-
-  // Recuperar nombre guardado si existe
-  const nombreGuardado = localStorage.getItem('nombreUsuario');
-  if (nombreGuardado) {
-    nombreInput.value = nombreGuardado;
-    nombreOverlay.textContent = nombreGuardado;
-  }
-
-  // Guardar nombre mientras el usuario escribe
-  nombreInput.addEventListener('input', () => {
-    const valor = nombreInput.value || "Tu Nombre";
-    nombreOverlay.textContent = valor;
-    localStorage.setItem('nombreUsuario', valor);
-  });
-
-  // Cuando descarga la tarjeta, limpiar localStorage
-  descargaBtn.addEventListener('click', () => {
-    // Guardar nombre temporal por si lo necesita html2canvas
-    const nombreActual = nombreInput.value || "Tu Nombre";
-
-    html2canvas(tarjetaContainer).then(canvas => {
-      const link = document.createElement('a');
-      link.download = 'tarjeta-pascua.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-
-      // Limpiar datos guardados de manera segura
-      localStorage.removeItem('nombreUsuario');
-    });
-  });
-</script>
-  
 </body>
 </html>
