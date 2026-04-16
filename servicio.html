@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const header = document.createElement("div");
 
   header.innerHTML = `
-    <nav id="iosHeader"
+    <nav
       style="
         position: sticky;
         top: 0;
@@ -246,36 +246,31 @@ document.addEventListener("DOMContentLoaded", function () {
         justify-content: center;
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        background: rgba(255,255,255,0.8);
-        border-bottom: 0.5px solid rgba(0,0,0,0.08);
+        background: rgba(28, 25, 23, 0.85); /* café oscuro elegante */
+        border-bottom: 1px solid rgba(255,255,255,0.05);
       ">
 
-      <!-- Botón estilo iOS -->
-      <button onclick="window.history.back()"
+      <!-- Botón Home -->
+      <button onclick="window.location.href='/'"
         style="
           position: absolute;
           left: 12px;
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
-          gap: 4px;
-          background: transparent;
+          justify-content: center;
+          border-radius: 999px;
           border: none;
-          color: #b45309;
-          font-weight: 500;
-          font-size: 16px;
-        ">
-        <i class="bi bi-arrow-left-short fs-2"></i>
-        Volver
+          background: rgba(255,255,255,0.08);
+          color: #fbbf24; /* ámbar suave */
+          transition: all 0.2s ease;
+        "
+        onmousedown="this.style.transform='scale(0.9)'"
+        onmouseup="this.style.transform='scale(1)'"
+      >
+        <i class="bi bi-house fs-5"></i>
       </button>
-
-      <!-- Título -->
-      <span style="
-        font-weight: 600;
-        font-size: 17px;
-        color: #111;
-      ">
-        Reflexión
-      </span>
 
     </nav>
   `;
@@ -284,6 +279,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+
   
 </body>
 </html>
