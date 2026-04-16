@@ -229,5 +229,61 @@ Frase de santo:
 }
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const header = document.createElement("div");
+
+  header.innerHTML = `
+    <nav id="iosHeader"
+      style="
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        background: rgba(255,255,255,0.8);
+        border-bottom: 0.5px solid rgba(0,0,0,0.08);
+      ">
+
+      <!-- Botón estilo iOS -->
+      <button onclick="window.history.back()"
+        style="
+          position: absolute;
+          left: 12px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          background: transparent;
+          border: none;
+          color: #b45309;
+          font-weight: 500;
+          font-size: 16px;
+        ">
+        <i class="bi bi-arrow-left-short fs-2"></i>
+        Volver
+      </button>
+
+      <!-- Título -->
+      <span style="
+        font-weight: 600;
+        font-size: 17px;
+        color: #111;
+      ">
+        Reflexión
+      </span>
+
+    </nav>
+  `;
+
+  document.body.insertBefore(header, document.body.firstChild);
+
+});
+</script>
+  
 </body>
 </html>
