@@ -229,7 +229,7 @@ Frase de santo:
 }
 </script>
 
-<script>
+  <script>
 document.addEventListener("DOMContentLoaded", function () {
 
   const header = document.createElement("div");
@@ -240,30 +240,67 @@ document.addEventListener("DOMContentLoaded", function () {
         position: sticky;
         top: 0;
         z-index: 1000;
-        height: 56px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        background: rgba(28, 25, 23, 0.85); /* café oscuro elegante */
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+
+        backdrop-filter: blur(22px);
+        -webkit-backdrop-filter: blur(22px);
+
+        background: linear-gradient(
+          to bottom,
+          rgba(40, 37, 34, 0.95),
+          rgba(28, 25, 23, 0.85)
+        );
+
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+
+        box-shadow:
+          0 8px 20px rgba(0,0,0,0.25),   /* sombra externa */
+          inset 0 1px 0 rgba(255,255,255,0.06); /* luz superior */
       ">
 
-      <!-- Botón Home -->
+      <!-- brillo superior (efecto 3D) -->
+      <div style="
+        position:absolute;
+        top:0;
+        left:0;
+        right:0;
+        height:1px;
+        background: linear-gradient(
+          to right,
+          transparent,
+          rgba(255,255,255,0.25),
+          transparent
+        );
+      "></div>
+
+      <!-- Botón -->
       <button onclick="window.location.href='/'"
         style="
           position: absolute;
           left: 12px;
-          width: 36px;
-          height: 36px;
+          width: 38px;
+          height: 38px;
           display: flex;
           align-items: center;
           justify-content: center;
           border-radius: 999px;
           border: none;
-          background: rgba(255,255,255,0.08);
-          color: #fbbf24; /* ámbar suave */
+
+          background: linear-gradient(
+            145deg,
+            rgba(255,255,255,0.12),
+            rgba(255,255,255,0.04)
+          );
+
+          color: #fbbf24;
+
+          box-shadow:
+            0 4px 10px rgba(0,0,0,0.35),
+            inset 0 1px 0 rgba(255,255,255,0.15);
+
           transition: all 0.2s ease;
         "
         onmousedown="this.style.transform='scale(0.9)'"
