@@ -9,53 +9,61 @@
 
 <style>
 body{
-  font-family: sans-serif;
   margin:0;
-  background: linear-gradient(135deg,#1e293b,#0f172a);
+  font-family:-apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(180deg,#1e293b,#0f172a);
   color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:100vh;
 }
 
 .container{
-  width:90%;
+  padding:20px;
   max-width:420px;
+  margin:auto;
+}
+
+.header{
+  text-align:center;
+  margin-bottom:20px;
+  font-weight:600;
+  font-size:18px;
 }
 
 .card{
   background: rgba(255,255,255,0.08);
-  backdrop-filter: blur(15px);
-  border:1px solid rgba(255,255,255,0.2);
-  padding:20px;
+  backdrop-filter: blur(20px);
   border-radius:20px;
-  box-shadow:0 10px 30px rgba(0,0,0,0.4);
-}
-
-h1{
-  text-align:center;
-  font-size:20px;
+  padding:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
 input, textarea{
   width:100%;
-  margin:8px 0;
-  padding:10px;
+  padding:12px;
+  margin-top:10px;
   border-radius:12px;
   border:none;
   outline:none;
+  font-size:14px;
 }
 
 button{
   width:100%;
-  padding:12px;
-  margin-top:10px;
+  margin-top:12px;
+  padding:14px;
   border:none;
   border-radius:999px;
+  font-weight:bold;
+  font-size:15px;
+}
+
+.primary{
   background:#22c55e;
   color:white;
-  font-weight:bold;
+}
+
+.share{
+  background:#3b82f6;
+  color:white;
 }
 
 .preview{
@@ -63,10 +71,7 @@ button{
   padding:15px;
   border-radius:15px;
   background:rgba(255,255,255,0.1);
-}
-
-.share{
-  background:#3b82f6;
+  white-space:pre-line;
 }
 </style>
 </head>
@@ -75,48 +80,56 @@ button{
 
 <div class="container">
 
-  <div class="card">
-    <h1>✝️ Mi Tarjeta de Misa</h1>
+  <div class="header">
+    ✝️ Mi Tarjeta de Misa
+  </div>
 
-    <input id="frase" placeholder="Frase de la homilía">
-    <input id="compromiso" placeholder="Mi compromiso">
+  <div class="card">
+
+    <input id="frase" placeholder="Frase que te llamó la atención">
+    <input id="compromiso" placeholder="Compromiso personal">
     <textarea id="oracion" placeholder="Oración o intención"></textarea>
 
-    <button onclick="generar()">Crear tarjeta</button>
+    <button class="primary" onclick="generar()">Crear tarjeta</button>
 
-    <div class="preview" id="preview" style="display:none;"></div>
+    <div id="preview" class="preview" style="display:none;"></div>
 
     <button class="share" onclick="compartir()">Compartir por WhatsApp</button>
+
   </div>
 
 </div>
 
 <script>
-let textoFinal = "";
+let texto = "";
 
 function generar(){
   const f = document.getElementById("frase").value;
   const c = document.getElementById("compromiso").value;
   const o = document.getElementById("oracion").value;
 
-  textoFinal =
+  texto =
 `✝️ Mi Tarjeta de Misa
 
-📖 Frase:
-${f}
+📖 ${f}
 
-🙏 Compromiso:
-${c}
+🙏 ${c}
 
-💛 Oración:
-${o}`;
+💛 ${o}
 
-  document.getElementById("preview").style.display="block";
-  document.getElementById("preview").innerText = textoFinal;
+Hecho con Mi Tarjeta de Misa`;
+
+  const preview = document.getElementById("preview");
+  preview.style.display="block";
+  preview.innerText = texto;
 }
 
 function compartir(){
-  const url = "https://wa.me/?text=" + encodeURIComponent(textoFinal);
+  if(!texto){
+    alert("Primero crea la tarjeta");
+    return;
+  }
+  const url = "https://wa.me/?text=" + encodeURIComponent(texto);
   window.open(url,"_blank");
 }
 </script>
