@@ -134,7 +134,7 @@
 <!-- TARJETA -->
 <div id="tarjeta-container">
   <img src="https://palabradelpadre.github.io/pascua3.png" style="width:100%;">
-  <div id="cita-overlay">Selecciona un versículo o escribe abajo</div>
+  <div id="cita-overlay">Esribe o selecciona un versículo</div>
 </div>
 
 <!-- BOTÓN -->
@@ -164,10 +164,16 @@ versiculos.forEach(v => {
   btn.className = "versiculo-btn";
   btn.innerHTML = `<strong>${v.text}</strong><br><small>${v.ref}</small>`;
 
-  btn.onclick = () => {
-    textarea.value = "";
-    overlay.textContent = `${v.text}\n${v.ref}`;
-  };
+btn.onclick = () => {
+  const actual = textarea.value.trim();
+
+  const nuevoTexto = actual
+    ? `${actual}\n\n ${v.text}\n ${v.ref}`
+    : `${v.text}\n ${v.ref}`;
+
+  textarea.value = nuevoTexto;
+  overlay.textContent = nuevoTexto;
+};
 
   lista.appendChild(btn);
 });
