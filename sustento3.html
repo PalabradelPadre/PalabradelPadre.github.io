@@ -66,6 +66,7 @@
       text-align: center;
       width: 90%;
       white-space: pre-line;
+      word-break: break-word;
     }
 
     .versiculo-btn {
@@ -99,6 +100,7 @@
       border: 2px solid #d4af37;
       resize: none;
       outline: none;
+      font-family: 'Roboto', sans-serif;
     }
   </style>
 </head>
@@ -124,7 +126,7 @@
     ✨ Escribe lo que aprendiste en la misa
   </p>
 
-  <textarea id="mi-reflexion" rows="3"
+  <textarea id="mi-reflexion" rows="4"
     placeholder="✝️ ¿Qué te dejó la misa de hoy?"></textarea>
 </div>
 
@@ -134,19 +136,20 @@
 <!-- TARJETA -->
 <div id="tarjeta-container">
   <img src="https://palabradelpadre.github.io/pascua3.png" style="width:100%;">
-  <div id="cita-overlay">Esribe o selecciona un versículo</div>
+  <div id="cita-overlay">Escribe o selecciona un versículo</div>
 </div>
 
 <!-- BOTÓN -->
 <div style="margin-top:15px;">
   <button id="descarga-btn" class="btn btn-primary w-48">
-    Crear y compartir
+    Crear y descargar
   </button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script>
+
 const versiculos = [
   { ref: "Jeremías 29,11", text: "Porque yo sé los planes que tengo para vosotros." },
   { ref: "Salmo 23,1", text: "El Señor es mi pastor, nada me falta." },
@@ -158,45 +161,40 @@ const lista = document.getElementById("lista-versiculos");
 const overlay = document.getElementById("cita-overlay");
 const textarea = document.getElementById("mi-reflexion");
 
-// Versículos
+// 🔥 SOLO UNA FUENTE DE VERDAD: textarea
+function actualizar() {
+  overlay.textContent = textarea.value || "Escribe o selecciona un versículo";
+}
+
+// Versículos (REEMPLAZAN, no acumulan caos)
 versiculos.forEach(v => {
   const btn = document.createElement("button");
   btn.className = "versiculo-btn";
   btn.innerHTML = `<strong>${v.text}</strong><br><small>${v.ref}</small>`;
 
-btn.onclick = () => {
-  const actual = textarea.value.trim();
-
-  const nuevoTexto = actual
-    ? `${actual}\n\n ${v.text}\n ${v.ref}`
-    : `${v.text}\n ${v.ref}`;
-
-  textarea.value = nuevoTexto;
-  overlay.textContent = nuevoTexto;
-};
+  btn.onclick = () => {
+    textarea.value = textarea.value.trim()
+  ? `${textarea.value}\n\n${v.text}\n${v.ref}`
+  : `${v.text}\n${v.ref}`;
+    actualizar();
+  };
 
   lista.appendChild(btn);
 });
 
-// Texto libre (misa)
-textarea.addEventListener("input", () => {
-  overlay.textContent = textarea.value || "Selecciona un versículo";
-});
+// escritura libre
+textarea.addEventListener("input", actualizar);
 
-// DESCARGA + COMPARTIR
+// descarga
 document.getElementById("descarga-btn").addEventListener("click", () => {
   html2canvas(document.getElementById("tarjeta-container")).then(canvas => {
     const link = document.createElement("a");
     link.download = "tarjeta-biblica.png";
     link.href = canvas.toDataURL("image/png");
     link.click();
-
-    setTimeout(() => {
-      const msg = encodeURIComponent("Mira lo que aprendí hoy 🙏");
-      window.open(`https://wa.me/?text=${msg}`, "_blank");
-    }, 800);
   });
 });
+
 </script>
 
 </body>
