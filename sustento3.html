@@ -189,7 +189,12 @@ textarea.addEventListener("input", actualizar);
 document.getElementById("descarga-btn").addEventListener("click", () => {
   html2canvas(document.getElementById("tarjeta-container")).then(canvas => {
     const link = document.createElement("a");
-    link.download = "tarjeta-biblica.png";
+    
+    let count = parseInt(localStorage.getItem("count") || "0") + 1;
+localStorage.setItem("count", count);
+
+link.download = `tarjeta-biblica-${count}.png`;
+    
     link.href = canvas.toDataURL("image/png");
     link.click();
   });
